@@ -43,13 +43,14 @@
         android:id="@+id/layoutPosts"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="116dp"
         android:layout_weight="1"
         android:gravity="center"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/gridPosts"
+        app:layout_constraintEnd_toEndOf="@id/imgProfile"
         app:layout_constraintTop_toBottomOf="@id/txtUsername"
-        app:layout_constraintVertical_bias="0.0"
-        tools:layout_editor_absoluteX="90dp">
+        app:layout_constraintVertical_bias="0.0">
 
         <TextView
             android:id="@+id/txtPostCount"

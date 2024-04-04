@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "935281458728",
+    "project_id": "locatemate-cf72b",
+    "storage_bucket": "locatemate-cf72b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:935281458728:android:7de993cad3b507f686bf1d",
+        "android_client_info": {
+          "package_name": "com.example.mbt_locatemate"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6-tNNsSwnI5otFBduNZo_0TlWwmPUfOg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

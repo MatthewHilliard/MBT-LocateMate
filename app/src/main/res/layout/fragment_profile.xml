@@ -6,14 +6,16 @@
     android:layout_height="match_parent"
     tools:context=".ProfileFragment">
 
-    <ImageButton
+    <Button
         android:id="@+id/btnSettings"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_margin="16dp"
-        android:src="@drawable/ic_settings"
-        android:background="?attr/selectableItemBackgroundBorderless" />
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="301dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:text="Settings" />
 
     <ImageView
         android:id="@+id/imgProfile"
@@ -24,7 +26,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:src="@drawable/ic_profile"/>
+        android:src="@drawable/profile"/>
 
     <TextView
         android:id="@+id/txtUsername"
@@ -33,7 +35,7 @@
         android:layout_toEndOf="@id/imgProfile"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="&#64;brinjja"
+        android:text="username"
         android:textSize="18sp"
         android:textStyle="bold"/>
 

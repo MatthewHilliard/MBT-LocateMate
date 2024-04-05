@@ -30,7 +30,9 @@
         android:text="Username"
         app:layout_constraintEnd_toStartOf="@+id/post_guess"
         app:layout_constraintStart_toEndOf="@+id/post_pfp"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:textColor="@color/black"
+        android:fontFamily="@font/fredoka_one"/>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/post_guess"
@@ -51,7 +53,7 @@
 
     <ImageView
         android:id="@+id/post_image"
-        android:layout_width="379dp"
+        android:layout_width="380dp"
         android:layout_height="373dp"
         android:layout_marginStart="12dp"
         android:layout_marginTop="2dp"
@@ -62,5 +64,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/post_pfp" />
+
+    <TextView
+        android:id="@+id/post_caption"
+        android:layout_width="380dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="10dp"
+        android:fontFamily="@font/fredoka_one"
+        android:text="Caption goes here"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/post_image" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

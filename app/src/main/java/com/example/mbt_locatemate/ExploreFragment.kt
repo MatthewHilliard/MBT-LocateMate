@@ -51,7 +51,7 @@ class ExploreFragment: Fragment() {
     }
     private fun generateDummyPosts(): List<Post> {
         val dummyList = mutableListOf<Post>()
-        for (i in 1..20) { // Generate 20 dummy posts
+        for (i in 1..10) {
             val username = "User $i"
             val caption = "This is post number $i"
             dummyList.add(Post(UUID.randomUUID(), username, caption))

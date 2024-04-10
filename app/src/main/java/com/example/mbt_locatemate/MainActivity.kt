@@ -2,13 +2,20 @@ package com.example.mbt_locatemate
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var auth: FirebaseAuth
     private lateinit var bottomNavBar: BottomNavigationView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        auth = Firebase.auth
 
         bottomNavBar = findViewById(R.id.nav_bar)
 
@@ -33,6 +40,24 @@ class MainActivity : AppCompatActivity() {
                     false
                 }
             }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val currentUser = auth.currentUser
+        if (currentUser == null) run {
+            val loginFragment = LoginFragment()
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, loginFragment).commit()
+        }
+    }
+
+    fun showBottomNavBar(show: Boolean) {
+        if (show) {
+            bottomNavBar.visibility = View.VISIBLE
+        } else {
+            bottomNavBar.visibility = View.GONE
         }
     }
 }

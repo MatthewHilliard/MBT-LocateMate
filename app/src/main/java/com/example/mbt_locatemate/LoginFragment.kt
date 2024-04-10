@@ -36,6 +36,8 @@ class LoginFragment: Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_login, container, false)
 
+        (activity as MainActivity).showBottomNavBar(false)
+
         auth = Firebase.auth
         oneTapClient = Identity.getSignInClient(requireContext())
         signInRequest = BeginSignInRequest.builder()
@@ -59,16 +61,6 @@ class LoginFragment: Fragment() {
         }
 
         return view
-    }
-
-    override fun onStart() {
-        super.onStart()
-        val currentUser = auth.currentUser
-        if (currentUser != null) run {
-            val exploreFragment = ExploreFragment()
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, exploreFragment).commit()
-        }
     }
 
     private suspend fun loginUser(view: View) {
@@ -101,4 +93,9 @@ class LoginFragment: Fragment() {
                 }
             }
         }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        (activity as MainActivity).showBottomNavBar(true)
+    }
 }

@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "935281458728-5v98gibnunemgku6qaglbtg3e2gjbs33.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mbt_locatemate",
+            "certificate_hash": "7cf3c9201c00b7ef515c8055edd81d3ed9f0c1fa"
+          }
+        },
+        {
           "client_id": "935281458728-li7hdnbc0feirb35k51f2par38m1eca1.apps.googleusercontent.com",
           "client_type": 3
         }

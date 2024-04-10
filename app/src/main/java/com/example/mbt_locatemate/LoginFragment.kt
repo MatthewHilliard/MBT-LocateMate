@@ -1,7 +1,9 @@
 package com.example.mbt_locatemate
 
 import android.app.Activity.RESULT_OK
+import android.content.ContentValues.TAG
 import android.os.Bundle
+import android.util.Log
 import com.google.android.gms.auth.api.identity.SignInClient
 import android.view.LayoutInflater
 import android.view.View
@@ -19,13 +21,19 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.storage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 class LoginFragment: Fragment() {
     private lateinit var auth: FirebaseAuth
+    private val db = Firebase.firestore
     private var oneTapClient: SignInClient? = null
     private lateinit var signInRequest: BeginSignInRequest
 
@@ -81,7 +89,22 @@ class LoginFragment: Fragment() {
                         val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
                         auth.signInWithCredential(firebaseCredential).addOnCompleteListener{
                             if (it.isSuccessful) {
-                                (activity as MainActivity).bottomNavBar.selectedItemId = R.id.exploreTab
+                                val user = auth.currentUser
+                                if (user !== null) {
+                                    val uid = user.uid
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        val userExists = checkIfUserExists(uid)
+                                        withContext(Dispatchers.Main) {
+                                            if (!userExists) {
+                                                val registerFragment = RegisterFragment()
+                                                parentFragmentManager.beginTransaction().replace(R.id.fragment_container, registerFragment).commit()
+                                            } else {
+                                                (activity as MainActivity).showBottomNavBar(true)
+                                                (activity as MainActivity).bottomNavBar.selectedItemId = R.id.exploreTab
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -91,8 +114,12 @@ class LoginFragment: Fragment() {
             }
         }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        (activity as MainActivity).showBottomNavBar(true)
+    private suspend fun checkIfUserExists(uid: String): Boolean {
+        return try {
+            val querySnapshot = db.collection("users").whereEqualTo("id", uid).get().await()
+            !querySnapshot.isEmpty
+        } catch (e: Exception) {
+            false
+        }
     }
 }

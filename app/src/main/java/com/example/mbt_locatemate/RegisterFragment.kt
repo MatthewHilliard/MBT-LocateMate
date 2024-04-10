@@ -49,9 +49,10 @@ class RegisterFragment : Fragment() {
                         if (user !== null) {
                             val userInfo = hashMapOf(
                                 "id" to user.uid,
-                                "username" to usernameInput.text.toString()
+                                "username" to usernameInput.text.toString(),
+                                "email" to user.email
                             )
-                            db.collection("users").document(usernameInput.text.toString())
+                            db.collection("users").document(user.uid)
                                 .set(userInfo)
                                 .addOnSuccessListener {
                                     Log.d(ContentValues.TAG, "New user document added")

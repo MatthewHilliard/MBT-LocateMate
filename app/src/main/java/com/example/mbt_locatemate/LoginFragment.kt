@@ -81,10 +81,7 @@ class LoginFragment: Fragment() {
                         val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
                         auth.signInWithCredential(firebaseCredential).addOnCompleteListener{
                             if (it.isSuccessful) {
-                                Toast.makeText(requireContext(), "Sign In Complete", Toast.LENGTH_SHORT).show()
-                                val exploreFragment = ExploreFragment()
-                                parentFragmentManager.beginTransaction()
-                                    .replace(R.id.fragment_container, exploreFragment).commit()
+                                (activity as MainActivity).bottomNavBar.selectedItemId = R.id.exploreTab
                             }
                         }
                     }

@@ -10,7 +10,7 @@ import com.google.firebase.auth.auth
 
 class MainActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
-    private lateinit var bottomNavBar: BottomNavigationView
+    lateinit var bottomNavBar: BottomNavigationView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

@@ -12,7 +12,12 @@
           "package_name": "com.example.mbt_locatemate"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "935281458728-li7hdnbc0feirb35k51f2par38m1eca1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB6-tNNsSwnI5otFBduNZo_0TlWwmPUfOg"
@@ -20,7 +25,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "935281458728-li7hdnbc0feirb35k51f2par38m1eca1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

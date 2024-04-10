@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButtonToggleGroup
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 import java.util.UUID
 
 class ExploreFragment: Fragment() {
@@ -17,6 +19,8 @@ class ExploreFragment: Fragment() {
     private lateinit var postRecyclerView: RecyclerView
 
     private lateinit var segmentedButton: MaterialButtonToggleGroup
+
+    val firestore = Firebase.firestore
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -48,20 +48,48 @@
         app:layout_constraintTop_toBottomOf="@+id/usernameText" />
 
     <com.google.android.material.button.MaterialButton
+        android:id="@+id/pickImageButton"
+        android:layout_width="200dp"
+        android:layout_height="80dp"
+        android:layout_marginStart="105dp"
+        android:layout_marginTop="59dp"
+        android:layout_marginEnd="106dp"
+        android:backgroundTint="@color/cool_blue"
+        android:fontFamily="@font/fredoka_one"
+        android:text="Pick Profile Picture"
+        android:textSize="22dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/usernameInput" />
+
+    <ImageView
+        android:id="@+id/profilePicture"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginStart="105dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="106dp"
+        android:src="@drawable/profile_selection"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pickImageButton" />
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/registerButton"
         android:layout_width="180dp"
         android:layout_height="50dp"
         android:layout_marginStart="115dp"
-        android:layout_marginTop="270dp"
+        android:layout_marginTop="29dp"
         android:layout_marginEnd="116dp"
-        android:layout_marginBottom="175dp"
+        android:layout_marginBottom="50dp"
         android:backgroundTint="@color/cool_blue"
         android:fontFamily="@font/fredoka_one"
         android:text="Register"
         android:textSize="22dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/usernameInput" />
+        app:layout_constraintTop_toBottomOf="@+id/profilePicture" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

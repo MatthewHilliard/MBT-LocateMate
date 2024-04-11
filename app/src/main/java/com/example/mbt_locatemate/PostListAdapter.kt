@@ -32,11 +32,12 @@ class PostListAdapter(private var posts: List<Post>) : RecyclerView.Adapter<Post
         private val postUser: TextView = itemView.findViewById(R.id.post_user)
         private val postCaption: TextView = itemView.findViewById(R.id.post_caption)
         private val postImage: ImageView = itemView.findViewById(R.id.post_image)
+        private val pfpImage: ImageView = itemView.findViewById(R.id.post_pfp)
         fun bind(post: Post) {
             postUser.text = post.username
             postCaption.text = post.caption
-            Log.d("PostListAdapter", "Image url is ${post.imgUrl}")
             Picasso.get().load(post.imgUrl).into(postImage)
+            Picasso.get().load(post.pfpUrl).into(pfpImage)
         }
     }
 }

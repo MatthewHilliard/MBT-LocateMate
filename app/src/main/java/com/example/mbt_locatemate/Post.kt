@@ -6,5 +6,6 @@ import java.util.UUID
 data class Post (
     val id: UUID,
     val username:String,
-    val caption:String
+    val caption:String,
+    val imgUrl:String
 )

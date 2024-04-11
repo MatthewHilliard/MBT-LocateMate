@@ -57,15 +57,6 @@ class ExploreFragment: Fragment() {
 
         return view
     }
-    private fun generateDummyPosts(): List<Post> {
-        val dummyList = mutableListOf<Post>()
-        for (i in 1..10) {
-            val username = "@user$i"
-            val caption = "This is post number $i"
-            dummyList.add(Post(UUID.randomUUID(), username, caption))
-        }
-        return dummyList
-    }
 
     private fun loadPosts() {
         db.collection("posts")
@@ -73,16 +64,13 @@ class ExploreFragment: Fragment() {
             .addOnSuccessListener { documents ->
                 val postList = mutableListOf<Post>()
                 for (document in documents) {
-                    Log.d("ExploreFragment", "We are creating this post")
                     val username = document.getString("username") ?: ""
                     val caption = document.getString("caption") ?: ""
-                    val post = Post(UUID.randomUUID(), username, caption)
+                    val imgUrl = document.getString("img_url") ?: ""
+                    val post = Post(UUID.randomUUID(), username, caption, imgUrl)
                     postList.add(post)
                 }
                 adapter.updatePosts(postList)
-            }
-            .addOnFailureListener { exception ->
-                Log.e("ExploreFragment", "Error fetching posts", exception)
             }
     }
 }

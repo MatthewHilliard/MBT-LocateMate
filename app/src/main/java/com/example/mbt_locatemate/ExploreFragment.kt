@@ -41,24 +41,51 @@ class ExploreFragment: Fragment() {
         postRecyclerView.adapter = adapter
 
         segmentedButton = view.findViewById(R.id.segmentedButton)
-
-        segmentedButton.addOnButtonCheckedListener { segmentedButton, checkedId, isChecked ->
-            when (checkedId) {
-                R.id.friendsButton -> {
-
-                }
-                R.id.exploreButton -> {
-
+        segmentedButton.addOnButtonCheckedListener { group, checkedId, isChecked ->
+            if (isChecked) {
+                when (checkedId) {
+                    R.id.friendsButton -> {
+                        loadFriendPosts()
+                    }
+                    R.id.exploreButton -> {
+                        loadAllPosts()
+                    }
                 }
             }
         }
 
-        loadPosts()
-
+        segmentedButton.check(R.id.friendsButton)
         return view
     }
 
-    private fun loadPosts() {
+    private fun loadFriendPosts() {
+        val userId = auth.currentUser?.uid
+        if (userId != null) {
+            db.collection("friends").document(userId)
+                .collection("friend_usernames")
+                .get()
+                .addOnSuccessListener { friendsSnapshot ->
+                    val friendUsernames = friendsSnapshot.documents.map { it.id }
+
+                    db.collection("posts")
+                        .whereIn("username", friendUsernames)
+                        .get()
+                        .addOnSuccessListener { postsSnapshot ->
+                            val postList = mutableListOf<Post>()
+                            for (document in postsSnapshot) {
+                                val username = document.getString("username") ?: ""
+                                val caption = document.getString("caption") ?: ""
+                                val imgUrl = document.getString("img_url") ?: ""
+                                val post = Post(UUID.randomUUID(), username, caption, imgUrl)
+                                postList.add(post)
+                            }
+                            adapter.updatePosts(postList)
+                        }
+                }
+        }
+    }
+
+    private fun loadAllPosts() {
         db.collection("posts")
             .get()
             .addOnSuccessListener { documents ->

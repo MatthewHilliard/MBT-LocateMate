@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -25,6 +26,7 @@ class ExploreFragment: Fragment() {
     private val db = Firebase.firestore
 
     private lateinit var segmentedButton: MaterialButtonToggleGroup
+    private lateinit var friendsButton: ImageView
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -39,6 +41,13 @@ class ExploreFragment: Fragment() {
 
         adapter = PostListAdapter(mutableListOf())
         postRecyclerView.adapter = adapter
+
+        friendsButton = view.findViewById(R.id.friendsIcon)
+        friendsButton.setOnClickListener(){
+            val friendsFragment = FriendsFragment()
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, friendsFragment).commit()
+        }
 
         segmentedButton = view.findViewById(R.id.segmentedButton)
         segmentedButton.addOnButtonCheckedListener { group, checkedId, isChecked ->

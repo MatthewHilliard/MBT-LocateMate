@@ -1,6 +1,7 @@
 package com.example.mbt_locatemate
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import java.util.UUID
 
@@ -18,10 +21,10 @@ class ExploreFragment: Fragment() {
     private lateinit var adapter: PostListAdapter
     private lateinit var postRecyclerView: RecyclerView
 
+    private lateinit var auth: FirebaseAuth
+    private val db = Firebase.firestore
+
     private lateinit var segmentedButton: MaterialButtonToggleGroup
-
-    val firestore = Firebase.firestore
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -32,11 +35,10 @@ class ExploreFragment: Fragment() {
         layoutManager = LinearLayoutManager(requireContext())
         postRecyclerView.layoutManager = layoutManager
 
+        auth = Firebase.auth
+
         adapter = PostListAdapter(mutableListOf())
         postRecyclerView.adapter = adapter
-
-        val dummyPosts = generateDummyPosts()
-        adapter.updatePosts(dummyPosts)
 
         segmentedButton = view.findViewById(R.id.segmentedButton)
 
@@ -51,6 +53,8 @@ class ExploreFragment: Fragment() {
             }
         }
 
+        loadPosts()
+
         return view
     }
     private fun generateDummyPosts(): List<Post> {
@@ -61,5 +65,24 @@ class ExploreFragment: Fragment() {
             dummyList.add(Post(UUID.randomUUID(), username, caption))
         }
         return dummyList
+    }
+
+    private fun loadPosts() {
+        db.collection("posts")
+            .get()
+            .addOnSuccessListener { documents ->
+                val postList = mutableListOf<Post>()
+                for (document in documents) {
+                    Log.d("ExploreFragment", "We are creating this post")
+                    val username = document.getString("username") ?: ""
+                    val caption = document.getString("caption") ?: ""
+                    val post = Post(UUID.randomUUID(), username, caption)
+                    postList.add(post)
+                }
+                adapter.updatePosts(postList)
+            }
+            .addOnFailureListener { exception ->
+                Log.e("ExploreFragment", "Error fetching posts", exception)
+            }
     }
 }

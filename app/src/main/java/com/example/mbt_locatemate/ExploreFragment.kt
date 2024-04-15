@@ -1,13 +1,12 @@
 package com.example.mbt_locatemate
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButtonToggleGroup
@@ -34,6 +33,13 @@ class ExploreFragment: Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_explore, container, false)
         postRecyclerView = view.findViewById(R.id.post_recycler_view)
+        postRecyclerView.addItemDecoration(
+            DividerItemDecoration(
+                postRecyclerView.context,
+                DividerItemDecoration.VERTICAL
+            )
+        )
+
         layoutManager = LinearLayoutManager(requireContext())
         postRecyclerView.layoutManager = layoutManager
 

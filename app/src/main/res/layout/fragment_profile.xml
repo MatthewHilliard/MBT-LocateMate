@@ -33,8 +33,9 @@
         android:layout_marginTop="16dp"
         android:text="username"
         android:textSize="24sp"
-        android:textStyle="normal"
-        android:fontFamily="@font/fredoka_one"
+        android:textStyle="bold"
+        android:fontFamily="@font/poppins"
+        android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="@+id/imgProfile"
         app:layout_constraintStart_toStartOf="@+id/imgProfile"
         app:layout_constraintTop_toBottomOf="@+id/imgProfile" />
@@ -58,16 +59,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="24"
-            android:fontFamily="@font/fredoka_one"
-            android:textSize="20sp"/>
+            android:fontFamily="@font/poppins"
+            android:textSize="20dp"
+            android:textColor="@color/black"/>
 
         <TextView
             android:id="@+id/txPostLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Posts"
-            android:fontFamily="@font/fredoka_one"
-            android:textSize="16sp" />
+            android:fontFamily="@font/poppins"
+            android:textSize="16dp"
+            android:textColor="@color/black"/>
     </LinearLayout>
 
     <LinearLayout
@@ -87,16 +90,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="84"
-            android:fontFamily="@font/fredoka_one"
-            android:textSize="20sp"/>
+            android:fontFamily="@font/poppins"
+            android:textSize="20dp"
+            android:textColor="@color/black"/>
 
         <TextView
             android:id="@+id/txtGuessLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Guesses"
-            android:fontFamily="@font/fredoka_one"
-            android:textSize="16sp" />
+            android:fontFamily="@font/poppins"
+            android:textSize="16dp"
+            android:textColor="@color/black"/>
     </LinearLayout>
 
     <GridView

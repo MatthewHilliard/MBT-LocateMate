@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.tabs.TabItem
 import com.google.android.material.tabs.TabLayout
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -131,7 +130,7 @@ class FriendsFragment : Fragment() {
                                         friendList.add(friend)
                                     }
                                 }
-                                adapter.updateFriends(friendList)
+                                adapter.updateAddFriends(friendList)
                             }
                     }
             }

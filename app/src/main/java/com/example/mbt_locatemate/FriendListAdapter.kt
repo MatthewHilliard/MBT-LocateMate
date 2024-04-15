@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 
 class FriendListAdapter(private var friends: List<Friend>) : RecyclerView.Adapter<FriendListAdapter.ViewHolder>() {
+    private var onAddFriends: Boolean = false
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.list_item_friend, parent, false)
         return ViewHolder(v)
@@ -25,14 +26,35 @@ class FriendListAdapter(private var friends: List<Friend>) : RecyclerView.Adapte
     fun updateFriends(newFriends: List<Friend>) {
         friends = newFriends
         notifyDataSetChanged()
+        onAddFriends = false
+    }
+
+    fun updateAddFriends(newFriends: List<Friend>) {
+        friends = newFriends
+        notifyDataSetChanged()
+        onAddFriends = true
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val friendButton: ImageView = itemView.findViewById(R.id.friendButton)
         private val friendUser: TextView = itemView.findViewById(R.id.friend_user)
         private val pfpImage: ImageView = itemView.findViewById(R.id.pfp_friend)
         fun bind(friend: Friend) {
             friendUser.text = friend.username
             Picasso.get().load(friend.pfpUrl).into(pfpImage)
+            if(onAddFriends){
+                friendButton.setImageResource(R.drawable.baseline_person_add_alt_1_24)
+            } else {
+                friendButton.setImageResource(R.drawable.baseline_person_remove_24)
+            }
+
+            friendButton.setOnClickListener {
+                if (onAddFriends) {
+
+                } else {
+
+                }
+            }
         }
     }
 }

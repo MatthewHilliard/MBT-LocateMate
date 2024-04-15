@@ -78,7 +78,12 @@ class FriendListAdapter(private var friends: List<Friend>) : RecyclerView.Adapte
 
             val emptyData: Map<String, Any> = HashMap()
 
-            friendDocumentRef.set(emptyData)
+            friendDocumentRef.set(emptyData).addOnSuccessListener {
+                val updatedFriendsList = friends.toMutableList()
+                updatedFriendsList.remove(friend)
+
+                updateAddFriends(updatedFriendsList)
+            }
         }
     }
 
@@ -92,7 +97,12 @@ class FriendListAdapter(private var friends: List<Friend>) : RecyclerView.Adapte
                 .collection("friend_usernames")
                 .document(friendUsername)
 
-            friendDocumentRef.delete()
+            friendDocumentRef.delete().addOnSuccessListener {
+                val updatedFriendsList = friends.toMutableList()
+                updatedFriendsList.remove(friend)
+
+                updateFriends(updatedFriendsList)
+            }
         }
     }
 }

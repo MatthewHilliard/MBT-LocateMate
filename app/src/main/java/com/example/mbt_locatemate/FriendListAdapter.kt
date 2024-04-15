@@ -1,17 +1,25 @@
 package com.example.mbt_locatemate
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.firestore
 import com.squareup.picasso.Picasso
 
 class FriendListAdapter(private var friends: List<Friend>) : RecyclerView.Adapter<FriendListAdapter.ViewHolder>() {
     private var onAddFriends: Boolean = false
+    private lateinit var auth: FirebaseAuth
+    private val db = Firebase.firestore
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.list_item_friend, parent, false)
+        auth = Firebase.auth
         return ViewHolder(v)
     }
 
@@ -50,11 +58,34 @@ class FriendListAdapter(private var friends: List<Friend>) : RecyclerView.Adapte
 
             friendButton.setOnClickListener {
                 if (onAddFriends) {
-
+                    addFriend(friend)
                 } else {
-
+                    removeFriend(friend)
                 }
             }
+        }
+    }
+
+    private fun addFriend(friend: Friend){
+        val userId = auth.currentUser?.uid
+        if (userId != null) {
+            val friendUsername = friend.username
+
+            val friendDocumentRef = db.collection("friends")
+                .document(userId)
+                .collection("friend_usernames")
+                .document(friendUsername)
+
+            val emptyData: Map<String, Any> = HashMap()
+
+            friendDocumentRef.set(emptyData)
+        }
+    }
+
+    private fun removeFriend(friend: Friend){
+        val userId = auth.currentUser?.uid
+        if (userId != null) {
+
         }
     }
 }

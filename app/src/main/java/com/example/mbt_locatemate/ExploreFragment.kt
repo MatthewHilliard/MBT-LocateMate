@@ -101,6 +101,9 @@ class ExploreFragment: Fragment() {
                                 }
                                 adapter.updatePosts(postList)
                             }
+                    } else {
+                        val postList = mutableListOf<Post>()
+                        adapter.updatePosts(postList)
                     }
                 }
         }

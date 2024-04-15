@@ -84,21 +84,24 @@ class ExploreFragment: Fragment() {
                 .addOnSuccessListener { friendsSnapshot ->
                     val friendUsernames = friendsSnapshot.documents.map { it.id }
 
-                    db.collection("posts")
-                        .whereIn("username", friendUsernames)
-                        .get()
-                        .addOnSuccessListener { postsSnapshot ->
-                            val postList = mutableListOf<Post>()
-                            for (document in postsSnapshot) {
-                                val username = document.getString("username") ?: ""
-                                val caption = document.getString("caption") ?: ""
-                                val imgUrl = document.getString("img_url") ?: ""
-                                val pfpUrl = document.getString("pfp_url") ?: ""
-                                val post = Post(UUID.randomUUID(), username, caption, imgUrl, pfpUrl)
-                                postList.add(post)
+                    if(friendUsernames.isNotEmpty()) {
+                        db.collection("posts")
+                            .whereIn("username", friendUsernames)
+                            .get()
+                            .addOnSuccessListener { postsSnapshot ->
+                                val postList = mutableListOf<Post>()
+                                for (document in postsSnapshot) {
+                                    val username = document.getString("username") ?: ""
+                                    val caption = document.getString("caption") ?: ""
+                                    val imgUrl = document.getString("img_url") ?: ""
+                                    val pfpUrl = document.getString("pfp_url") ?: ""
+                                    val post =
+                                        Post(UUID.randomUUID(), username, caption, imgUrl, pfpUrl)
+                                    postList.add(post)
+                                }
+                                adapter.updatePosts(postList)
                             }
-                            adapter.updatePosts(postList)
-                        }
+                    }
                 }
         }
     }

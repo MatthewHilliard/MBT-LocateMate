@@ -85,7 +85,14 @@ class FriendListAdapter(private var friends: List<Friend>) : RecyclerView.Adapte
     private fun removeFriend(friend: Friend){
         val userId = auth.currentUser?.uid
         if (userId != null) {
+            val friendUsername = friend.username
 
+            val friendDocumentRef = db.collection("friends")
+                .document(userId)
+                .collection("friend_usernames")
+                .document(friendUsername)
+
+            friendDocumentRef.delete()
         }
     }
 }

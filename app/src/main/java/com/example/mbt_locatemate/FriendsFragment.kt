@@ -10,6 +10,8 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.tabs.TabItem
+import com.google.android.material.tabs.TabLayout
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -20,6 +22,7 @@ class FriendsFragment : Fragment() {
     private lateinit var layoutManager: RecyclerView.LayoutManager
     private lateinit var adapter: FriendListAdapter
     private lateinit var friendRecyclerView: RecyclerView
+    private lateinit var tabLayout: TabLayout
 
     private lateinit var auth: FirebaseAuth
     private val db = Firebase.firestore
@@ -45,8 +48,27 @@ class FriendsFragment : Fragment() {
         adapter = FriendListAdapter(mutableListOf())
         friendRecyclerView.adapter = adapter
 
-        val backButton = view.findViewById<ImageView>(R.id.friendBackButton)
+        tabLayout = view.findViewById(R.id.tabLayout)
+        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                tab?.let {
+                    when (it.position) {
+                        0 -> {
+                            loadFriends("")
+                        }
+                        1 -> {
+                            loadAddFriends("")
+                        }
+                    }
+                }
+            }
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+            }
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+            }
+        })
 
+        val backButton = view.findViewById<ImageView>(R.id.friendBackButton)
         backButton.setOnClickListener(){
             val exploreFragment = ExploreFragment()
             parentFragmentManager.beginTransaction()
@@ -77,6 +99,37 @@ class FriendsFragment : Fragment() {
                                     val pfpUrl = document.getString("pfp_url") ?: ""
                                     val friend = Friend(username, pfpUrl)
                                     friendList.add(friend)
+                                }
+                                adapter.updateFriends(friendList)
+                            }
+                    }
+            }
+        }
+    }
+
+    private fun loadAddFriends(search: String) {
+        val userId = auth.currentUser?.uid
+        if (userId != null) {
+            if (search.isEmpty()) {
+                db.collection("friends").document(userId)
+                    .collection("friend_usernames")
+                    .get()
+                    .addOnSuccessListener { friendsSnapshot ->
+                        val friendUsernames = friendsSnapshot.documents.map { it.id }
+
+                        db.collection("users")
+                            .whereNotIn("username", friendUsernames)
+                            .get()
+                            .addOnSuccessListener { documents ->
+                                val friendList = mutableListOf<Friend>()
+                                for (document in documents) {
+                                    val id = document.getString("id") ?: ""
+                                    val username = document.getString("username") ?: ""
+                                    val pfpUrl = document.getString("pfp_url") ?: ""
+                                    val friend = Friend(username, pfpUrl)
+                                    if(id != userId){
+                                        friendList.add(friend)
+                                    }
                                 }
                                 adapter.updateFriends(friendList)
                             }

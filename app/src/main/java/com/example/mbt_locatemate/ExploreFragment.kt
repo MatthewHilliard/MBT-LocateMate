@@ -61,9 +61,11 @@ class ExploreFragment: Fragment() {
                 when (checkedId) {
                     R.id.friendsButton -> {
                         loadFriendPosts()
+                        postRecyclerView.smoothScrollToPosition(0)
                     }
                     R.id.exploreButton -> {
                         loadAllPosts()
+                        postRecyclerView.smoothScrollToPosition(0)
                     }
                 }
             }

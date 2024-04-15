@@ -104,19 +104,36 @@ class ExploreFragment: Fragment() {
     }
 
     private fun loadAllPosts() {
-        db.collection("posts")
-            .get()
-            .addOnSuccessListener { documents ->
-                val postList = mutableListOf<Post>()
-                for (document in documents) {
-                    val username = document.getString("username") ?: ""
-                    val caption = document.getString("caption") ?: ""
-                    val imgUrl = document.getString("img_url") ?: ""
-                    val pfpUrl = document.getString("pfp_url") ?: ""
-                    val post = Post(UUID.randomUUID(), username, caption, imgUrl, pfpUrl)
-                    postList.add(post)
-                }
-                adapter.updatePosts(postList)
+        //TODO this is super inefficent tbh and uses a ton of API calls so perhaps rework the database a bit to make fewer calls
+        val userId = auth.currentUser?.uid
+        var userUsername: String? = null
+        val userFriends = mutableListOf<String>()
+        if (userId != null) {
+            db.collection("users").document(userId).get().addOnSuccessListener { document ->
+                userUsername = document.getString("username")
             }
+            db.collection("friends").document(userId)
+                .collection("friend_usernames")
+                .get()
+                .addOnSuccessListener { friendsSnapshot ->
+                    userFriends.addAll(friendsSnapshot.documents.map { it.id })
+                }
+            db.collection("posts")
+                .get()
+                .addOnSuccessListener { documents ->
+                    val postList = mutableListOf<Post>()
+                    for (document in documents) {
+                        val username = document.getString("username") ?: ""
+                        val caption = document.getString("caption") ?: ""
+                        val imgUrl = document.getString("img_url") ?: ""
+                        val pfpUrl = document.getString("pfp_url") ?: ""
+                        val post = Post(UUID.randomUUID(), username, caption, imgUrl, pfpUrl)
+                        if (username != userUsername && username !in userFriends) {
+                            postList.add(post)
+                        }
+                    }
+                    adapter.updatePosts(postList)
+                }
+        }
     }
 }

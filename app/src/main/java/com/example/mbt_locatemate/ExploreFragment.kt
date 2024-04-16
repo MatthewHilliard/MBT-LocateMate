@@ -111,6 +111,8 @@ class ExploreFragment: Fragment() {
 
     private fun loadAllPosts() {
         //TODO this is super inefficent tbh and uses a ton of API calls so perhaps rework the database a bit to make fewer calls
+        //yeah actually the own users post sometimes gets rendered so its def a bit bugged because of excessive api calls
+        //i think we should figure out how to make global variables upon app start of basic user info like username and pfp
         val userId = auth.currentUser?.uid
         var userUsername: String? = null
         val userFriends = mutableListOf<String>()

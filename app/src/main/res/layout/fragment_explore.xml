@@ -38,12 +38,10 @@
         android:id="@+id/friendsIcon"
         android:layout_width="55dp"
         android:layout_height="55dp"
-        android:layout_marginStart="32dp"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="19dp"
         android:src="@drawable/baseline_people_alt_24"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/locateMateTitle"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.button.MaterialButtonToggleGroup
@@ -76,8 +74,10 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/post_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="576dp"
+        android:layout_height="0dp"
         android:layout_marginTop="5dp"
+        android:layout_marginBottom="65dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/segmentedButton" />

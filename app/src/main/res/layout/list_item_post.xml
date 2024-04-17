@@ -61,12 +61,32 @@
         app:layout_constraintTop_toBottomOf="@+id/post_pfp"
         app:shapeAppearanceOverlay="@style/RoundedImageViewStyle" />
 
+    <ImageView
+        android:id="@+id/leaderboardButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="5dp"
+        android:src="@drawable/baseline_leaderboard_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/post_image" />
+
+    <ImageView
+        android:id="@+id/commentsButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="12dp"
+        android:src="@drawable/baseline_chat_bubble_outline_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/post_image" />
+
     <TextView
         android:id="@+id/post_caption"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="10dp"
         android:fontFamily="@font/poppins"
         android:text="Caption goes here"
@@ -74,7 +94,8 @@
         android:textSize="18dp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/post_image" />
+        app:layout_constraintTop_toBottomOf="@+id/leaderboardButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

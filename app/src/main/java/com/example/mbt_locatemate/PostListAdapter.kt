@@ -1,6 +1,5 @@
 package com.example.mbt_locatemate
 
-import MapGuessFragment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View

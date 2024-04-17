@@ -140,12 +140,4 @@ class FriendsFragment : Fragment() {
             }
         }
     }
-
-    private fun navigateToMapGuessFragment(post: Post) {
-        val guessFragment = MapGuessFragment.newInstance(post.id) // Ensure you have this method in your MapGuessFragment
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, guessFragment)
-            .addToBackStack(null) // Add transaction to the back stack
-            .commit()
-    }
 }

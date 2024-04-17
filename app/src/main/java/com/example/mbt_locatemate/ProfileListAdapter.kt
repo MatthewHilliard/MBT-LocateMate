@@ -28,8 +28,11 @@ class ProfilePostListAdapter(private var posts: List<Post>) : RecyclerView.Adapt
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val postCaption: TextView = itemView.findViewById(R.id.cardCaption)
+        private val postImage: ImageView = itemView.findViewById(R.id.cardPost)
         fun bind(post: Post) {
-
+            Picasso.get().load(post.imgUrl).into(postImage)
+            postCaption.text = post.caption
         }
     }
 }

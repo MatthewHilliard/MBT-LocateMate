@@ -6,20 +6,20 @@
     android:layout_height="match_parent"
     tools:context=".ProfileFragment">
 
-    <Button
+    <ImageView
         android:id="@+id/settingsButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:src="@drawable/baseline_settings_24"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:text="Settings" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/imgProfile"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         app:shapeAppearanceOverlay="@style/roundedImageView"
         android:layout_marginTop="12dp"
         app:layout_constraintTop_toBottomOf="@+id/settingsButton"
@@ -46,12 +46,12 @@
         android:id="@+id/layoutPosts"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="116dp"
+        android:layout_marginStart="60dp"
         android:layout_weight="1"
         android:gravity="center"
         android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/gridPosts"
-        app:layout_constraintEnd_toEndOf="@id/imgProfile"
+        app:layout_constraintBottom_toTopOf="@+id/userPostsRecyclerView"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/txtUsername"
         app:layout_constraintVertical_bias="0.0">
 
@@ -59,63 +59,59 @@
             android:id="@+id/txtPostCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="24"
             android:fontFamily="@font/poppins"
-            android:textSize="20dp"
-            android:textColor="@color/black"/>
+            android:text="24"
+            android:textColor="@color/black"
+            android:textSize="20dp" />
 
         <TextView
             android:id="@+id/txPostLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Posts"
             android:fontFamily="@font/poppins"
-            android:textSize="16dp"
-            android:textColor="@color/black"/>
+            android:text="Posts"
+            android:textColor="@color/black"
+            android:textSize="16dp" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/layoutGuesses"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="140dp"
+        android:layout_marginEnd="60dp"
         android:layout_weight="1"
         android:gravity="center"
         android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/gridPosts"
-        app:layout_constraintStart_toEndOf="@id/layoutPosts"
+        app:layout_constraintBottom_toTopOf="@+id/userPostsRecyclerView"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/txtUsername">
 
         <TextView
             android:id="@+id/txtGuessCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="84"
             android:fontFamily="@font/poppins"
-            android:textSize="20dp"
-            android:textColor="@color/black"/>
+            android:text="84"
+            android:textColor="@color/black"
+            android:textSize="20dp" />
 
         <TextView
             android:id="@+id/txtGuessLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Guesses"
             android:fontFamily="@font/poppins"
-            android:textSize="16dp"
-            android:textColor="@color/black"/>
+            android:text="Guesses"
+            android:textColor="@color/black"
+            android:textSize="16dp" />
     </LinearLayout>
 
-    <GridView
-        android:id="@+id/gridPosts"
-        android:layout_width="0dp"
-        android:layout_height="600dp"
-        app:layout_constraintTop_toBottomOf="@id/layoutGuesses"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:numColumns="auto_fit"
-        android:horizontalSpacing="10dp"
-        android:verticalSpacing="10dp"
-        android:stretchMode="columnWidth"
-        android:gravity="center"/>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/userPostsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="65dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layoutPosts" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

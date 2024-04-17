@@ -8,6 +8,8 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.RecyclerView
+import com.example.mbt_locatemate.databinding.ActivityMainBinding
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -17,6 +19,10 @@ import com.squareup.picasso.Picasso
 class ProfileFragment: Fragment() {
     private lateinit var auth: FirebaseAuth
     private val db = Firebase.firestore
+
+    private lateinit var layoutManager: RecyclerView.LayoutManager
+    private lateinit var adapter: ProfilePostListAdapter
+    private lateinit var profilePostRecyclerView: RecyclerView
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -26,11 +32,11 @@ class ProfileFragment: Fragment() {
         auth = Firebase.auth
         val user = auth.currentUser
 
+        profilePostRecyclerView = view.findViewById(R.id.userPostsRecyclerView)
+
         val usernameText = view.findViewById<TextView>(R.id.txtUsername)
         val pfpImage = view.findViewById<ImageView>(R.id.imgProfile)
         if (user != null) {
-            //NOTE - current retrival of things is quite slow since it has to go through the cloud to retrieve a single thing
-            //There are ways to locally store values once we retrieve them for the first time that we should look at later
             db.collection("users").document(user.uid).get().addOnSuccessListener { document ->
                 val username = document.getString("username")
                 val pfpUrl = document.getString("pfp_url")
@@ -39,7 +45,7 @@ class ProfileFragment: Fragment() {
             }
         }
 
-        val settingsButton = view.findViewById<Button>(R.id.settingsButton)
+        val settingsButton = view.findViewById<ImageView>(R.id.settingsButton)
 
         settingsButton.setOnClickListener(){
             val settingsFragment = SettingsFragment()

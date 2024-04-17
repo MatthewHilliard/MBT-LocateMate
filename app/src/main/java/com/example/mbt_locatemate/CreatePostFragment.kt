@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
 class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private lateinit var nMap: GoogleMap
-    private lateinit var mapView: MapView
+    //private lateinit var mapView: MapView
     private lateinit var lastLocation: Location
     private lateinit var image: ImageView
     var imageTaken = false
@@ -65,18 +65,26 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
         }
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(this)
-       // mapView.onCreate(savedInstanceState)
+        mapFragment?.onCreate(savedInstanceState)
         //mapView.getMapAsync(this)
-        val markerOptions = MarkerOptions().position(LatLng(40.7128, 74.0060))
-        markerOptions.title("New York")
+
 //        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext())
         return view
     }
     override fun onMapReady(googleMap: GoogleMap) {
         nMap = googleMap
         nMap.uiSettings.isZoomControlsEnabled = true
-        nMap.setOnMarkerClickListener(this)
+        // Define the coordinates
+        val location = LatLng(74.0060,40.7128)
 
+        // Create marker options
+        val markerOptions = MarkerOptions().position(location).title("New York")
+
+        // Add marker to the map
+        nMap.addMarker(markerOptions)
+
+        // Optionally move the camera to the marker
+        nMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 12f))
         //setUpMap()
     }
 

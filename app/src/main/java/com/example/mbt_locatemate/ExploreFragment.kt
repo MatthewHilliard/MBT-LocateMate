@@ -95,8 +95,7 @@ class ExploreFragment: Fragment() {
                                     val caption = document.getString("caption") ?: ""
                                     val imgUrl = document.getString("img_url") ?: ""
                                     val pfpUrl = document.getString("pfp_url") ?: ""
-                                    val post =
-                                        Post(UUID.randomUUID(), username, caption, imgUrl, pfpUrl)
+                                    val post = Post(UUID.randomUUID(), username, caption, imgUrl, pfpUrl)
                                     postList.add(post)
                                 }
                                 adapter.updatePosts(postList)

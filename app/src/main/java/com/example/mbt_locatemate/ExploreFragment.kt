@@ -45,7 +45,11 @@ class ExploreFragment: Fragment() {
 
         auth = Firebase.auth
 
-        adapter = PostListAdapter(mutableListOf())
+        adapter = PostListAdapter(mutableListOf()).apply {
+            onGuessClickListener = { post ->
+                navigateToMapGuessFragment(post)
+            }
+        }
         postRecyclerView.adapter = adapter
 
         friendsButton = view.findViewById(R.id.friendsIcon)
@@ -73,6 +77,14 @@ class ExploreFragment: Fragment() {
 
         segmentedButton.check(R.id.friendsButton)
         return view
+    }
+
+    private fun navigateToMapGuessFragment(post: Post) {
+        val guessFragment = MapGuessFragment.newInstance(post.id)
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, guessFragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun loadFriendPosts() {

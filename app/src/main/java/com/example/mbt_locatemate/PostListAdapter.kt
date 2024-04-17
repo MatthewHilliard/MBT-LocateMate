@@ -4,12 +4,17 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 
 class PostListAdapter(private var posts: List<Post>) : RecyclerView.Adapter<PostListAdapter.ViewHolder>() {
+
+    var onGuessClickListener: ((Post) -> Unit)? = null
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.list_item_post, parent, false)
         return ViewHolder(v)
@@ -36,6 +41,18 @@ class PostListAdapter(private var posts: List<Post>) : RecyclerView.Adapter<Post
         private val postCaption: TextView = itemView.findViewById(R.id.post_caption)
         private val postImage: ImageView = itemView.findViewById(R.id.post_image)
         private val pfpImage: ImageView = itemView.findViewById(R.id.post_pfp)
+
+        private val guessButton: Button = itemView.findViewById(R.id.post_guess)
+
+        init {
+            guessButton.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    onGuessClickListener?.invoke(posts[position])
+                }
+            }
+        }
+
         fun bind(post: Post) {
             postUser.text = post.username
             postCaption.text = post.caption
@@ -50,5 +67,6 @@ class PostListAdapter(private var posts: List<Post>) : RecyclerView.Adapter<Post
 
             }
         }
+
     }
 }

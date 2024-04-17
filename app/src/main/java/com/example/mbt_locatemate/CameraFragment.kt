@@ -29,6 +29,8 @@ class CameraFragment: Fragment() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 
         resultContract.launch(intent)
+        val createPostFragment = CreatePostFragment()
+        parentFragmentManager.beginTransaction().replace(R.id.fragment_container, createPostFragment).commit()
         return view
     }
 }

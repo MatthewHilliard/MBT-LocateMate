@@ -1,5 +1,6 @@
 package com.example.mbt_locatemate
 
+import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +21,9 @@ import java.util.UUID
 class MapGuessFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var map: GoogleMap
+
+    private val boston = LatLng(42.0, -71.0)
+    private lateinit var guess: LatLng
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,15 +48,39 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
         super.onActivityCreated(savedInstanceState)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(this)
+
+        val guessButton: Button = view.findViewById(R.id.guessButton)
+        guessButton.setOnClickListener {
+            //val guess = guessLocation
+            if (guess != null) {
+                val distance = FloatArray(1)
+                Location.distanceBetween(
+                    boston.latitude,
+                    boston.longitude,
+                    guess.latitude,
+                    guess.longitude,
+                    distance
+                )
+                val distanceInMeters = distance[0]
+                showDistanceToast(distanceInMeters)
+            } else {
+                Toast.makeText(context, "Please select a location first!", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun showDistanceToast(distance: Float) {
+        val distanceInKm = distance / 1000
+        Toast.makeText(context, "Distance to target: ${distanceInKm}km", Toast.LENGTH_LONG).show()
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
 
         // example
-        val sydney = LatLng(-34.0, 151.0)
-        map.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        map.moveCamera(com.google.android.gms.maps.CameraUpdateFactory.newLatLng(sydney))
+        //val boston = LatLng(42.0, -71.0)
+        map.addMarker(MarkerOptions().position(boston).title("Marker in Boston"))
+        map.moveCamera(com.google.android.gms.maps.CameraUpdateFactory.newLatLng(boston))
 
         map.uiSettings.isZoomControlsEnabled = true
         map.uiSettings.isScrollGesturesEnabled = true
@@ -60,6 +88,7 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
 
         // set click listener
         map.setOnMapClickListener { latLng ->
+            guess = latLng
             map.clear()
             map.addMarker(MarkerOptions().position(latLng).title("Guess Location"))
         }

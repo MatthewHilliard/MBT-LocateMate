@@ -7,7 +7,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 
-class MapsFragment : Fragment(), OnMapReadyCallback {
+class MapGuessFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var map: GoogleMap
 
@@ -34,6 +34,20 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         map.setOnMapClickListener { latLng ->
             map.clear()
             map.addMarker(MarkerOptions().position(latLng).title("Guess Location"))
+        }
+    }
+
+    companion object {
+        fun newInstance(): MapGuessFragment {
+            return MapGuessFragment()
+        }
+        // If you need to pass arguments to your Fragment, you can add them here
+        fun newInstanceWithArgs(someId: String): MapGuessFragment {
+            val bundle = Bundle()
+            bundle.putString("some_key", someId)
+            val fragment = MapGuessFragment()
+            fragment.arguments = bundle
+            return fragment
         }
     }
 }

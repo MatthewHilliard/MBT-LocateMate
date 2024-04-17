@@ -12,9 +12,9 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 
-class PostFragment: Fragment() {
+class CameraFragment: Fragment() {
 
-    val resutContract = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+    val resultContract = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
             val bitmap = result?.data?.extras?.get("data") as Bitmap
         }
@@ -28,7 +28,9 @@ class PostFragment: Fragment() {
         val view = inflater.inflate(R.layout.fragment_post, container, false)
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 
-        resutContract.launch(intent)
+        resultContract.launch(intent)
+        val createPostFragment = CreatePostFragment()
+        parentFragmentManager.beginTransaction().replace(R.id.fragment_container, createPostFragment).commit()
         return view
     }
 }

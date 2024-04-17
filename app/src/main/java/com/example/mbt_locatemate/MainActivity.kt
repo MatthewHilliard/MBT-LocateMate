@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.postTab->{
-                    val postFragment = PostFragment()
+                    val postFragment = CameraFragment()
                     supportFragmentManager.beginTransaction().replace(R.id.fragment_container, postFragment).commit()
                     true
                 }

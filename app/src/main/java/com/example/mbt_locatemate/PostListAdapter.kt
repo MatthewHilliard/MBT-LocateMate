@@ -29,6 +29,9 @@ class PostListAdapter(private var posts: List<Post>) : RecyclerView.Adapter<Post
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val leaderboardButton: ImageView = itemView.findViewById(R.id.leaderboardButton)
+        private val commentsButton: ImageView = itemView.findViewById(R.id.commentsButton)
+
         private val postUser: TextView = itemView.findViewById(R.id.post_user)
         private val postCaption: TextView = itemView.findViewById(R.id.post_caption)
         private val postImage: ImageView = itemView.findViewById(R.id.post_image)
@@ -38,6 +41,14 @@ class PostListAdapter(private var posts: List<Post>) : RecyclerView.Adapter<Post
             postCaption.text = post.caption
             Picasso.get().load(post.imgUrl).into(postImage)
             Picasso.get().load(post.pfpUrl).into(pfpImage)
+
+            leaderboardButton.setOnClickListener(){
+
+            }
+
+            commentsButton.setOnClickListener(){
+
+            }
         }
     }
 }

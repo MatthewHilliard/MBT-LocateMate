@@ -79,8 +79,8 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
 
         // example
         //val boston = LatLng(42.0, -71.0)
-        map.addMarker(MarkerOptions().position(boston).title("Marker in Boston"))
-        map.moveCamera(com.google.android.gms.maps.CameraUpdateFactory.newLatLng(boston))
+        //map.addMarker(MarkerOptions().position(boston).title("Marker in Boston"))
+        //map.moveCamera(com.google.android.gms.maps.CameraUpdateFactory.newLatLng(boston))
 
         map.uiSettings.isZoomControlsEnabled = true
         map.uiSettings.isScrollGesturesEnabled = true

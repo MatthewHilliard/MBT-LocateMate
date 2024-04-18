@@ -80,7 +80,7 @@ class ExploreFragment: Fragment() {
     }
 
     private fun navigateToMapGuessFragment(post: Post) {
-        val guessFragment = MapGuessFragment.newInstance(post.id)
+        val guessFragment = MapGuessFragment.newInstance(post)
         parentFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, guessFragment)
             .addToBackStack(null)

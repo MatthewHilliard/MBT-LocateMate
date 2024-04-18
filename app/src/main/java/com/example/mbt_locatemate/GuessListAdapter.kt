@@ -7,6 +7,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class GuessListAdapter(private val guesses: List<Guess>) : RecyclerView.Adapter<GuessListAdapter.ViewHolder>() {
+    var onGuessClickListener: ((Post) -> Unit)? = null
+
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val textViewUsername: TextView = view.findViewById(R.id.friend_user)
         val textViewDistance: TextView = view.findViewById(R.id.friend_guess)

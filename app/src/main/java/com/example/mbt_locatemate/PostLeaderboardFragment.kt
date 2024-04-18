@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
+import java.util.UUID
 
 class PostLeaderboardFragment : Fragment() {
 
@@ -52,17 +54,23 @@ class PostLeaderboardFragment : Fragment() {
                 //adapter.setGuesses(guesses) im gonna come back to this
             }
             .addOnFailureListener { exception ->
-                // Handle any errors here
+                Toast.makeText(context, "Failure ??", Toast.LENGTH_SHORT).show()
             }
     }
 
     companion object {
         private const val ARG_POST_ID = "post_id"
 
-        fun newInstance(postId: String) = PostLeaderboardFragment().apply {
-            arguments = Bundle().apply {
-                putString(ARG_POST_ID, postId)
-            }
+        fun newInstance(postId: UUID) = PostLeaderboardFragment().apply {
+            return PostLeaderboardFragment()
+        }
+
+        fun newInstanceWithArgs(someId: String): PostLeaderboardFragment {
+            val bundle = Bundle()
+            bundle.putString("some_key", someId)
+            val fragment = PostLeaderboardFragment()
+            fragment.arguments = bundle
+            return fragment
         }
     }
 }

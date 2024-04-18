@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.mbt_locatemate.ExploreFragment
@@ -16,6 +15,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.firestore.FirebaseFirestore
 import java.util.UUID
 
 class MapGuessFragment : Fragment(), OnMapReadyCallback {
@@ -24,6 +24,14 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
 
     private val boston = LatLng(42.0, -71.0)
     private lateinit var guess: LatLng
+
+    private lateinit var post: Post
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        post = arguments?.getParcelable<Post>(ARG_POST)!!
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,8 +59,7 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
 
         val guessButton: Button = view.findViewById(R.id.guessButton)
         guessButton.setOnClickListener {
-            //val guess = guessLocation
-            if (guess != null) {
+            if (::guess.isInitialized) {
                 val distance = FloatArray(1)
                 Location.distanceBetween(
                     boston.latitude,
@@ -63,6 +70,10 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
                 )
                 val distanceInMeters = distance[0]
                 showDistanceToast(distanceInMeters)
+
+                navigateToPostLeaderboardFragment(post)
+
+
             } else {
                 Toast.makeText(context, "Please select a location first!", Toast.LENGTH_SHORT).show()
             }
@@ -77,11 +88,6 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
 
-        // example
-        //val boston = LatLng(42.0, -71.0)
-        //map.addMarker(MarkerOptions().position(boston).title("Marker in Boston"))
-        //map.moveCamera(com.google.android.gms.maps.CameraUpdateFactory.newLatLng(boston))
-
         map.uiSettings.isZoomControlsEnabled = true
         map.uiSettings.isScrollGesturesEnabled = true
         map.uiSettings.isZoomGesturesEnabled = true
@@ -94,18 +100,26 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    private fun navigateToPostLeaderboardFragment(post: Post) {
+        val leaderboardFragment = PostLeaderboardFragment.newInstance(post.id)
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, leaderboardFragment)
+            //.addToBackStack(null) i want the back button on the leaderboard to go to explore
+            .commit()
+    }
 
     companion object {
-        fun newInstance(id: UUID): MapGuessFragment {
-            return MapGuessFragment()
-        }
+        private const val ARG_POST = "post"
 
-        fun newInstanceWithArgs(someId: String): MapGuessFragment {
-            val bundle = Bundle()
-            bundle.putString("some_key", someId)
+        // Change the method to accept a Post object
+        fun newInstance(post: Post): MapGuessFragment {
             val fragment = MapGuessFragment()
-            fragment.arguments = bundle
+            val args = Bundle().apply {
+                putParcelable(ARG_POST, post)
+            }
+            fragment.arguments = args
             return fragment
         }
     }
+
 }

@@ -5,8 +5,8 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import java.io.ByteArrayOutputStream
 import android.location.Location
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.LayoutInflater
@@ -22,18 +22,24 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.button.MaterialButton
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.firestore
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.UUID
+import java.util.*
+
 
 class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
@@ -43,10 +49,15 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
     var imageTaken = false
     private lateinit var caption: EditText
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private lateinit var storage: FirebaseStorage
+    private val db = Firebase.firestore
+    private lateinit var auth: FirebaseAuth
+    private lateinit var imageBitmap: Bitmap
 
     val resultContract = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
             val bitmap = result.data?.extras?.get("data") as Bitmap
+            imageBitmap = bitmap
             image.setImageBitmap(bitmap)
         }
     }
@@ -59,6 +70,8 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_post_create, container, false)
+        auth = Firebase.auth
+        storage = Firebase.storage
         //open camera to take a photo
         image = view.findViewById(R.id.imageView)
         caption = view.findViewById(R.id.captionText)
@@ -72,10 +85,14 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
         val cancel = view.findViewById<MaterialButton>(R.id.cancelButton)
         cancel.setOnClickListener {
             imageTaken = false
+            val exploreFragment = ExploreFragment()
+            parentFragmentManager.beginTransaction().replace(R.id.fragment_container, exploreFragment).commit()
         }
         val post = view.findViewById<MaterialButton>(R.id.postButton)
         post.setOnClickListener {
             savePost()
+            val exploreFragment = ExploreFragment()
+            parentFragmentManager.beginTransaction().replace(R.id.fragment_container, exploreFragment).commit()
         }
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(this)
@@ -86,29 +103,53 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
     }
 
     private fun savePost() {
-        val firebaseAuth = FirebaseAuth.getInstance()
-        val currentUser = firebaseAuth.currentUser
-
-        val captionText = caption.text.toString()
-        val imageUrl = "https://firebasestorage.googleapis.com/v0/b/locatemate-cf72b.appspot.com/o/matthew_hilliard_test.jpg?alt=media&token=230d74c2-fba6-41f4-a147-2175029f6e59"
-        val profilePictureUrl = "https://firebasestorage.googleapis.com/v0/b/locatemate-cf72b.appspot.com/o/images%2Fmattpfp.PNG?alt=media&token=31c60078-ec95-4277-8b5a-8046d6cd2341"
-        var username = ""
+        val currentUser = auth.currentUser
         if (currentUser != null) {
-            username = currentUser.displayName.toString()
-        }
-        val location = LatLng(lastLocation.latitude, lastLocation.longitude)
+            val baos = ByteArrayOutputStream()
+            imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+            val data = baos.toByteArray()
+            val imageId = UUID.randomUUID().toString()
 
-        val post = Post(id= UUID.randomUUID(), username = username, caption = captionText, imgUrl = imageUrl, pfpUrl = profilePictureUrl, location = location)
-        // Upload post to Firestore
-        val db = FirebaseFirestore.getInstance()
-        db.collection("posts")
-            .add(post)
-            .addOnSuccessListener { documentReference ->
-                // Post uploaded successfully
-            }
-            .addOnFailureListener { e ->
-                // Handle failure
-            }
+            storage.reference.child("images/${currentUser.uid}/posts/$imageId.jpg").putBytes(data)
+                .addOnSuccessListener { task->
+                    task.metadata!!.reference!!.downloadUrl
+                        .addOnSuccessListener { url ->
+                            val imageUrl = url.toString()
+                            val captionText = caption.text.toString()
+                            val location = LatLng(lastLocation.latitude, lastLocation.longitude)
+                            //get username and stuff
+                            db.collection("users")
+                                .document(currentUser.uid)
+                                .get()
+                                .addOnSuccessListener { document ->
+                                    if (document != null && document.exists()) {
+                                        val postId = UUID.randomUUID()
+                                        val username = document.getString("username") ?: ""
+                                        val pfpUrl = document.getString("pfp_url") ?: ""
+                                        val postInfo = hashMapOf(
+                                            "id" to postId,
+                                            "username" to username,
+                                            "caption" to captionText,
+                                            "pfp_url" to pfpUrl,
+                                            "img_url" to imageUrl,
+                                            "location" to location,
+                                        )
+                                        db.collection("posts").document(postId.toString())
+                                            .set(postInfo)
+                                            .addOnSuccessListener { documentReference ->
+                                                // Post uploaded successfully
+                                            }
+                                            .addOnFailureListener { e ->
+                                                // Handle failure
+                                            }
+                                    }
+                                }.addOnFailureListener { exception ->
+                                            // Handle any errors that may occur
+                                            println("Error getting document: $exception")
+                                }
+                        }
+                }
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {

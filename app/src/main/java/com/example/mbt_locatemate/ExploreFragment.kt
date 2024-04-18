@@ -108,7 +108,10 @@ class ExploreFragment: Fragment() {
                                     val caption = document.getString("caption") ?: ""
                                     val imgUrl = document.getString("img_url") ?: ""
                                     val pfpUrl = document.getString("pfp_url") ?: ""
-                                    val post = Post(UUID.randomUUID(), username, caption, imgUrl, pfpUrl, LatLng(40.712775, -74.0059717))
+                                    val latitude = document.getDouble("latitude") ?: 0.0
+                                    val longitude = document.getDouble("longitude") ?: 0.0
+                                    val location = LatLng(latitude, longitude)
+                                    val post = Post(UUID.randomUUID(), username, caption, imgUrl, pfpUrl, location)
                                     postList.add(post)
                                 }
                                 adapter.updatePosts(postList)
@@ -147,7 +150,10 @@ class ExploreFragment: Fragment() {
                         val caption = document.getString("caption") ?: ""
                         val imgUrl = document.getString("img_url") ?: ""
                         val pfpUrl = document.getString("pfp_url") ?: ""
-                        val post = Post(UUID.randomUUID(), username, caption, imgUrl, pfpUrl, LatLng(40.712775, -74.0059717))
+                        val latitude = document.getDouble("latitude") ?: 0.0
+                        val longitude = document.getDouble("longitude") ?: 0.0
+                        val location = LatLng(latitude, longitude)
+                        val post = Post(UUID.randomUUID(), username, caption, imgUrl, pfpUrl, location)
                         if (username != userUsername && username !in userFriends) {
                             postList.add(post)
                         }

@@ -19,6 +19,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FieldValue
 import kotlinx.coroutines.CoroutineScope
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
@@ -26,6 +27,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.UUID
 
 class MapGuessFragment : Fragment(), OnMapReadyCallback {
@@ -45,6 +47,8 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         post = arguments?.getParcelable<Post>(ARG_POST)!!
+        val postID = post.id
+        Toast.makeText(requireContext(), "Post ID: $postID", Toast.LENGTH_SHORT).show()
     }
 
     override fun onCreateView(
@@ -88,14 +92,15 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
                 showDistanceToast(distanceInMeters)
 
                 CoroutineScope(Dispatchers.IO).launch {
+                    //val postID = post.id
                     val postRef = db.collection("posts").document(post.id.toString())
 
-                    val guessData = hashMapOf(
-                        "user" to "username_here",  // The username of the user making the guess
-                        "distance" to "distance_value_here"  // The distance value for the guess
+                    val newGuess = hashMapOf(
+                        "user" to "username_here",
+                        "distance" to "distance_value_here"
                     )
 
-                    postRef.collection("guesses").add(guessData).addOnSuccessListener { documentReference ->
+                    postRef.collection("guesses").add(newGuess).addOnSuccessListener { documentReference ->
                         // success
                     }.addOnFailureListener { e ->
                         // error

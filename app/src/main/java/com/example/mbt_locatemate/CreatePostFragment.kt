@@ -87,12 +87,16 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
             imageTaken = false
             val exploreFragment = ExploreFragment()
             parentFragmentManager.beginTransaction().replace(R.id.fragment_container, exploreFragment).commit()
+            (activity as MainActivity).bottomNavBar.selectedItemId =
+                R.id.exploreTab
         }
         val post = view.findViewById<MaterialButton>(R.id.postButton)
         post.setOnClickListener {
             savePost()
             val exploreFragment = ExploreFragment()
             parentFragmentManager.beginTransaction().replace(R.id.fragment_container, exploreFragment).commit()
+            (activity as MainActivity).bottomNavBar.selectedItemId =
+                R.id.exploreTab
         }
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(this)

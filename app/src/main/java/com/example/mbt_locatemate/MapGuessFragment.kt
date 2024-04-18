@@ -16,7 +16,14 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineScope
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
+import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 class MapGuessFragment : Fragment(), OnMapReadyCallback {
@@ -27,6 +34,10 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
     private lateinit var guess: LatLng
 
     private lateinit var post: Post
+
+    private lateinit var auth: FirebaseAuth
+    private lateinit var storage: FirebaseStorage
+    private val db = Firebase.firestore
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,6 +81,10 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
                 )
                 val distanceInMeters = distance[0]
                 showDistanceToast(distanceInMeters)
+
+                CoroutineScope(Dispatchers.IO).launch {
+
+                }
 
                 navigateToPostLeaderboardFragment(post)
 

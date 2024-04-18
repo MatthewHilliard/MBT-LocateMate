@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -107,7 +108,7 @@ class ExploreFragment: Fragment() {
                                     val caption = document.getString("caption") ?: ""
                                     val imgUrl = document.getString("img_url") ?: ""
                                     val pfpUrl = document.getString("pfp_url") ?: ""
-                                    val post = Post(UUID.randomUUID(), username, caption, imgUrl, pfpUrl)
+                                    val post = Post(UUID.randomUUID(), username, caption, imgUrl, pfpUrl, LatLng(40.712775, -74.0059717))
                                     postList.add(post)
                                 }
                                 adapter.updatePosts(postList)
@@ -146,7 +147,7 @@ class ExploreFragment: Fragment() {
                         val caption = document.getString("caption") ?: ""
                         val imgUrl = document.getString("img_url") ?: ""
                         val pfpUrl = document.getString("pfp_url") ?: ""
-                        val post = Post(UUID.randomUUID(), username, caption, imgUrl, pfpUrl)
+                        val post = Post(UUID.randomUUID(), username, caption, imgUrl, pfpUrl, LatLng(40.712775, -74.0059717))
                         if (username != userUsername && username !in userFriends) {
                             postList.add(post)
                         }

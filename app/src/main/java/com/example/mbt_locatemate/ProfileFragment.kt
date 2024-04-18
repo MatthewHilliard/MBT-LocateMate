@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mbt_locatemate.databinding.FragmentProfileBinding
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -81,7 +82,7 @@ class ProfileFragment: Fragment() {
                         val caption = document.getString("caption") ?: ""
                         val imgUrl = document.getString("img_url") ?: ""
                         val pfpUrl = document.getString("pfp_url") ?: ""
-                        val post = Post(UUID.randomUUID(), username, caption, imgUrl, pfpUrl)
+                        val post = Post(UUID.randomUUID(), username, caption, imgUrl, pfpUrl, LatLng(40.712775, -74.0059717))
                         postList.add(post)
                     }
                     adapter.updatePosts(postList)

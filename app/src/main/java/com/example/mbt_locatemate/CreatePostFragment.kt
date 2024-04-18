@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.location.Location
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.LayoutInflater
@@ -45,7 +46,7 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
 
     val resultContract = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
-            val bitmap = result?.data?.extras?.get("data") as Bitmap
+            val bitmap = result.data?.extras?.get("data") as Bitmap
             image.setImageBitmap(bitmap)
         }
     }

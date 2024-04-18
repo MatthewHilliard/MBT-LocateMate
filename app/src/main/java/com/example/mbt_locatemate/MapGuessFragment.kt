@@ -104,7 +104,6 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
         val leaderboardFragment = PostLeaderboardFragment.newInstance(post.id)
         parentFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, leaderboardFragment)
-            //.addToBackStack(null) i want the back button on the leaderboard to go to explore
             .commit()
     }
 

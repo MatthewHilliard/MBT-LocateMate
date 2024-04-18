@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ImageView
-        android:id="@+id/friendBackButton"
+        android:id="@+id/leaderboardBackButton"
         android:layout_width="55dp"
         android:layout_height="55dp"
         android:layout_marginStart="10dp"
@@ -15,23 +15,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+
     <TextView
         android:id="@+id/leaderboardText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="45dp"
         android:layout_marginTop="3dp"
-        android:layout_marginEnd="105dp"
+        android:layout_marginEnd="56dp"
         android:fontFamily="@font/poppins"
         android:text="Leaderboard"
-        android:textStyle="bold"
         android:textColor="@color/black"
         android:textSize="50dp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/friendBackButton"
+        app:layout_constraintStart_toEndOf="@+id/leaderboardBackButton"
         app:layout_constraintTop_toTopOf="parent" />
-
-
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/guess_recycler_view"

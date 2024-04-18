@@ -4,8 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
@@ -27,19 +30,26 @@ class PostLeaderboardFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_post_leaderboard, container, false)
-    }
+    ): View {
+        val view = inflater.inflate(R.layout.fragment_post_leaderboard, container, false)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         recyclerView = view.findViewById(R.id.guess_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(context)
         adapter = GuessListAdapter(mutableListOf())
         recyclerView.adapter = adapter
 
         postId?.let { loadLeaderboard(it) }
+
+        val backButton = view.findViewById<ImageView>(R.id.leaderboardBackButton)
+        backButton.setOnClickListener(){
+            val exploreFragment = ExploreFragment()
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, exploreFragment).commit()
+        }
+
+        return view
     }
+
 
     private fun loadLeaderboard(postId: String) {
         val db = FirebaseFirestore.getInstance()

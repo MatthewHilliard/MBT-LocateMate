@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.mbt_locatemate.ExploreFragment
@@ -40,9 +41,8 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
 
         val view = inflater.inflate(R.layout.fragment_mapguess, container, false)
 
-        val backButton = view?.findViewById<Button>(R.id.backButton)
-        backButton?.setOnClickListener(){
-            Toast.makeText(context, "Back button pressed!", Toast.LENGTH_SHORT).show()
+        val backButton = view.findViewById<ImageView>(R.id.guessBackButton)
+        backButton.setOnClickListener(){
             val exploreFragment = ExploreFragment()
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, exploreFragment).commit()

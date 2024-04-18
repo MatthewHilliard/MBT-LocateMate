@@ -18,10 +18,12 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 import kotlinx.coroutines.CoroutineScope
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -68,6 +70,9 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(this)
 
+        auth = Firebase.auth
+        storage = Firebase.storage
+
         val guessButton: Button = view.findViewById(R.id.guessButton)
         guessButton.setOnClickListener {
             if (::guess.isInitialized) {
@@ -83,7 +88,18 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
                 showDistanceToast(distanceInMeters)
 
                 CoroutineScope(Dispatchers.IO).launch {
+                    val postRef = db.collection("posts").document(post.id.toString())
 
+                    val guessData = hashMapOf(
+                        "user" to "username_here",  // The username of the user making the guess
+                        "distance" to "distance_value_here"  // The distance value for the guess
+                    )
+
+                    postRef.collection("guesses").add(guessData).addOnSuccessListener { documentReference ->
+                        // success
+                    }.addOnFailureListener { e ->
+                        // error
+                    }
                 }
 
                 navigateToPostLeaderboardFragment(post)

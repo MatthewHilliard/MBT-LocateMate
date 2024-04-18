@@ -11,6 +11,7 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,6 +27,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -33,7 +35,7 @@ import kotlinx.coroutines.launch
 class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private lateinit var nMap: GoogleMap
-    private lateinit var mapView: MapView
+    //private lateinit var mapView: MapView
     private lateinit var lastLocation: Location
     private lateinit var image: ImageView
     var imageTaken = false
@@ -63,50 +65,51 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
                 imageTaken = true
             }
         }
+        val cancel = view.findViewById<MaterialButton>(R.id.cancelButton)
+        cancel.setOnClickListener {
+            imageTaken = false
+        }
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(this)
-       // mapView.onCreate(savedInstanceState)
-        //mapView.getMapAsync(this)
-        val markerOptions = MarkerOptions().position(LatLng(40.7128, 74.0060))
-        markerOptions.title("New York")
-//        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext())
+        mapFragment?.onCreate(savedInstanceState)
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext())
         return view
     }
     override fun onMapReady(googleMap: GoogleMap) {
         nMap = googleMap
         nMap.uiSettings.isZoomControlsEnabled = true
-        nMap.setOnMarkerClickListener(this)
-
-        //setUpMap()
+        setUpMap()
     }
 
-//    private fun setUpMap() {
-//        if (ActivityCompat.checkSelfPermission(
-//                requireContext(),
-//                Manifest.permission.ACCESS_FINE_LOCATION
-//            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-//                requireContext(),
-//                Manifest.permission.ACCESS_COARSE_LOCATION
-//            ) != PackageManager.PERMISSION_GRANTED
-//        ) {
-//            ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_REQUEST_CODE)
-//            return
-//        }
-//        nMap.isMyLocationEnabled = true
-//        fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
-//            if (location != null) {
-//                lastLocation = location
-//                val currentLatLong = LatLng(location.latitude, location.longitude)
-//                placeMarker(currentLatLong)
-//            }
-//        }
-//    }
+    private fun setUpMap() {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_REQUEST_CODE)
+            return
+        }
+        nMap.isMyLocationEnabled = true
+        fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
+            if (location != null) {
+                lastLocation = location
+                val currentLatLong = LatLng(location.latitude, location.longitude)
+                placeMarker(currentLatLong)
+            }
+        }
+    }
 
-//    private fun placeMarker(latLong: LatLng) {
-//        val markerOptions = MarkerOptions().position(LatLng(40.7128, 74.0060))
-//        markerOptions.title("$latLong")
-//        nMap.addMarker(markerOptions)
-//    }
+    private fun placeMarker(latLong: LatLng) {
+        val markerOptions = MarkerOptions().position(LatLng(latLong.latitude, latLong.longitude))
+        markerOptions.title("$latLong")
+        nMap.addMarker(markerOptions)
+        nMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLong, 12f))
+    }
 
     override fun onMarkerClick(p0: Marker): Boolean = false
 

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,6 +23,12 @@ class FriendsFragment : Fragment() {
     private lateinit var adapter: FriendListAdapter
     private lateinit var friendRecyclerView: RecyclerView
     private lateinit var tabLayout: TabLayout
+    private lateinit var searchView: SearchView
+    private lateinit var searchText: String
+
+    private var onFriends = true
+    private var onRequest = false
+    private var onAdd = false
 
     private lateinit var auth: FirebaseAuth
     private val db = Firebase.firestore
@@ -53,13 +60,28 @@ class FriendsFragment : Fragment() {
                 tab?.let {
                     when (it.position) {
                         0 -> {
-                            loadFriends("")
+                            loadFriends()
+                            onFriends = true
+                            onRequest = false
+                            onAdd = false
+                            searchView.setQuery("", false);
+                            searchView.clearFocus();
                         }
                         1 -> {
-                            loadFriendRequests("")
+                            loadFriendRequests()
+                            onFriends = false
+                            onRequest = true
+                            onAdd = false
+                            searchView.setQuery("", false);
+                            searchView.clearFocus();
                         }
                         2 -> {
-                            loadAddFriends("")
+                            loadAddFriends()
+                            onFriends = false
+                            onRequest = false
+                            onAdd = true
+                            searchView.setQuery("", false);
+                            searchView.clearFocus();
                         }
                     }
                 }
@@ -77,14 +99,44 @@ class FriendsFragment : Fragment() {
                 .replace(R.id.fragment_container, exploreFragment).commit()
         }
 
-        loadFriends("")
+        searchView = view.findViewById(R.id.friendSearch)
+        searchView.clearFocus()
+        searchText = ""
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                if(onFriends){
+                    if (query != null) {
+                        searchText = query
+                    }
+                    loadFriends()
+                } else if(onRequest){
+                    if (query != null) {
+                        searchText = query
+                    }
+                    loadFriendRequests()
+                } else {
+                    if (query != null) {
+                        searchText = query
+                    }
+                    loadAddFriends()
+                }
+                searchView.clearFocus()
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                return false
+            }
+        })
+
+        loadFriends()
         return view
     }
 
-    private fun loadFriends(search: String) {
+    private fun loadFriends() {
         val userId = auth.currentUser?.uid
         if (userId != null) {
-            if (search.isEmpty()) {
+            if (searchText.isEmpty()) {
                 db.collection("friends").document(userId)
                     .collection("friend_usernames")
                     .get()
@@ -115,10 +167,10 @@ class FriendsFragment : Fragment() {
         }
     }
 
-    private fun loadAddFriends(search: String) {
+    private fun loadAddFriends() {
         val userId = auth.currentUser?.uid
         if (userId != null) {
-            if (search.isEmpty()) {
+            if (searchText.isEmpty()) {
                 db.collection("friends").document(userId)
                     .collection("friend_usernames")
                     .get()
@@ -160,10 +212,10 @@ class FriendsFragment : Fragment() {
         }
     }
 
-    private fun loadFriendRequests(search: String) {
+    private fun loadFriendRequests() {
         val userId = auth.currentUser?.uid
         if (userId != null) {
-            if (search.isEmpty()) {
+            if (searchText.isEmpty()) {
                 db.collection("friends").document(userId)
                     .collection("incoming_requests")
                     .get()

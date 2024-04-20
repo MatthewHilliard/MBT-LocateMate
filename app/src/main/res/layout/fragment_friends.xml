@@ -31,8 +31,10 @@
         app:layout_constraintStart_toEndOf="@+id/friendBackButton"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.search.SearchBar
+    <androidx.appcompat.widget.SearchView
         android:id="@+id/friendSearch"
+        app:iconifiedByDefault="false"
+        app:queryHint="Search for users..."
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginStart="16dp"
@@ -40,7 +42,7 @@
         android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/friendText" />
+        app:layout_constraintTop_toBottomOf="@+id/friendText"/>
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"

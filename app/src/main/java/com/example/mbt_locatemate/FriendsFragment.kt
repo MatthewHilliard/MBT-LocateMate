@@ -56,6 +56,9 @@ class FriendsFragment : Fragment() {
                             loadFriends("")
                         }
                         1 -> {
+                            loadFriendRequests("")
+                        }
+                        2 -> {
                             loadAddFriends("")
                         }
                     }
@@ -136,6 +139,39 @@ class FriendsFragment : Fragment() {
                                     }
                                     adapter.updateAddFriends(friendList)
                         }
+                    }
+            }
+        }
+    }
+
+    private fun loadFriendRequests(search: String) {
+        val userId = auth.currentUser?.uid
+        if (userId != null) {
+            if (search.isEmpty()) {
+                db.collection("friends").document(userId)
+                    .collection("friend_requests")
+                    .get()
+                    .addOnSuccessListener { friendsSnapshot ->
+                        val friendRequests = friendsSnapshot.documents.map { it.id }.toMutableList()
+                        if(friendRequests.isEmpty()){
+                            friendRequests.add("")
+                        }
+                        db.collection("users")
+                            .whereIn("username", friendRequests)
+                            .get()
+                            .addOnSuccessListener { documents ->
+                                val requestList = mutableListOf<Friend>()
+                                for (document in documents) {
+                                    val id = document.getString("id") ?: ""
+                                    val username = document.getString("username") ?: ""
+                                    val pfpUrl = document.getString("pfp_url") ?: ""
+                                    val friend = Friend(username, pfpUrl)
+                                    if(id != userId){
+                                        requestList.add(friend)
+                                    }
+                                }
+                                adapter.updateRequestFriends(requestList)
+                            }
                     }
             }
         }

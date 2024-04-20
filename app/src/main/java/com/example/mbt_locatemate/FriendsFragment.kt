@@ -202,7 +202,6 @@ class FriendsFragment : Fragment() {
         val userId = auth.currentUser?.uid
         if (userId != null) {
             if (searchText.isEmpty()) {
-                // Load all friend and incoming request usernames if searchText is empty
                 db.collection("friends").document(userId)
                     .collection("friend_usernames")
                     .get()
@@ -222,7 +221,6 @@ class FriendsFragment : Fragment() {
                                     requestUsernames.add("")
                                 }
                                 val combinedUsernames = friendUsernames + requestUsernames
-                                // Fetch outgoing request usernames
                                 db.collection("friends").document(userId)
                                     .collection("outgoing_requests")
                                     .get()
@@ -232,9 +230,7 @@ class FriendsFragment : Fragment() {
                                         if (outgoingUsernames.isEmpty()) {
                                             outgoingUsernames.add("")
                                         }
-                                        // Combine all used usernames (friends, incoming requests, outgoing requests)
                                         val usedUsernames = combinedUsernames + outgoingUsernames
-                                        // Fetch users not in the combined list of used usernames
                                         db.collection("users")
                                             .whereNotIn("username", usedUsernames)
                                             .get()
@@ -255,7 +251,6 @@ class FriendsFragment : Fragment() {
                             }
                     }
             } else {
-                // Filter friend requests by username prefix if searchText is not empty
                 db.collection("friends").document(userId)
                     .collection("friend_usernames")
                     .get()
@@ -275,7 +270,6 @@ class FriendsFragment : Fragment() {
                                     requestUsernames.add("")
                                 }
                                 val combinedUsernames = friendUsernames + requestUsernames
-                                // Fetch outgoing request usernames
                                 db.collection("friends").document(userId)
                                     .collection("outgoing_requests")
                                     .get()
@@ -285,13 +279,11 @@ class FriendsFragment : Fragment() {
                                         if (outgoingUsernames.isEmpty()) {
                                             outgoingUsernames.add("")
                                         }
-                                        // Combine all used usernames (friends, incoming requests, outgoing requests)
                                         val usedUsernames = combinedUsernames + outgoingUsernames
-                                        // Fetch users not in the combined list of used usernames and filtered by prefix
                                         db.collection("users")
                                             .whereNotIn("username", usedUsernames)
                                             .whereGreaterThanOrEqualTo("username", searchText)
-                                            .whereLessThan("username", searchText + "\uf8ff") // Ending character for prefix filtering
+                                            .whereLessThan("username", searchText + "\uf8ff")
                                             .get()
                                             .addOnSuccessListener { documents ->
                                                 val friendList = mutableListOf<Friend>()

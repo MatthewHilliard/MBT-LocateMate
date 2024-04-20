@@ -75,9 +75,9 @@ class FriendListAdapter(private var friends: List<Friend>) : RecyclerView.Adapte
 
             friendButton.setOnClickListener {
                 if (onAddFriends) {
-                    //moveToRequest(friend)
+                    moveToRequest(friend)
                 } else if (onRequestFriends){
-                    //denyRequest(friend)
+                    denyRequest(friend)
                 } else {
                     removeFriend(friend)
                 }
@@ -99,9 +99,13 @@ class FriendListAdapter(private var friends: List<Friend>) : RecyclerView.Adapte
                 .collection("friend_usernames")
                 .document(friendUsername)
 
-            val emptyData: Map<String, Any> = HashMap()
+            val friendData = mapOf(
+                "id" to friend.id,
+                "username" to friendUsername,
+                "pfp_url" to friend.pfpUrl
+            )
 
-            friendDocumentRef.set(emptyData).addOnSuccessListener {
+            friendDocumentRef.set(friendData).addOnSuccessListener {
                 val updatedFriendsList = friends.toMutableList()
                 updatedFriendsList.remove(friend)
 
@@ -110,11 +114,28 @@ class FriendListAdapter(private var friends: List<Friend>) : RecyclerView.Adapte
 
             val friendRequestRef = db.collection("friends")
                 .document(userId)
-                .collection("friend_requests")
+                .collection("incoming_requests")
                 .document(friendUsername)
 
             friendRequestRef.delete().addOnSuccessListener {
 
+            }
+
+            db.collection("users").document(userId).get().addOnSuccessListener { document ->
+                val userData = mapOf(
+                    "id" to userId,
+                    "username" to document.getString("username"),
+                    "pfp_url" to document.getString("pfp_url")
+                )
+                val userRequestRef = userData["username"]?.let {
+                    db.collection("friends")
+                        .document(userId)
+                        .collection("outgoing_requests")
+                        .document(it)
+                }
+                userRequestRef?.delete()?.addOnSuccessListener {
+
+                }
             }
         }
     }
@@ -138,41 +159,78 @@ class FriendListAdapter(private var friends: List<Friend>) : RecyclerView.Adapte
         }
     }
 
-//    private fun moveToRequest(friend: Friend){
-//        val userId = auth.currentUser?.uid
-//        if (userId != null) {
-//            val friendUsername = friend.username
-//
-//            val friendDocumentRef = db.collection("friends")
-//                .document(userId)
-//                .collection("friend_usernames")
-//                .document(friendUsername)
-//
-//            friendDocumentRef.delete().addOnSuccessListener {
-//                val updatedFriendsList = friends.toMutableList()
-//                updatedFriendsList.remove(friend)
-//
-//                updateFriends(updatedFriendsList)
-//            }
-//        }
-//    }
+    private fun moveToRequest(friend: Friend){
+        val userId = auth.currentUser?.uid
+        if (userId != null) {
+            db.collection("users").document(userId).get().addOnSuccessListener { document ->
+                val userData = mapOf(
+                    "id" to userId,
+                    "username" to document.getString("username"),
+                    "pfp_url" to document.getString("pfp_url")
+                )
 
-//    private fun denyRequest(friend: Friend){
-//        val userId = auth.currentUser?.uid
-//        if (userId != null) {
-//            val friendUsername = friend.username
-//
-//            val friendDocumentRef = db.collection("friends")
-//                .document(userId)
-//                .collection("friend_usernames")
-//                .document(friendUsername)
-//
-//            friendDocumentRef.delete().addOnSuccessListener {
-//                val updatedFriendsList = friends.toMutableList()
-//                updatedFriendsList.remove(friend)
-//
-//                updateFriends(updatedFriendsList)
-//            }
-//        }
-//    }
+                val userDocumentRef = document.getString("username")?.let {
+                    db.collection("friends")
+                        .document(friend.id)
+                        .collection("incoming_requests")
+                        .document(it)
+                }
+
+                val friendData = mapOf(
+                    "id" to friend.id,
+                    "username" to friend.username,
+                    "pfp_url" to friend.pfpUrl
+                )
+
+                val friendRequestRef = userData["id"]?.let { it ->
+                        db.collection("friends")
+                            .document(it)
+                            .collection("outgoing_requests")
+                            .document(friend.username)
+                }
+
+                userDocumentRef?.set(userData)?.addOnSuccessListener {
+                    friendRequestRef?.set(friendData)?.addOnSuccessListener {
+                        val updatedFriendsList = friends.toMutableList()
+                        updatedFriendsList.remove(friend)
+
+                        updateAddFriends(updatedFriendsList)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun denyRequest(friend: Friend){
+        val userId = auth.currentUser?.uid
+        if (userId != null) {
+            db.collection("users").document(userId).get().addOnSuccessListener { document ->
+                val userData = mapOf(
+                    "id" to userId,
+                    "username" to document.getString("username"),
+                    "pfp_url" to document.getString("pfp_url")
+                )
+                val userDocumentRef = userData["username"]?.let {
+                    db.collection("friends")
+                        .document(friend.id)
+                        .collection("outgoing_requests")
+                        .document(it)
+                }
+
+                userDocumentRef?.delete()?.addOnSuccessListener {
+                    val friendDocumentRef = db.collection("friends")
+                        .document(userId)
+                        .collection("incoming_requests")
+                        .document(friend.username)
+
+                    friendDocumentRef.delete().addOnSuccessListener {
+                        val updatedFriendsList = friends.toMutableList()
+                        updatedFriendsList.remove(friend)
+
+                        updateFriends(updatedFriendsList)
+                    }
+                }
+            }
+        }
+    }
 }

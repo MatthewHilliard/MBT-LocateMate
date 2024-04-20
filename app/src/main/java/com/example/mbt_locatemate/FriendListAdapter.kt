@@ -127,9 +127,21 @@ class FriendListAdapter(private var friends: List<Friend>) : RecyclerView.Adapte
                     "username" to document.getString("username"),
                     "pfp_url" to document.getString("pfp_url")
                 )
+
+                val userDocumentRef = userData["username"]?.let {
+                    db.collection("friends")
+                        .document(friend.id)
+                        .collection("friend_usernames")
+                        .document(it)
+                }
+
+                userDocumentRef?.set(userData)?.addOnSuccessListener {
+
+                }
+
                 val userRequestRef = userData["username"]?.let {
                     db.collection("friends")
-                        .document(userId)
+                        .document(friend.id)
                         .collection("outgoing_requests")
                         .document(it)
                 }

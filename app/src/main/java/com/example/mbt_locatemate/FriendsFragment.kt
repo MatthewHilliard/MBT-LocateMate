@@ -202,6 +202,7 @@ class FriendsFragment : Fragment() {
         val userId = auth.currentUser?.uid
         if (userId != null) {
             if (searchText.isEmpty()) {
+                // Load all friend and incoming request usernames if searchText is empty
                 db.collection("friends").document(userId)
                     .collection("friend_usernames")
                     .get()
@@ -221,25 +222,40 @@ class FriendsFragment : Fragment() {
                                     requestUsernames.add("")
                                 }
                                 val combinedUsernames = friendUsernames + requestUsernames
-                                db.collection("users")
-                                    .whereNotIn("username", combinedUsernames)
+                                // Fetch outgoing request usernames
+                                db.collection("friends").document(userId)
+                                    .collection("outgoing_requests")
                                     .get()
-                                    .addOnSuccessListener { documents ->
-                                        val friendList = mutableListOf<Friend>()
-                                        for (document in documents) {
-                                            val id = document.getString("id") ?: ""
-                                            val username = document.getString("username") ?: ""
-                                            val pfpUrl = document.getString("pfp_url") ?: ""
-                                            val friend = Friend(id, username, pfpUrl)
-                                            if (id != userId) {
-                                                friendList.add(friend)
-                                            }
+                                    .addOnSuccessListener { outgoingSnapshot ->
+                                        val outgoingUsernames =
+                                            outgoingSnapshot.documents.map { it.id }.toMutableList()
+                                        if (outgoingUsernames.isEmpty()) {
+                                            outgoingUsernames.add("")
                                         }
-                                        adapter.updateAddFriends(friendList)
+                                        // Combine all used usernames (friends, incoming requests, outgoing requests)
+                                        val usedUsernames = combinedUsernames + outgoingUsernames
+                                        // Fetch users not in the combined list of used usernames
+                                        db.collection("users")
+                                            .whereNotIn("username", usedUsernames)
+                                            .get()
+                                            .addOnSuccessListener { documents ->
+                                                val friendList = mutableListOf<Friend>()
+                                                for (document in documents) {
+                                                    val id = document.getString("id") ?: ""
+                                                    val username = document.getString("username") ?: ""
+                                                    val pfpUrl = document.getString("pfp_url") ?: ""
+                                                    val friend = Friend(id, username, pfpUrl)
+                                                    if (id != userId) {
+                                                        friendList.add(friend)
+                                                    }
+                                                }
+                                                adapter.updateAddFriends(friendList)
+                                            }
                                     }
                             }
                     }
             } else {
+                // Filter friend requests by username prefix if searchText is not empty
                 db.collection("friends").document(userId)
                     .collection("friend_usernames")
                     .get()
@@ -259,23 +275,37 @@ class FriendsFragment : Fragment() {
                                     requestUsernames.add("")
                                 }
                                 val combinedUsernames = friendUsernames + requestUsernames
-                                db.collection("users")
-                                    .whereNotIn("username", combinedUsernames)
-                                    .whereGreaterThanOrEqualTo("username", searchText)
-                                    .whereLessThan("username", searchText + "\uf8ff")
+                                // Fetch outgoing request usernames
+                                db.collection("friends").document(userId)
+                                    .collection("outgoing_requests")
                                     .get()
-                                    .addOnSuccessListener { documents ->
-                                        val friendList = mutableListOf<Friend>()
-                                        for (document in documents) {
-                                            val id = document.getString("id") ?: ""
-                                            val username = document.getString("username") ?: ""
-                                            val pfpUrl = document.getString("pfp_url") ?: ""
-                                            val friend = Friend(id, username, pfpUrl)
-                                            if (id != userId) {
-                                                friendList.add(friend)
-                                            }
+                                    .addOnSuccessListener { outgoingSnapshot ->
+                                        val outgoingUsernames =
+                                            outgoingSnapshot.documents.map { it.id }.toMutableList()
+                                        if (outgoingUsernames.isEmpty()) {
+                                            outgoingUsernames.add("")
                                         }
-                                        adapter.updateAddFriends(friendList)
+                                        // Combine all used usernames (friends, incoming requests, outgoing requests)
+                                        val usedUsernames = combinedUsernames + outgoingUsernames
+                                        // Fetch users not in the combined list of used usernames and filtered by prefix
+                                        db.collection("users")
+                                            .whereNotIn("username", usedUsernames)
+                                            .whereGreaterThanOrEqualTo("username", searchText)
+                                            .whereLessThan("username", searchText + "\uf8ff") // Ending character for prefix filtering
+                                            .get()
+                                            .addOnSuccessListener { documents ->
+                                                val friendList = mutableListOf<Friend>()
+                                                for (document in documents) {
+                                                    val id = document.getString("id") ?: ""
+                                                    val username = document.getString("username") ?: ""
+                                                    val pfpUrl = document.getString("pfp_url") ?: ""
+                                                    val friend = Friend(id, username, pfpUrl)
+                                                    if (id != userId) {
+                                                        friendList.add(friend)
+                                                    }
+                                                }
+                                                adapter.updateAddFriends(friendList)
+                                            }
                                     }
                             }
                     }

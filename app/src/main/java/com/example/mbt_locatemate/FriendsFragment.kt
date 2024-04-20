@@ -1,7 +1,6 @@
 package com.example.mbt_locatemate
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +15,6 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
-import java.util.UUID
 
 class FriendsFragment : Fragment() {
     private lateinit var layoutManager: RecyclerView.LayoutManager
@@ -64,24 +62,27 @@ class FriendsFragment : Fragment() {
                             onFriends = true
                             onRequest = false
                             onAdd = false
-                            searchView.setQuery("", false);
-                            searchView.clearFocus();
+                            searchView.setQuery("", false)
+                            searchView.clearFocus()
+                            searchText = ""
                         }
                         1 -> {
                             loadFriendRequests()
                             onFriends = false
                             onRequest = true
                             onAdd = false
-                            searchView.setQuery("", false);
-                            searchView.clearFocus();
+                            searchView.setQuery("", false)
+                            searchView.clearFocus()
+                            searchText = ""
                         }
                         2 -> {
                             loadAddFriends()
                             onFriends = false
                             onRequest = false
                             onAdd = true
-                            searchView.setQuery("", false);
-                            searchView.clearFocus();
+                            searchView.setQuery("", false)
+                            searchView.clearFocus()
+                            searchText = ""
                         }
                     }
                 }
@@ -93,7 +94,7 @@ class FriendsFragment : Fragment() {
         })
 
         val backButton = view.findViewById<ImageView>(R.id.friendBackButton)
-        backButton.setOnClickListener(){
+        backButton.setOnClickListener{
             val exploreFragment = ExploreFragment()
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, exploreFragment).commit()
@@ -104,6 +105,10 @@ class FriendsFragment : Fragment() {
         searchText = ""
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(query: String?): Boolean {
                 if(onFriends){
                     if (query != null) {
                         searchText = query
@@ -120,12 +125,7 @@ class FriendsFragment : Fragment() {
                     }
                     loadAddFriends()
                 }
-                searchView.clearFocus()
                 return true
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                return false
             }
         })
 
@@ -133,6 +133,7 @@ class FriendsFragment : Fragment() {
         return view
     }
 
+    //Used Chat GPT to assist in the query
     private fun loadFriends() {
         val userId = auth.currentUser?.uid
         if (userId != null) {
@@ -163,10 +164,40 @@ class FriendsFragment : Fragment() {
                             adapter.updateFriends(friendList)
                         }
                     }
+            } else {
+                db.collection("friends").document(userId)
+                    .collection("friend_usernames")
+                    .get()
+                    .addOnSuccessListener { friendsSnapshot ->
+                        val friendUsernames = friendsSnapshot.documents.map { it.id }
+
+                        if (friendUsernames.isNotEmpty()) {
+                            db.collection("users")
+                                .whereIn("username", friendUsernames)
+                                .whereGreaterThanOrEqualTo("username", searchText)
+                                .whereLessThan("username", searchText + "\uf8ff")
+                                .get()
+                                .addOnSuccessListener { documents ->
+                                    val friendList = mutableListOf<Friend>()
+                                    for (document in documents) {
+                                        val id = document.getString("id") ?: ""
+                                        val username = document.getString("username") ?: ""
+                                        val pfpUrl = document.getString("pfp_url") ?: ""
+                                        val friend = Friend(id, username, pfpUrl)
+                                        friendList.add(friend)
+                                    }
+                                    adapter.updateFriends(friendList)
+                                }
+                        } else {
+                            val friendList = mutableListOf<Friend>()
+                            adapter.updateFriends(friendList)
+                        }
+                    }
             }
         }
     }
 
+    //Used ChatGPT to assist in the query
     private fun loadAddFriends() {
         val userId = auth.currentUser?.uid
         if (userId != null) {
@@ -208,10 +239,51 @@ class FriendsFragment : Fragment() {
                                     }
                             }
                     }
+            } else {
+                db.collection("friends").document(userId)
+                    .collection("friend_usernames")
+                    .get()
+                    .addOnSuccessListener { friendsSnapshot ->
+                        val friendUsernames =
+                            friendsSnapshot.documents.map { it.id }.toMutableList()
+                        if (friendUsernames.isEmpty()) {
+                            friendUsernames.add("")
+                        }
+                        db.collection("friends").document(userId)
+                            .collection("incoming_requests")
+                            .get()
+                            .addOnSuccessListener { requestsSnapshot ->
+                                val requestUsernames =
+                                    requestsSnapshot.documents.map { it.id }.toMutableList()
+                                if (requestUsernames.isEmpty()) {
+                                    requestUsernames.add("")
+                                }
+                                val combinedUsernames = friendUsernames + requestUsernames
+                                db.collection("users")
+                                    .whereNotIn("username", combinedUsernames)
+                                    .whereGreaterThanOrEqualTo("username", searchText)
+                                    .whereLessThan("username", searchText + "\uf8ff")
+                                    .get()
+                                    .addOnSuccessListener { documents ->
+                                        val friendList = mutableListOf<Friend>()
+                                        for (document in documents) {
+                                            val id = document.getString("id") ?: ""
+                                            val username = document.getString("username") ?: ""
+                                            val pfpUrl = document.getString("pfp_url") ?: ""
+                                            val friend = Friend(id, username, pfpUrl)
+                                            if (id != userId) {
+                                                friendList.add(friend)
+                                            }
+                                        }
+                                        adapter.updateAddFriends(friendList)
+                                    }
+                            }
+                    }
             }
         }
     }
 
+    //Used ChatGPT to assist in the query
     private fun loadFriendRequests() {
         val userId = auth.currentUser?.uid
         if (userId != null) {
@@ -235,6 +307,35 @@ class FriendsFragment : Fragment() {
                                     val pfpUrl = document.getString("pfp_url") ?: ""
                                     val friend = Friend(id, username, pfpUrl)
                                     if(id != userId){
+                                        requestList.add(friend)
+                                    }
+                                }
+                                adapter.updateRequestFriends(requestList)
+                            }
+                    }
+            } else {
+                db.collection("friends").document(userId)
+                    .collection("incoming_requests")
+                    .get()
+                    .addOnSuccessListener { requestsSnapshot ->
+                        val friendRequests =
+                            requestsSnapshot.documents.map { it.id }.toMutableList()
+                        if (friendRequests.isEmpty()) {
+                            friendRequests.add("")
+                        }
+                        db.collection("users")
+                            .whereIn("username", friendRequests)
+                            .whereGreaterThanOrEqualTo("username", searchText)
+                            .whereLessThan("username", searchText + "\uf8ff")
+                            .get()
+                            .addOnSuccessListener { documents ->
+                                val requestList = mutableListOf<Friend>()
+                                for (document in documents) {
+                                    val id = document.getString("id") ?: ""
+                                    val username = document.getString("username") ?: ""
+                                    val pfpUrl = document.getString("pfp_url") ?: ""
+                                    val friend = Friend(id, username, pfpUrl)
+                                    if (id != userId) {
                                         requestList.add(friend)
                                     }
                                 }

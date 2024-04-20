@@ -125,41 +125,37 @@ class ExploreFragment: Fragment() {
     }
 
     private fun loadAllPosts() {
-        //TODO this is super inefficent tbh and uses a ton of API calls so perhaps rework the database a bit to make fewer calls
-        //yeah actually the own users post sometimes gets rendered so its def a bit bugged because of excessive api calls
-        //i think we should figure out how to make global variables upon app start of basic user info like username and pfp
         val userId = auth.currentUser?.uid
-        var userUsername: String? = null
         val userFriends = mutableListOf<String>()
         if (userId != null) {
-            db.collection("users").document(userId).get().addOnSuccessListener { document ->
-                userUsername = document.getString("username")
-            }
-            db.collection("friends").document(userId)
-                .collection("friend_usernames")
-                .get()
-                .addOnSuccessListener { friendsSnapshot ->
-                    userFriends.addAll(friendsSnapshot.documents.map { it.id })
-                }
-            db.collection("posts")
-                .get()
-                .addOnSuccessListener { documents ->
-                    val postList = mutableListOf<Post>()
-                    for (document in documents) {
-                        val username = document.getString("username") ?: ""
-                        val caption = document.getString("caption") ?: ""
-                        val imgUrl = document.getString("img_url") ?: ""
-                        val pfpUrl = document.getString("pfp_url") ?: ""
-                        val latitude = document.getDouble("latitude") ?: 0.0
-                        val longitude = document.getDouble("longitude") ?: 0.0
-                        val location = LatLng(latitude, longitude)
-                        val post = Post(UUID.randomUUID(), username, caption, imgUrl, pfpUrl, location)
-                        if (username != userUsername && username !in userFriends) {
-                            postList.add(post)
-                        }
+            db.collection("users").document(userId).get().addOnSuccessListener { currUser ->
+                val userUsername = currUser.getString("username")
+                db.collection("friends").document(userId)
+                    .collection("friend_usernames")
+                    .get()
+                    .addOnSuccessListener { friendsSnapshot ->
+                        userFriends.addAll(friendsSnapshot.documents.map { it.id })
                     }
-                    adapter.updatePosts(postList)
-                }
+                db.collection("posts")
+                    .get()
+                    .addOnSuccessListener { documents ->
+                        val postList = mutableListOf<Post>()
+                        for (document in documents) {
+                            val username = document.getString("username") ?: ""
+                            val caption = document.getString("caption") ?: ""
+                            val imgUrl = document.getString("img_url") ?: ""
+                            val pfpUrl = document.getString("pfp_url") ?: ""
+                            val latitude = document.getDouble("latitude") ?: 0.0
+                            val longitude = document.getDouble("longitude") ?: 0.0
+                            val location = LatLng(latitude, longitude)
+                            val post = Post(UUID.randomUUID(), username, caption, imgUrl, pfpUrl, location)
+                            if (username != userUsername && username !in userFriends) {
+                                postList.add(post)
+                            }
+                        }
+                        adapter.updatePosts(postList)
+                    }
+            }
         }
     }
 }

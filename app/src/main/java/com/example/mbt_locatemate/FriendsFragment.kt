@@ -56,6 +56,9 @@ class FriendsFragment : Fragment() {
                             loadFriends("")
                         }
                         1 -> {
+                            loadFriendRequests("")
+                        }
+                        2 -> {
                             loadAddFriends("")
                         }
                     }
@@ -95,13 +98,17 @@ class FriendsFragment : Fragment() {
                                 .addOnSuccessListener { documents ->
                                     val friendList = mutableListOf<Friend>()
                                     for (document in documents) {
+                                        val id = document.getString("id") ?: ""
                                         val username = document.getString("username") ?: ""
                                         val pfpUrl = document.getString("pfp_url") ?: ""
-                                        val friend = Friend(username, pfpUrl)
+                                        val friend = Friend(id, username, pfpUrl)
                                         friendList.add(friend)
                                     }
                                     adapter.updateFriends(friendList)
                                 }
+                        } else {
+                            val friendList = mutableListOf<Friend>()
+                            adapter.updateFriends(friendList)
                         }
                     }
             }
@@ -116,26 +123,71 @@ class FriendsFragment : Fragment() {
                     .collection("friend_usernames")
                     .get()
                     .addOnSuccessListener { friendsSnapshot ->
-                        val friendUsernames = friendsSnapshot.documents.map { it.id }.toMutableList()
-                        if(friendUsernames.isEmpty()){
+                        val friendUsernames =
+                            friendsSnapshot.documents.map { it.id }.toMutableList()
+                        if (friendUsernames.isEmpty()) {
                             friendUsernames.add("")
                         }
-                            db.collection("users")
-                                .whereNotIn("username", friendUsernames)
-                                .get()
-                                .addOnSuccessListener { documents ->
-                                    val friendList = mutableListOf<Friend>()
-                                    for (document in documents) {
-                                        val id = document.getString("id") ?: ""
-                                        val username = document.getString("username") ?: ""
-                                        val pfpUrl = document.getString("pfp_url") ?: ""
-                                        val friend = Friend(username, pfpUrl)
-                                        if(id != userId){
-                                            friendList.add(friend)
+                        db.collection("friends").document(userId)
+                            .collection("incoming_requests")
+                            .get()
+                            .addOnSuccessListener { requestsSnapshot ->
+                                val requestUsernames =
+                                    requestsSnapshot.documents.map { it.id }.toMutableList()
+                                if (requestUsernames.isEmpty()) {
+                                    requestUsernames.add("")
+                                }
+                                val combinedUsernames = friendUsernames + requestUsernames
+                                db.collection("users")
+                                    .whereNotIn("username", combinedUsernames)
+                                    .get()
+                                    .addOnSuccessListener { documents ->
+                                        val friendList = mutableListOf<Friend>()
+                                        for (document in documents) {
+                                            val id = document.getString("id") ?: ""
+                                            val username = document.getString("username") ?: ""
+                                            val pfpUrl = document.getString("pfp_url") ?: ""
+                                            val friend = Friend(id, username, pfpUrl)
+                                            if (id != userId) {
+                                                friendList.add(friend)
+                                            }
                                         }
+                                        adapter.updateAddFriends(friendList)
                                     }
-                                    adapter.updateAddFriends(friendList)
+                            }
+                    }
+            }
+        }
+    }
+
+    private fun loadFriendRequests(search: String) {
+        val userId = auth.currentUser?.uid
+        if (userId != null) {
+            if (search.isEmpty()) {
+                db.collection("friends").document(userId)
+                    .collection("incoming_requests")
+                    .get()
+                    .addOnSuccessListener { friendsSnapshot ->
+                        val friendRequests = friendsSnapshot.documents.map { it.id }.toMutableList()
+                        if(friendRequests.isEmpty()){
+                            friendRequests.add("")
                         }
+                        db.collection("users")
+                            .whereIn("username", friendRequests)
+                            .get()
+                            .addOnSuccessListener { documents ->
+                                val requestList = mutableListOf<Friend>()
+                                for (document in documents) {
+                                    val id = document.getString("id") ?: ""
+                                    val username = document.getString("username") ?: ""
+                                    val pfpUrl = document.getString("pfp_url") ?: ""
+                                    val friend = Friend(id, username, pfpUrl)
+                                    if(id != userId){
+                                        requestList.add(friend)
+                                    }
+                                }
+                                adapter.updateRequestFriends(requestList)
+                            }
                     }
             }
         }

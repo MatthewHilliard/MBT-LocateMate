@@ -12,6 +12,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.firestore.firestore
@@ -31,6 +32,7 @@ class SettingsFragment : Fragment() {
 
     private var uri: Uri? = null
 
+    private lateinit var prevUsername: String
     private var pfpUpdated = false
     private var pfpUrl: String? = null
     override fun onCreateView(
@@ -42,6 +44,12 @@ class SettingsFragment : Fragment() {
         auth = Firebase.auth
         storage = Firebase.storage
         val user = auth.currentUser
+
+        if (user != null) {
+            db.collection("users").document(user.uid).get().addOnSuccessListener { document ->
+                prevUsername = document.getString("username") ?: ""
+            }
+        }
 
         val profilePicture = view.findViewById<ImageView>(R.id.imgSettings)
         if (user != null) {
@@ -110,9 +118,14 @@ class SettingsFragment : Fragment() {
                         }
                         if (usernameInput.text?.isNotEmpty() == true) {
                             if (user !== null) {
+                                updatePostUsernames(prevUsername, usernameInput.text.toString())
+                                updateFriendUsernames(prevUsername, usernameInput.text.toString())
+
                                 db.collection("users")
                                     .document(user.uid)
                                     .update("username", usernameInput.text.toString())
+
+                                prevUsername = usernameInput.text.toString()
                             }
                         }
                         pfpUpdated = false
@@ -123,6 +136,29 @@ class SettingsFragment : Fragment() {
         }
             return view
         }
+
+    private fun updatePostUsernames(prevUsername: String, newUsername: String){
+        val user = auth.currentUser
+        if(user != null){
+                db.collection("posts")
+                    .whereEqualTo("username", prevUsername)
+                    .get()
+                    .addOnSuccessListener { querySnapshot ->
+                        val batch = db.batch()
+                        querySnapshot.documents.forEach { postDoc ->
+                            val postRef = db.collection("posts").document(postDoc.id)
+                            batch.update(postRef, "username", newUsername)
+                            Log.d("SettingsFragment", "We are here")
+                        }
+
+                        batch.commit()
+            }
+        }
+    }
+
+    private fun updateFriendUsernames(prevUsername: String, newUsername: String){
+
+    }
 
     private suspend fun checkIfUsernameExists(username: String): Boolean {
         return try {

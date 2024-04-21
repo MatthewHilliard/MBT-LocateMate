@@ -12,8 +12,10 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import android.net.Uri
+import android.widget.Toast
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.storage
 import com.squareup.picasso.Picasso
 
 class SettingsFragment : Fragment() {
@@ -33,6 +35,7 @@ class SettingsFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_settings, container, false)
         auth = Firebase.auth
+        storage = Firebase.storage
         val user = auth.currentUser
 
         val profilePicture = view.findViewById<ImageView>(R.id.imgSettings)
@@ -44,12 +47,10 @@ class SettingsFragment : Fragment() {
         }
 
         val pickImage = registerForActivityResult(ActivityResultContracts.GetContent()){
-            if(pfpUrl?.equals(it) != true){
+            if(pfpUrl?.equals(it) != true && it != null){
                 profilePicture.setImageURI(it)
-                if(it != null){
-                    uri = it
-                    pfpUpdated = true
-                }
+                uri = it
+                pfpUpdated = true
             }
         }
 
@@ -75,13 +76,27 @@ class SettingsFragment : Fragment() {
         val saveButton = view.findViewById<Button>(R.id.saveButton)
         saveButton.setOnClickListener{
             if(pfpUpdated){
-
+                if (user !== null) {
+                    uri?.let {
+                        storage.reference.child("images/${user.uid}.jpg").putFile(it)
+                            .addOnSuccessListener { task ->
+                                task.metadata!!.reference!!.downloadUrl
+                                    .addOnSuccessListener { url ->
+                                        val pfpUrl = url.toString()
+                                        db.collection("users")
+                                            .document(user.uid)
+                                            .update("pfp_url", pfpUrl)
+                                    }
+                            }
+                    }
+                }
             }
             if(usernameUpdated){
 
             }
             pfpUpdated = false
             usernameUpdated = false
+            Toast.makeText(requireContext(), "Profile updated!", Toast.LENGTH_SHORT).show()
         }
 
         return view

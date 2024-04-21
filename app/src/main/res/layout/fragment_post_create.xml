@@ -11,7 +11,7 @@
         android:id="@+id/cancelButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="53dp"
+        android:layout_marginStart="24dp"
         android:layout_marginBottom="65dp"
         android:backgroundTint="@color/cool_blue"
         android:fontFamily="@font/poppins"
@@ -20,7 +20,22 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/captionText"
-        app:layout_constraintVertical_bias="0.3"/>
+        app:layout_constraintVertical_bias="0.304" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/cameraButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="160dp"
+        android:layout_marginBottom="65dp"
+        android:backgroundTint="@color/cool_blue"
+        android:fontFamily="@font/poppins"
+        android:text=""
+        android:textSize="17dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/captionText"
+        app:layout_constraintVertical_bias="0.304" />
 
     <fragment
         android:id="@+id/map"
@@ -79,7 +94,7 @@
         android:id="@+id/postButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="53dp"
+        android:layout_marginEnd="24dp"
         android:layout_marginBottom="65dp"
         android:backgroundTint="@color/cool_blue"
         android:fontFamily="@font/poppins"
@@ -88,7 +103,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/captionText"
-        app:layout_constraintVertical_bias="0.3">
-  </com.google.android.material.button.MaterialButton>
+        app:layout_constraintVertical_bias="0.304"></com.google.android.material.button.MaterialButton>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

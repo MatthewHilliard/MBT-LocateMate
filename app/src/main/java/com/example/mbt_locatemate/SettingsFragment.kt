@@ -13,10 +13,16 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import android.net.Uri
 import android.widget.Toast
+import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.storage
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 class SettingsFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
@@ -26,7 +32,6 @@ class SettingsFragment : Fragment() {
     private var uri: Uri? = null
 
     private var pfpUpdated = false
-    private var usernameUpdated = false
     private var pfpUrl: String? = null
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,59 +51,85 @@ class SettingsFragment : Fragment() {
             }
         }
 
-        val pickImage = registerForActivityResult(ActivityResultContracts.GetContent()){
-            if(pfpUrl?.equals(it) != true && it != null){
+        val pickImage = registerForActivityResult(ActivityResultContracts.GetContent()) {
+            if (pfpUrl?.equals(it) != true && it != null) {
                 profilePicture.setImageURI(it)
                 uri = it
                 pfpUpdated = true
             }
         }
 
-        profilePicture.setOnClickListener{
+        profilePicture.setOnClickListener {
             pickImage.launch("image/*")
         }
 
         val logoutButton = view.findViewById<Button>(R.id.logoutButton)
-        logoutButton.setOnClickListener(){
+        logoutButton.setOnClickListener() {
             Firebase.auth.signOut()
             val loginFragment = LoginFragment()
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, loginFragment).commit()
         }
 
+        val usernameInput = view.findViewById<TextInputEditText>(R.id.usernameEditText)
+
         val backButton = view.findViewById<ImageView>(R.id.settingsBackButton)
-        backButton.setOnClickListener{
+        backButton.setOnClickListener {
             val profileFragment = ProfileFragment()
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, profileFragment).commit()
         }
 
         val saveButton = view.findViewById<Button>(R.id.saveButton)
-        saveButton.setOnClickListener{
-            if(pfpUpdated){
-                if (user !== null) {
-                    uri?.let {
-                        storage.reference.child("images/${user.uid}.jpg").putFile(it)
-                            .addOnSuccessListener { task ->
-                                task.metadata!!.reference!!.downloadUrl
-                                    .addOnSuccessListener { url ->
-                                        val pfpUrl = url.toString()
-                                        db.collection("users")
-                                            .document(user.uid)
-                                            .update("pfp_url", pfpUrl)
-                                    }
+        saveButton.setOnClickListener {
+            CoroutineScope(Dispatchers.IO).launch {
+                val usernameExists = checkIfUsernameExists(usernameInput.text.toString())
+                withContext(Dispatchers.Main) {
+                    if (usernameExists) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Username already exists",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        if (pfpUpdated) {
+                            if (user !== null) {
+                                uri?.let {
+                                    storage.reference.child("images/${user.uid}.jpg").putFile(it)
+                                        .addOnSuccessListener { task ->
+                                            task.metadata!!.reference!!.downloadUrl
+                                                .addOnSuccessListener { url ->
+                                                    val pfpUrl = url.toString()
+                                                    db.collection("users")
+                                                        .document(user.uid)
+                                                        .update("pfp_url", pfpUrl)
+                                                }
+                                        }
+                                }
                             }
+                        }
+                        if (usernameInput.text?.isNotEmpty() == true) {
+                            if (user !== null) {
+                                db.collection("users")
+                                    .document(user.uid)
+                                    .update("username", usernameInput.text.toString())
+                            }
+                        }
+                        pfpUpdated = false
+                        Toast.makeText(requireContext(), "Profile updated!", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
-            if(usernameUpdated){
-
-            }
-            pfpUpdated = false
-            usernameUpdated = false
-            Toast.makeText(requireContext(), "Profile updated!", Toast.LENGTH_SHORT).show()
+        }
+            return view
         }
 
-        return view
+    private suspend fun checkIfUsernameExists(username: String): Boolean {
+        return try {
+            val querySnapshot = db.collection("users").whereEqualTo("username", username).get().await()
+            !querySnapshot.isEmpty
+        } catch (e: Exception) {
+            false
+        }
     }
 }

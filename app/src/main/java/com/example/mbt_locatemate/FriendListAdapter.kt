@@ -1,6 +1,6 @@
 package com.example.mbt_locatemate
 
-import android.util.Log
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,6 +33,7 @@ class FriendListAdapter(private var friends: List<Friend>) : RecyclerView.Adapte
         holder.bind(friends[position])
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateFriends(newFriends: List<Friend>) {
         friends = newFriends
         notifyDataSetChanged()
@@ -40,6 +41,7 @@ class FriendListAdapter(private var friends: List<Friend>) : RecyclerView.Adapte
         onRequestFriends = false
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateAddFriends(newFriends: List<Friend>) {
         friends = newFriends
         notifyDataSetChanged()
@@ -47,6 +49,7 @@ class FriendListAdapter(private var friends: List<Friend>) : RecyclerView.Adapte
         onRequestFriends = false
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateRequestFriends(newFriends: List<Friend>) {
         friends = newFriends
         notifyDataSetChanged()
@@ -155,18 +158,33 @@ class FriendListAdapter(private var friends: List<Friend>) : RecyclerView.Adapte
     private fun removeFriend(friend: Friend){
         val userId = auth.currentUser?.uid
         if (userId != null) {
-            val friendUsername = friend.username
-
             val friendDocumentRef = db.collection("friends")
                 .document(userId)
                 .collection("friend_usernames")
-                .document(friendUsername)
+                .document(friend.username)
 
             friendDocumentRef.delete().addOnSuccessListener {
-                val updatedFriendsList = friends.toMutableList()
-                updatedFriendsList.remove(friend)
+                db.collection("users").document(userId).get().addOnSuccessListener { document ->
+                    val userData = mapOf(
+                        "id" to userId,
+                        "username" to document.getString("username"),
+                        "pfp_url" to document.getString("pfp_url")
+                    )
 
-                updateFriends(updatedFriendsList)
+                    val userDocumentRef = userData["username"]?.let { it1 ->
+                        db.collection("friends")
+                            .document(friend.id)
+                            .collection("friend_usernames")
+                            .document(it1)
+                    }
+
+                    userDocumentRef?.delete()?.addOnSuccessListener {
+                        val updatedFriendsList = friends.toMutableList()
+                        updatedFriendsList.remove(friend)
+
+                        updateFriends(updatedFriendsList)
+                    }
+                }
             }
         }
     }

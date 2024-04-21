@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ProfileFragment">
+    tools:context=".ProfileFragment"
+    android:background="@drawable/profile_gradient">
 
     <ImageView
         android:id="@+id/settingsButton"
@@ -22,6 +23,7 @@
         android:layout_height="120dp"
         app:shapeAppearanceOverlay="@style/roundedImageView"
         android:layout_marginTop="12dp"
+        android:scaleType="centerCrop"
         app:layout_constraintTop_toBottomOf="@+id/settingsButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -62,7 +64,7 @@
             android:fontFamily="@font/poppins"
             android:text="24"
             android:textColor="@color/black"
-            android:textSize="20dp" />
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/txPostLabel"
@@ -71,7 +73,7 @@
             android:fontFamily="@font/poppins"
             android:text="Posts"
             android:textColor="@color/black"
-            android:textSize="16dp" />
+            android:textSize="16sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -93,7 +95,7 @@
             android:fontFamily="@font/poppins"
             android:text="84"
             android:textColor="@color/black"
-            android:textSize="20dp" />
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/txtGuessLabel"
@@ -102,7 +104,7 @@
             android:fontFamily="@font/poppins"
             android:text="Guesses"
             android:textColor="@color/black"
-            android:textSize="16dp" />
+            android:textSize="16sp" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView

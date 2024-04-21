@@ -156,8 +156,41 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    //Utilized chat GPT for query assistance
     private fun updateFriendUsernames(prevUsername: String, newUsername: String){
+        val user = auth.currentUser
+        if (user != null) {
+            db.collection("friends")
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    querySnapshot.documents.forEach { userDoc ->
+                        val userId = userDoc.id
+                        val collections = listOf("incoming_requests", "outgoing_requests", "friend_usernames")
 
+                        collections.forEach { collection ->
+                            val collectionRef = db.collection("friends").document(userId).collection(collection)
+
+                            collectionRef
+                                .whereEqualTo("username", prevUsername)
+                                .get()
+                                .addOnSuccessListener { querySnapshot ->
+                                    querySnapshot.documents.forEach { doc ->
+                                        val docId = doc.id
+                                        val docData = doc.data
+
+                                        if (docData != null) {
+                                            val newDocRef = collectionRef.document(newUsername)
+
+                                            newDocRef.set(docData)
+                                            collectionRef.document(docId).delete()
+                                            newDocRef.update("username", newUsername)
+                                        }
+                                    }
+                                }
+                        }
+                    }
+                }
+        }
     }
 
     private suspend fun checkIfUsernameExists(username: String): Boolean {

@@ -93,6 +93,9 @@ class RegisterFragment : Fragment() {
                                                     }.addOnFailureListener { e ->
                                                         Log.e(ContentValues.TAG, "Error adding new user document", e)
                                                     }
+
+                                                db.collection("friends").document(user.uid)
+                                                    .set(mapOf("exists" to true))
                                             }
                                     }
                             }

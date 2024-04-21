@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -27,6 +28,13 @@ class SettingsFragment : Fragment() {
             val loginFragment = LoginFragment()
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, loginFragment).commit()
+        }
+
+        val backButton = view.findViewById<ImageView>(R.id.settingsBackButton)
+        backButton.setOnClickListener{
+            val profileFragment = ProfileFragment()
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, profileFragment).commit()
         }
 
         return view

@@ -130,13 +130,14 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
                                         val postId = UUID.randomUUID()
                                         val username = document.getString("username") ?: ""
                                         val pfpUrl = document.getString("pfp_url") ?: ""
+                                        val emptyList: MutableList<Any> = mutableListOf()
                                         val postInfo = hashMapOf(
                                             "id" to postId,
                                             "username" to username,
                                             "caption" to captionText,
                                             "pfp_url" to pfpUrl,
                                             "img_url" to imageUrl,
-                                            "location" to location,
+                                            "location" to location
                                         )
                                         db.collection("posts").document(postId.toString())
                                             .set(postInfo)

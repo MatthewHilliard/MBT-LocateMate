@@ -11,6 +11,11 @@
         android:layout_width="match_parent"
         android:layout_height="500dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/comment_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
     </FrameLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

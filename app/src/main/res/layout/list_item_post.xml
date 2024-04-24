@@ -14,6 +14,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="10dp"
         android:src="@drawable/profile"
+        android:scaleType="centerCrop"
         app:layout_constraintEnd_toStartOf="@+id/post_user"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

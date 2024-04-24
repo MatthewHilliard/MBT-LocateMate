@@ -50,6 +50,10 @@ class ExploreFragment: Fragment() {
             onGuessClickListener = { post ->
                 navigateToMapGuessFragment(post)
             }
+
+            onCommentsClickListener = { post ->
+                openCommentsSheet(post)
+            }
         }
         postRecyclerView.adapter = adapter
 
@@ -78,6 +82,11 @@ class ExploreFragment: Fragment() {
 
         segmentedButton.check(R.id.friendsButton)
         return view
+    }
+
+    private fun openCommentsSheet(post: Post) {
+        val bottomSheetFragment = CommentsFragment()
+        bottomSheetFragment.show(parentFragmentManager, bottomSheetFragment.tag)
     }
 
     private fun navigateToMapGuessFragment(post: Post) {

@@ -21,7 +21,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -57,6 +61,21 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
     private val db = Firebase.firestore
     private lateinit var auth: FirebaseAuth
     private lateinit var imageBitmap: Bitmap
+//    val locationRequest = LocationRequest.create().apply {
+//        priority = Priority.PRIORITY_HIGH_ACCURACY
+//        interval = 10000 // 10 seconds
+//        fastestInterval = 5000 // 5 seconds
+//    }
+//    val locationCallback = object : LocationCallback() {
+//        override fun onLocationResult(locationResult: LocationResult) {
+//            locationResult ?: return
+//            for (location in locationResult.locations) {
+//                // Handle received location
+//                val currentLatLong = LatLng(location.latitude, location.longitude)
+//                placeMarker(currentLatLong)
+//            }
+//        }
+//    }
 
     val resultContract = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
@@ -191,6 +210,8 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
                 lastLocation = location
                 val currentLatLong = LatLng(location.latitude, location.longitude)
                 placeMarker(currentLatLong)
+            } else {
+                //fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null)
             }
         }
     }

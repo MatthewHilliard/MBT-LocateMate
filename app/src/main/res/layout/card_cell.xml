@@ -9,7 +9,6 @@
         android:layout_width="180dp"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:clickable="true"
         android:focusable="true"
         android:elevation="7dp"
         app:cardCornerRadius="15dp">

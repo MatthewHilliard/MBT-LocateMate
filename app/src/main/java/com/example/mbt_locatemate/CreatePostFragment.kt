@@ -5,13 +5,15 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import java.io.ByteArrayOutputStream
 import android.location.Location
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.activity.result.ActivityResult
@@ -19,7 +21,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -37,22 +43,39 @@ import com.google.firebase.storage.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
+import java.io.File
 import java.util.UUID
-import java.util.*
 
 
 class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private lateinit var nMap: GoogleMap
+    private val CONTENT_REQUEST = 1337
+    private var output: File? = null
     private lateinit var lastLocation: Location
     private lateinit var image: ImageView
-    var imageTaken = false
     private lateinit var caption: EditText
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var storage: FirebaseStorage
     private val db = Firebase.firestore
     private lateinit var auth: FirebaseAuth
     private lateinit var imageBitmap: Bitmap
+//    val locationRequest = LocationRequest.create().apply {
+//        priority = Priority.PRIORITY_HIGH_ACCURACY
+//        interval = 10000 // 10 seconds
+//        fastestInterval = 5000 // 5 seconds
+//    }
+//    val locationCallback = object : LocationCallback() {
+//        override fun onLocationResult(locationResult: LocationResult) {
+//            locationResult ?: return
+//            for (location in locationResult.locations) {
+//                // Handle received location
+//                val currentLatLong = LatLng(location.latitude, location.longitude)
+//                placeMarker(currentLatLong)
+//            }
+//        }
+//    }
 
     val resultContract = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
@@ -75,16 +98,23 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
         //open camera to take a photo
         image = view.findViewById(R.id.imageView)
         caption = view.findViewById(R.id.captionText)
-        if (!imageTaken) {
+        val takePic = view.findViewById<Button>(R.id.cameraButton)
+        takePic.setOnClickListener {
             GlobalScope.launch(Dispatchers.IO) {
                 val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                //the commented out stuff is for fixing image quality, haven't quite figured it out yet
+//                val dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
+//
+//                output = File(dir, "CameraContentDemo.jpeg")
+//                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(output))
+
+//                startActivityForResult(intent, CONTENT_REQUEST)
+//                val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                 resultContract.launch(intent)
-                imageTaken = true
             }
         }
         val cancel = view.findViewById<MaterialButton>(R.id.cancelButton)
         cancel.setOnClickListener {
-            imageTaken = false
             val exploreFragment = ExploreFragment()
             parentFragmentManager.beginTransaction().replace(R.id.fragment_container, exploreFragment).commit()
             (activity as MainActivity).bottomNavBar.selectedItemId =
@@ -181,6 +211,8 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
                 lastLocation = location
                 val currentLatLong = LatLng(location.latitude, location.longitude)
                 placeMarker(currentLatLong)
+            } else {
+                //fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null)
             }
         }
     }

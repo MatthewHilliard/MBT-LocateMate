@@ -76,6 +76,7 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
 
         auth = Firebase.auth
         storage = Firebase.storage
+        val currentUser = auth.currentUser
 
         val guessButton: Button = view.findViewById(R.id.guessButton)
         guessButton.setOnClickListener {
@@ -96,8 +97,8 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
                     val postRef = db.collection("posts").document(post.id.toString())
 
                     val newGuess = hashMapOf(
-                        "user" to "username_here",
-                        "distance" to "distance_value_here"
+                        "user" to currentUser,
+                        "distance" to distanceInMeters
                     )
 
                     postRef.collection("guesses").add(newGuess).addOnSuccessListener { documentReference ->

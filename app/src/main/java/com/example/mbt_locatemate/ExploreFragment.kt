@@ -1,6 +1,7 @@
 package com.example.mbt_locatemate
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -73,7 +74,7 @@ class ExploreFragment: Fragment() {
                         postRecyclerView.smoothScrollToPosition(0)
                     }
                     R.id.exploreButton -> {
-                        loadAllPosts()
+                        loadPublicPosts()
                         postRecyclerView.smoothScrollToPosition(0)
                     }
                 }
@@ -134,7 +135,7 @@ class ExploreFragment: Fragment() {
         }
     }
 
-    private fun loadAllPosts() {
+    private fun loadPublicPosts() {
         val userId = auth.currentUser?.uid
         val userFriends = mutableListOf<String>()
         if (userId != null) {
@@ -165,6 +166,8 @@ class ExploreFragment: Fragment() {
                             }
                         }
                         adapter.updatePosts(postList)
+
+                            }
                     }
             }
         }

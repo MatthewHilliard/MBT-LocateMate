@@ -2,6 +2,7 @@ package com.example.mbt_locatemate
 
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -76,7 +77,7 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
 
         auth = Firebase.auth
         storage = Firebase.storage
-        val currentUser = auth.currentUser
+        val currentUserId = auth.currentUser?.uid
 
         val guessButton: Button = view.findViewById(R.id.guessButton)
         guessButton.setOnClickListener {
@@ -92,25 +93,39 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
                 val distanceInMeters = distance[0]
                 showDistanceToast(distanceInMeters)
 
-                CoroutineScope(Dispatchers.IO).launch {
-                    //val postID = post.id
-                    val postRef = db.collection("posts").document(post.id.toString())
+                if (currentUserId != null) {
+                    // fetching username
+                    db.collection("users").document(currentUserId).get()
+                        .addOnSuccessListener { documentSnapshot ->
+                            if (documentSnapshot.exists()) {
+                                val username = documentSnapshot.getString("username")
+                                // check for username
+                                if (username != null) {
+                                    // add guess to subcollection
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        val newGuess = hashMapOf(
+                                            "user" to username,
+                                            "distance" to distanceInMeters
+                                        )
 
-                    val newGuess = hashMapOf(
-                        "user" to currentUser,
-                        "distance" to distanceInMeters
-                    )
-
-                    postRef.collection("guesses").add(newGuess).addOnSuccessListener { documentReference ->
-                        // success
-                    }.addOnFailureListener { e ->
-                        // error
-                    }
+                                        val postRef = db.collection("posts").document(post.id.toString())
+                                        postRef.collection("guesses").add(newGuess).addOnSuccessListener {
+                                            // success
+                                            navigateToPostLeaderboardFragment(post)
+                                        }.addOnFailureListener { e ->
+                                            Log.w("TAG", "Error adding document", e)
+                                        }
+                                    }
+                                } else {
+                                    Log.w("TAG", "null username")
+                                }
+                            } else {
+                                Log.w("TAG", "no user?")
+                            }
+                        }.addOnFailureListener { exception ->
+                            Log.w("TAG", "error idk", exception)
+                        }
                 }
-
-                navigateToPostLeaderboardFragment(post)
-
-
             } else {
                 Toast.makeText(context, "Please select a location first!", Toast.LENGTH_SHORT).show()
             }

@@ -7,23 +7,22 @@
     android:gravity="center_horizontal"
     android:layout_height="match_parent">
 
-    <com.google.android.material.button.MaterialButton
+    <ImageView
         android:id="@+id/cancelButton"
         android:layout_width="70dp"
         android:layout_height="51dp"
         android:layout_marginStart="24dp"
         android:layout_marginBottom="65dp"
         android:backgroundTint="@color/cool_blue"
-        android:drawableLeft="@drawable/baseline_close_24"
+        android:src="@drawable/baseline_close_24"
         android:fontFamily="@font/poppins"
         android:text=""
-        android:textSize="17dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/captionText"
         app:layout_constraintVertical_bias="0.304" />
 
-    <com.google.android.material.button.MaterialButton
+    <ImageView
         android:id="@+id/cameraButton"
         android:layout_width="72dp"
         android:layout_height="50dp"
@@ -31,11 +30,10 @@
         android:layout_marginEnd="75dp"
         android:layout_marginBottom="65dp"
         android:backgroundTint="@color/cool_blue"
-        android:drawableLeft="@drawable/outline_camera_alt_24"
+        android:src="@drawable/outline_camera_alt_24"
         android:fontFamily="@font/poppins"
         android:gravity="center"
         android:text=""
-        android:textSize="17dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/postButton"
         app:layout_constraintStart_toEndOf="@+id/cancelButton"
@@ -95,20 +93,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/captionTitle" />
 
-    <com.google.android.material.button.MaterialButton
+    <ImageView
         android:id="@+id/postButton"
         android:layout_width="72dp"
         android:layout_height="52dp"
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="65dp"
         android:backgroundTint="@color/cool_blue"
-        android:drawableLeft="@drawable/baseline_check_24"
+        android:src="@drawable/baseline_check_24"
         android:fontFamily="@font/poppins"
         android:text=""
-        android:textSize="17dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/captionText"
-        app:layout_constraintVertical_bias="0.304"></com.google.android.material.button.MaterialButton>
+        app:layout_constraintVertical_bias="0.304"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

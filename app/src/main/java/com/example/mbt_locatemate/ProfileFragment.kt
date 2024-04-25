@@ -42,15 +42,16 @@ class ProfileFragment: Fragment() {
         layoutManager = GridLayoutManager(requireContext(), 2)
         profilePostRecyclerView.layoutManager = layoutManager
 
-        adapter = ProfilePostListAdapter(mutableListOf()){ post ->
+        adapter = ProfilePostListAdapter(emptyList()){ post ->
             val bundle = Bundle().apply {
                 putParcelable("post", post)
             }
-            val fragment = IndividualPostFragment().apply {
+            val individualPostFragment = IndividualPostFragment().apply {
                 arguments = bundle
             }
+            Log.d("OnClick", "Beginning fragment replacement")
             parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, fragment)
+                .replace(R.id.fragment_container, individualPostFragment)
                 .addToBackStack(null)
                 .commit()
         }

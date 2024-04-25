@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.mbt_locatemate.ExploreFragment
@@ -15,7 +16,18 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FieldValue
+import kotlinx.coroutines.CoroutineScope
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.storage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.UUID
 
 class MapGuessFragment : Fragment(), OnMapReadyCallback {
@@ -27,10 +39,16 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var post: Post
 
+    private lateinit var auth: FirebaseAuth
+    private lateinit var storage: FirebaseStorage
+    private val db = Firebase.firestore
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         post = arguments?.getParcelable<Post>(ARG_POST)!!
+        val postID = post.id
+        Toast.makeText(requireContext(), "Post ID: $postID", Toast.LENGTH_SHORT).show()
     }
 
     override fun onCreateView(
@@ -40,9 +58,8 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
 
         val view = inflater.inflate(R.layout.fragment_mapguess, container, false)
 
-        val backButton = view?.findViewById<Button>(R.id.backButton)
-        backButton?.setOnClickListener(){
-            Toast.makeText(context, "Back button pressed!", Toast.LENGTH_SHORT).show()
+        val backButton = view.findViewById<ImageView>(R.id.guessBackButton)
+        backButton.setOnClickListener(){
             val exploreFragment = ExploreFragment()
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, exploreFragment).commit()
@@ -57,6 +74,9 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(this)
 
+        auth = Firebase.auth
+        storage = Firebase.storage
+
         val guessButton: Button = view.findViewById(R.id.guessButton)
         guessButton.setOnClickListener {
             if (::guess.isInitialized) {
@@ -70,6 +90,22 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
                 )
                 val distanceInMeters = distance[0]
                 showDistanceToast(distanceInMeters)
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    //val postID = post.id
+                    val postRef = db.collection("posts").document(post.id.toString())
+
+                    val newGuess = hashMapOf(
+                        "user" to "username_here",
+                        "distance" to "distance_value_here"
+                    )
+
+                    postRef.collection("guesses").add(newGuess).addOnSuccessListener { documentReference ->
+                        // success
+                    }.addOnFailureListener { e ->
+                        // error
+                    }
+                }
 
                 navigateToPostLeaderboardFragment(post)
 

@@ -1,19 +1,16 @@
 package com.example.mbt_locatemate
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 
 class PostListAdapter(private var posts: List<Post>) : RecyclerView.Adapter<PostListAdapter.ViewHolder>() {
-
+    var onCommentsClickListener: ((Post) -> Unit)? = null
     var onGuessClickListener: ((Post) -> Unit)? = null
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.list_item_post, parent, false)
@@ -51,6 +48,13 @@ class PostListAdapter(private var posts: List<Post>) : RecyclerView.Adapter<Post
                     onGuessClickListener?.invoke(posts[position])
                 }
             }
+
+            commentsButton.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    onCommentsClickListener?.invoke(posts[position])
+                }
+            }
         }
 
         fun bind(post: Post) {
@@ -58,14 +62,6 @@ class PostListAdapter(private var posts: List<Post>) : RecyclerView.Adapter<Post
             postCaption.text = post.caption
             Picasso.get().load(post.imgUrl).into(postImage)
             Picasso.get().load(post.pfpUrl).into(pfpImage)
-
-            leaderboardButton.setOnClickListener(){
-
-            }
-
-            commentsButton.setOnClickListener(){
-
-            }
         }
 
     }

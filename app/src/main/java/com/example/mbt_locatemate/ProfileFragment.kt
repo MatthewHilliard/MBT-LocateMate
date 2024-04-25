@@ -42,7 +42,18 @@ class ProfileFragment: Fragment() {
         layoutManager = GridLayoutManager(requireContext(), 2)
         profilePostRecyclerView.layoutManager = layoutManager
 
-        adapter = ProfilePostListAdapter(mutableListOf())
+        adapter = ProfilePostListAdapter(mutableListOf()){ post ->
+            val bundle = Bundle().apply {
+                putParcelable("post", post)
+            }
+            val fragment = IndividualPostFragment().apply {
+                arguments = bundle
+            }
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit()
+        }
         profilePostRecyclerView.adapter = adapter
 
         val usernameText = view.findViewById<TextView>(R.id.txtUsername)

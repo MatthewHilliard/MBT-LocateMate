@@ -82,6 +82,10 @@ class IndividualPostFragment: Fragment() {
             .addOnFailureListener { e ->
                 Log.d("PostActions", "Error deleting post $postId")
             }
+        val profileFragment = ProfileFragment()
+        parentFragmentManager.beginTransaction().replace(R.id.fragment_container, profileFragment).commit()
+        (activity as MainActivity).bottomNavBar.selectedItemId =
+            R.id.profileTab
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

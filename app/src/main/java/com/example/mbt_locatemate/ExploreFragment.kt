@@ -113,6 +113,7 @@ class ExploreFragment: Fragment() {
                             .addOnSuccessListener { postsSnapshot ->
                                 val postList = mutableListOf<Post>()
                                 for (document in postsSnapshot) {
+                                    val postId = document.getString("id") ?: UUID.randomUUID().toString()
                                     val username = document.getString("username") ?: ""
                                     val caption = document.getString("caption") ?: ""
                                     val imgUrl = document.getString("img_url") ?: ""
@@ -120,7 +121,7 @@ class ExploreFragment: Fragment() {
                                     val latitude = document.getDouble("latitude") ?: 0.0
                                     val longitude = document.getDouble("longitude") ?: 0.0
                                     val location = LatLng(latitude, longitude)
-                                    val post = Post(UUID.randomUUID().toString(), username, caption, imgUrl, pfpUrl, location)
+                                    val post = Post(postId, username, caption, imgUrl, pfpUrl, location)
                                     postList.add(post)
                                 }
                                 adapter.updatePosts(postList)
@@ -150,6 +151,7 @@ class ExploreFragment: Fragment() {
                     .addOnSuccessListener { documents ->
                         val postList = mutableListOf<Post>()
                         for (document in documents) {
+                            val postId = document.getString("id") ?: UUID.randomUUID().toString()
                             val username = document.getString("username") ?: ""
                             val caption = document.getString("caption") ?: ""
                             val imgUrl = document.getString("img_url") ?: ""
@@ -157,7 +159,7 @@ class ExploreFragment: Fragment() {
                             val latitude = document.getDouble("latitude") ?: 0.0
                             val longitude = document.getDouble("longitude") ?: 0.0
                             val location = LatLng(latitude, longitude)
-                            val post = Post(UUID.randomUUID().toString(), username, caption, imgUrl, pfpUrl, location)
+                            val post = Post(postId, username, caption, imgUrl, pfpUrl, location)
                             if (username != userUsername && username !in userFriends) {
                                 postList.add(post)
                             }

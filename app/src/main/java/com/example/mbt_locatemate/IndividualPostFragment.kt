@@ -52,6 +52,12 @@ class IndividualPostFragment: Fragment() {
             }
         })
 
+        val commentsButton = view.findViewById<ImageView>(R.id.commentsButton)
+        commentsButton.setOnClickListener{
+            val commentsFragment = CommentsFragment()
+            commentsFragment.show(parentFragmentManager, "CommentsFragment")
+        }
+
         return view
     }
 

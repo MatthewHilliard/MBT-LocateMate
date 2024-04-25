@@ -157,7 +157,7 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
                                 .get()
                                 .addOnSuccessListener { document ->
                                     if (document != null && document.exists()) {
-                                        val postId = UUID.randomUUID()
+                                        val postId = UUID.randomUUID().toString()
                                         val username = document.getString("username") ?: ""
                                         val pfpUrl = document.getString("pfp_url") ?: ""
                                         val emptyList: MutableList<Any> = mutableListOf()
@@ -169,7 +169,7 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
                                             "img_url" to imageUrl,
                                             "location" to location
                                         )
-                                        db.collection("posts").document(postId.toString())
+                                        db.collection("posts").document(postId)
                                             .set(postInfo)
                                             .addOnSuccessListener { documentReference ->
                                                 // Post uploaded successfully

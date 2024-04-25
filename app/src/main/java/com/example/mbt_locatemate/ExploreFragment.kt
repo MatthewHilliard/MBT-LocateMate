@@ -120,7 +120,7 @@ class ExploreFragment: Fragment() {
                                     val latitude = document.getDouble("latitude") ?: 0.0
                                     val longitude = document.getDouble("longitude") ?: 0.0
                                     val location = LatLng(latitude, longitude)
-                                    val post = Post(UUID.randomUUID(), username, caption, imgUrl, pfpUrl, location)
+                                    val post = Post(UUID.randomUUID().toString(), username, caption, imgUrl, pfpUrl, location)
                                     postList.add(post)
                                 }
                                 adapter.updatePosts(postList)
@@ -157,7 +157,7 @@ class ExploreFragment: Fragment() {
                             val latitude = document.getDouble("latitude") ?: 0.0
                             val longitude = document.getDouble("longitude") ?: 0.0
                             val location = LatLng(latitude, longitude)
-                            val post = Post(UUID.randomUUID(), username, caption, imgUrl, pfpUrl, location)
+                            val post = Post(UUID.randomUUID().toString(), username, caption, imgUrl, pfpUrl, location)
                             if (username != userUsername && username !in userFriends) {
                                 postList.add(post)
                             }

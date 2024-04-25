@@ -10,7 +10,7 @@ import java.util.UUID
 
 @Parcelize
 data class Post (
-    val id: UUID,
+    val id: String,
     val username:String,
     val caption:String,
     val imgUrl:String,

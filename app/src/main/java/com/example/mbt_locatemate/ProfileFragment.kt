@@ -94,7 +94,7 @@ class ProfileFragment: Fragment() {
                         val caption = document.getString("caption") ?: ""
                         val imgUrl = document.getString("img_url") ?: ""
                         val pfpUrl = document.getString("pfp_url") ?: ""
-                        val post = Post(UUID.randomUUID(), username, caption, imgUrl, pfpUrl, LatLng(40.712775, -74.0059717))
+                        val post = Post(UUID.randomUUID().toString(), username, caption, imgUrl, pfpUrl, LatLng(40.712775, -74.0059717))
                         postList.add(post)
                     }
                     adapter.updatePosts(postList)

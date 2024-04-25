@@ -71,7 +71,7 @@ class PostLeaderboardFragment : Fragment() {
     companion object {
         private const val ARG_POST_ID = "post_id"
 
-        fun newInstance(postId: UUID) = PostLeaderboardFragment().apply {
+        fun newInstance(postId: String) = PostLeaderboardFragment().apply {
             return PostLeaderboardFragment()
         }
 

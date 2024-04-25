@@ -34,6 +34,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -61,6 +62,8 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
     private val db = Firebase.firestore
     private lateinit var auth: FirebaseAuth
     private lateinit var imageBitmap: Bitmap
+    private lateinit var segmentedButton: MaterialButtonToggleGroup
+    private var isPublicPost = false
 //    val locationRequest = LocationRequest.create().apply {
 //        priority = Priority.PRIORITY_HIGH_ACCURACY
 //        interval = 10000 // 10 seconds
@@ -76,6 +79,7 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
 //            }
 //        }
 //    }
+
 
     val resultContract = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
@@ -133,6 +137,22 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
         mapFragment?.onCreate(savedInstanceState)
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext())
+
+        segmentedButton = view.findViewById(R.id.postTypeButton)
+        segmentedButton.addOnButtonCheckedListener { group, checkedId, isChecked ->
+            if (isChecked) {
+                when (checkedId) {
+                    R.id.friendsOnlyButton -> {
+                        isPublicPost = false
+                    }
+                    R.id.publicButton -> {
+                        isPublicPost = true
+                    }
+                }
+            }
+        }
+
+        segmentedButton.check(R.id.friendsOnlyButton)
         return view
     }
 
@@ -167,7 +187,9 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
                                             "caption" to captionText,
                                             "pfp_url" to pfpUrl,
                                             "img_url" to imageUrl,
-                                            "location" to location
+                                            "location" to location,
+                                            "public" to isPublicPost
+
                                         )
                                         db.collection("posts").document(postId.toString())
                                             .set(postInfo)

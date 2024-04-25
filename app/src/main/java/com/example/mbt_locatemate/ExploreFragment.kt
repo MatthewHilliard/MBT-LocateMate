@@ -114,6 +114,7 @@ class ExploreFragment: Fragment() {
                             .addOnSuccessListener { postsSnapshot ->
                                 val postList = mutableListOf<Post>()
                                 for (document in postsSnapshot) {
+                                    val postId = document.getString("id") ?: UUID.randomUUID().toString()
                                     val username = document.getString("username") ?: ""
                                     val caption = document.getString("caption") ?: ""
                                     val imgUrl = document.getString("img_url") ?: ""
@@ -121,7 +122,7 @@ class ExploreFragment: Fragment() {
                                     val latitude = document.getDouble("latitude") ?: 0.0
                                     val longitude = document.getDouble("longitude") ?: 0.0
                                     val location = LatLng(latitude, longitude)
-                                    val post = Post(UUID.randomUUID(), username, caption, imgUrl, pfpUrl, location)
+                                    val post = Post(postId, username, caption, imgUrl, pfpUrl, location)
                                     postList.add(post)
                                 }
                                 adapter.updatePosts(postList)
@@ -145,27 +146,27 @@ class ExploreFragment: Fragment() {
                     .get()
                     .addOnSuccessListener { friendsSnapshot ->
                         userFriends.addAll(friendsSnapshot.documents.map { it.id })
+                    }
+                db.collection("posts")
+                    .get()
+                    .addOnSuccessListener { documents ->
+                        val postList = mutableListOf<Post>()
+                        for (document in documents) {
+                            val postId = document.getString("id") ?: UUID.randomUUID().toString()
+                            val username = document.getString("username") ?: ""
+                            val caption = document.getString("caption") ?: ""
+                            val imgUrl = document.getString("img_url") ?: ""
+                            val pfpUrl = document.getString("pfp_url") ?: ""
+                            val latitude = document.getDouble("latitude") ?: 0.0
+                            val longitude = document.getDouble("longitude") ?: 0.0
+                            val location = LatLng(latitude, longitude)
+                            val post = Post(postId, username, caption, imgUrl, pfpUrl, location)
+                            if (username != userUsername && username !in userFriends) {
+                                postList.add(post)
+                            }
+                        }
+                        adapter.updatePosts(postList)
 
-                        db.collection("posts")
-                            .whereEqualTo("public", true)
-                            .get()
-                            .addOnSuccessListener { documents ->
-                                val postList = mutableListOf<Post>()
-                                for (document in documents) {
-                                    val username = document.getString("username") ?: ""
-                                    val caption = document.getString("caption") ?: ""
-                                    val imgUrl = document.getString("img_url") ?: ""
-                                    val pfpUrl = document.getString("pfp_url") ?: ""
-                                    val latitude = document.getDouble("latitude") ?: 0.0
-                                    val longitude = document.getDouble("longitude") ?: 0.0
-                                    val location = LatLng(latitude, longitude)
-                                    val post = Post(UUID.randomUUID(), username, caption, imgUrl, pfpUrl, location)
-
-                                    if (username != userUsername && username !in userFriends) {
-                                        postList.add(post)
-                                    }
-                                }
-                                adapter.updatePosts(postList)
                             }
                     }
             }

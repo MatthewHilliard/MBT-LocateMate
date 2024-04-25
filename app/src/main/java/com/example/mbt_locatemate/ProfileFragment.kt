@@ -90,11 +90,12 @@ class ProfileFragment: Fragment() {
                     val postList = mutableListOf<Post>()
                     for (document in posts) {
                         Log.d("ProfileFragment", "Post found")
+                        val postId = document.getString("id") ?: UUID.randomUUID().toString()
                         val username = document.getString("username") ?: ""
                         val caption = document.getString("caption") ?: ""
                         val imgUrl = document.getString("img_url") ?: ""
                         val pfpUrl = document.getString("pfp_url") ?: ""
-                        val post = Post(UUID.randomUUID(), username, caption, imgUrl, pfpUrl, LatLng(40.712775, -74.0059717))
+                        val post = Post(postId, username, caption, imgUrl, pfpUrl, LatLng(40.712775, -74.0059717))
                         postList.add(post)
                     }
                     adapter.updatePosts(postList)

@@ -102,7 +102,7 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
         //open camera to take a photo
         image = view.findViewById(R.id.imageView)
         caption = view.findViewById(R.id.captionText)
-        val takePic = view.findViewById<Button>(R.id.cameraButton)
+        val takePic = view.findViewById<ImageView>(R.id.cameraButton)
         takePic.setOnClickListener {
             GlobalScope.launch(Dispatchers.IO) {
                 val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
@@ -117,14 +117,14 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
                 resultContract.launch(intent)
             }
         }
-        val cancel = view.findViewById<MaterialButton>(R.id.cancelButton)
+        val cancel = view.findViewById<ImageView>(R.id.cancelButton)
         cancel.setOnClickListener {
             val exploreFragment = ExploreFragment()
             parentFragmentManager.beginTransaction().replace(R.id.fragment_container, exploreFragment).commit()
             (activity as MainActivity).bottomNavBar.selectedItemId =
                 R.id.exploreTab
         }
-        val post = view.findViewById<MaterialButton>(R.id.postButton)
+        val post = view.findViewById<ImageView>(R.id.postButton)
         post.setOnClickListener {
             savePost()
             val exploreFragment = ExploreFragment()
@@ -177,7 +177,7 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
                                 .get()
                                 .addOnSuccessListener { document ->
                                     if (document != null && document.exists()) {
-                                        val postId = UUID.randomUUID()
+                                        val postId = UUID.randomUUID().toString()
                                         val username = document.getString("username") ?: ""
                                         val pfpUrl = document.getString("pfp_url") ?: ""
                                         val emptyList: MutableList<Any> = mutableListOf()
@@ -191,7 +191,7 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
                                             "public" to isPublicPost
 
                                         )
-                                        db.collection("posts").document(postId.toString())
+                                        db.collection("posts").document(postId)
                                             .set(postInfo)
                                             .addOnSuccessListener { documentReference ->
                                                 // Post uploaded successfully

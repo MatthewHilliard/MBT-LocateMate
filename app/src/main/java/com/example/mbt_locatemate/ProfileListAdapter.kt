@@ -37,10 +37,12 @@ class ProfilePostListAdapter(
         private val postImage: ImageView = itemView.findViewById(R.id.cardPost)
         init {
             itemView.setOnClickListener {
-                Log.d("OnClick", "post clicked!!")
+
                 val position = adapterPosition
 
                 if (position != RecyclerView.NO_POSITION) {
+                    val postId = posts[position].id
+                    Log.d("OnClick", "post $postId clicked!!")
                     onItemClick(posts[position])
 
                 }

@@ -1,6 +1,7 @@
 package com.example.mbt_locatemate
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -52,6 +53,10 @@ class ExploreFragment: Fragment() {
 
                 navigateToMapGuessFragment(post)
             }
+
+            onCommentsClickListener = { post ->
+                openCommentsSheet(post)
+            }
         }
         postRecyclerView.adapter = adapter
 
@@ -71,7 +76,7 @@ class ExploreFragment: Fragment() {
                         postRecyclerView.smoothScrollToPosition(0)
                     }
                     R.id.exploreButton -> {
-                        loadAllPosts()
+                        loadPublicPosts()
                         postRecyclerView.smoothScrollToPosition(0)
                     }
                 }
@@ -80,6 +85,11 @@ class ExploreFragment: Fragment() {
 
         segmentedButton.check(R.id.friendsButton)
         return view
+    }
+
+    private fun openCommentsSheet(post: Post) {
+        val bottomSheetFragment = CommentsFragment()
+        bottomSheetFragment.show(parentFragmentManager, bottomSheetFragment.tag)
     }
 
     private fun navigateToMapGuessFragment(post: Post) {
@@ -106,6 +116,7 @@ class ExploreFragment: Fragment() {
                             .addOnSuccessListener { postsSnapshot ->
                                 val postList = mutableListOf<Post>()
                                 for (document in postsSnapshot) {
+                                    val postId = document.getString("id") ?: UUID.randomUUID().toString()
                                     val username = document.getString("username") ?: ""
                                     val caption = document.getString("caption") ?: ""
                                     val imgUrl = document.getString("img_url") ?: ""
@@ -113,7 +124,7 @@ class ExploreFragment: Fragment() {
                                     val latitude = document.getDouble("latitude") ?: 0.0
                                     val longitude = document.getDouble("longitude") ?: 0.0
                                     val location = LatLng(latitude, longitude)
-                                    val post = Post(UUID.randomUUID(), username, caption, imgUrl, pfpUrl, location)
+                                    val post = Post(postId, username, caption, imgUrl, pfpUrl, location)
                                     postList.add(post)
                                 }
                                 adapter.updatePosts(postList)
@@ -126,42 +137,40 @@ class ExploreFragment: Fragment() {
         }
     }
 
-    private fun loadAllPosts() {
-        //TODO this is super inefficent tbh and uses a ton of API calls so perhaps rework the database a bit to make fewer calls
-        //yeah actually the own users post sometimes gets rendered so its def a bit bugged because of excessive api calls
-        //i think we should figure out how to make global variables upon app start of basic user info like username and pfp
+    private fun loadPublicPosts() {
         val userId = auth.currentUser?.uid
-        var userUsername: String? = null
         val userFriends = mutableListOf<String>()
         if (userId != null) {
-            db.collection("users").document(userId).get().addOnSuccessListener { document ->
-                userUsername = document.getString("username")
-            }
-            db.collection("friends").document(userId)
-                .collection("friend_usernames")
-                .get()
-                .addOnSuccessListener { friendsSnapshot ->
-                    userFriends.addAll(friendsSnapshot.documents.map { it.id })
-                }
-            db.collection("posts")
-                .get()
-                .addOnSuccessListener { documents ->
-                    val postList = mutableListOf<Post>()
-                    for (document in documents) {
-                        val username = document.getString("username") ?: ""
-                        val caption = document.getString("caption") ?: ""
-                        val imgUrl = document.getString("img_url") ?: ""
-                        val pfpUrl = document.getString("pfp_url") ?: ""
-                        val latitude = document.getDouble("latitude") ?: 0.0
-                        val longitude = document.getDouble("longitude") ?: 0.0
-                        val location = LatLng(latitude, longitude)
-                        val post = Post(UUID.randomUUID(), username, caption, imgUrl, pfpUrl, location)
-                        if (username != userUsername && username !in userFriends) {
-                            postList.add(post)
-                        }
+            db.collection("users").document(userId).get().addOnSuccessListener { currUser ->
+                val userUsername = currUser.getString("username")
+                db.collection("friends").document(userId)
+                    .collection("friend_usernames")
+                    .get()
+                    .addOnSuccessListener { friendsSnapshot ->
+                        userFriends.addAll(friendsSnapshot.documents.map { it.id })
                     }
-                    adapter.updatePosts(postList)
-                }
+                db.collection("posts")
+                    .get()
+                    .addOnSuccessListener { documents ->
+                        val postList = mutableListOf<Post>()
+                        for (document in documents) {
+                            val postId = document.getString("id") ?: UUID.randomUUID().toString()
+                            val username = document.getString("username") ?: ""
+                            val caption = document.getString("caption") ?: ""
+                            val imgUrl = document.getString("img_url") ?: ""
+                            val pfpUrl = document.getString("pfp_url") ?: ""
+                            val latitude = document.getDouble("latitude") ?: 0.0
+                            val longitude = document.getDouble("longitude") ?: 0.0
+                            val location = LatLng(latitude, longitude)
+                            val post = Post(postId, username, caption, imgUrl, pfpUrl, location)
+                            if (username != userUsername && username !in userFriends) {
+                                postList.add(post)
+                            }
+                        }
+                        adapter.updatePosts(postList)
+
+                            }
+                    }
+            }
         }
     }
-}

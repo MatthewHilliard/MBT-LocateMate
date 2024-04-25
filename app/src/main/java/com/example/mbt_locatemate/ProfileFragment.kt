@@ -42,7 +42,19 @@ class ProfileFragment: Fragment() {
         layoutManager = GridLayoutManager(requireContext(), 2)
         profilePostRecyclerView.layoutManager = layoutManager
 
-        adapter = ProfilePostListAdapter(mutableListOf())
+        adapter = ProfilePostListAdapter(emptyList()){ post ->
+            val bundle = Bundle().apply {
+                putParcelable("post", post)
+            }
+            val individualPostFragment = IndividualPostFragment().apply {
+                arguments = bundle
+            }
+            Log.d("OnClick", "Beginning fragment replacement")
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, individualPostFragment)
+                .addToBackStack(null)
+                .commit()
+        }
         profilePostRecyclerView.adapter = adapter
 
         val usernameText = view.findViewById<TextView>(R.id.txtUsername)
@@ -78,11 +90,12 @@ class ProfileFragment: Fragment() {
                     val postList = mutableListOf<Post>()
                     for (document in posts) {
                         Log.d("ProfileFragment", "Post found")
+                        val postId = document.getString("id") ?: UUID.randomUUID().toString()
                         val username = document.getString("username") ?: ""
                         val caption = document.getString("caption") ?: ""
                         val imgUrl = document.getString("img_url") ?: ""
                         val pfpUrl = document.getString("pfp_url") ?: ""
-                        val post = Post(UUID.randomUUID(), username, caption, imgUrl, pfpUrl, LatLng(40.712775, -74.0059717))
+                        val post = Post(postId, username, caption, imgUrl, pfpUrl, LatLng(40.712775, -74.0059717))
                         postList.add(post)
                     }
                     adapter.updatePosts(postList)

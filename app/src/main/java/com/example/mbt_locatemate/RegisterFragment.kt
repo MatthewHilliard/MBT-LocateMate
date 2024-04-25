@@ -18,7 +18,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.storage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -94,6 +93,9 @@ class RegisterFragment : Fragment() {
                                                     }.addOnFailureListener { e ->
                                                         Log.e(ContentValues.TAG, "Error adding new user document", e)
                                                     }
+
+                                                db.collection("friends").document(user.uid)
+                                                    .set(mapOf("exists" to true))
                                             }
                                     }
                             }

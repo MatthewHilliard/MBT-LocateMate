@@ -181,6 +181,7 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
                                         val username = document.getString("username") ?: ""
                                         val pfpUrl = document.getString("pfp_url") ?: ""
                                         val emptyList: MutableList<Any> = mutableListOf()
+                                        val timestamp = System.currentTimeMillis()
                                         val postInfo = hashMapOf(
                                             "id" to postId,
                                             "username" to username,
@@ -188,6 +189,7 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
                                             "pfp_url" to pfpUrl,
                                             "img_url" to imageUrl,
                                             "location" to location,
+                                            "timestamp" to timestamp,
                                             "public" to isPublicPost
 
                                         )

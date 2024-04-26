@@ -8,11 +8,13 @@ import android.widget.FrameLayout
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
+import java.util.UUID
 
 class CommentsFragment : BottomSheetDialogFragment() {
     private lateinit var layoutManager: RecyclerView.LayoutManager
@@ -48,6 +50,18 @@ class CommentsFragment : BottomSheetDialogFragment() {
     }
 
     private fun loadComments() {
-
+        db.collection("posts").document("2e8d3529-6f8a-466f-951e-0b5f78802ca8").collection("comments")
+            .get()
+            .addOnSuccessListener { documents ->
+                val commentList = mutableListOf<Comment>()
+                for (document in documents) {
+                    val commentText = document.getString("text") ?: ""
+                    val username = document.getString("username") ?: ""
+                    val pfpUrl = document.getString("pfp_url") ?: ""
+                    val comment = Comment(username, pfpUrl, commentText)
+                    commentList.add(comment)
+                }
+                adapter.updateComments(commentList)
+            }
     }
 }

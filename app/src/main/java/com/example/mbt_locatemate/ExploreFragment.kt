@@ -180,6 +180,7 @@ class ExploreFragment: Fragment() {
                         userFriends.addAll(friendsSnapshot.documents.map { it.id })
                     }
                 db.collection("posts")
+                    .whereEqualTo("public", true)
                     .get()
                     .addOnSuccessListener { documents ->
                         val postList = mutableListOf<Post>()

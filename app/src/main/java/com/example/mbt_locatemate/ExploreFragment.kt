@@ -17,6 +17,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import java.util.UUID
+import kotlin.concurrent.timerTask
 
 class ExploreFragment: Fragment() {
     private lateinit var layoutManager: RecyclerView.LayoutManager
@@ -122,9 +123,11 @@ class ExploreFragment: Fragment() {
                                     val latitude = document.getDouble("latitude") ?: 0.0
                                     val longitude = document.getDouble("longitude") ?: 0.0
                                     val location = LatLng(latitude, longitude)
-                                    val post = Post(postId, username, caption, imgUrl, pfpUrl, location)
+                                    val timestamp = document.getLong("timestamp") ?: 0
+                                    val post = Post(postId, username, caption, imgUrl, pfpUrl, location, timestamp)
                                     postList.add(post)
                                 }
+                                postList.sortByDescending { it.timestamp }
                                 adapter.updatePosts(postList)
                             }
                     } else {
@@ -160,11 +163,13 @@ class ExploreFragment: Fragment() {
                             val latitude = document.getDouble("latitude") ?: 0.0
                             val longitude = document.getDouble("longitude") ?: 0.0
                             val location = LatLng(latitude, longitude)
-                            val post = Post(postId, username, caption, imgUrl, pfpUrl, location)
+                            val timestamp = document.getLong("timestamp") ?: 0
+                            val post = Post(postId, username, caption, imgUrl, pfpUrl, location, timestamp)
                             if (username != userUsername && username !in userFriends) {
                                 postList.add(post)
                             }
                         }
+                        postList.sortByDescending { it.timestamp }
                         adapter.updatePosts(postList)
 
                             }

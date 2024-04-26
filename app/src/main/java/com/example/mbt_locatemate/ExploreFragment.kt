@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -50,6 +51,7 @@ class ExploreFragment: Fragment() {
 
         adapter = PostListAdapter(mutableListOf()).apply {
             onGuessClickListener = { post ->
+
                 navigateToMapGuessFragment(post)
             }
 
@@ -92,11 +94,38 @@ class ExploreFragment: Fragment() {
     }
 
     private fun navigateToMapGuessFragment(post: Post) {
-        val guessFragment = MapGuessFragment.newInstance(post)
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, guessFragment)
-            .addToBackStack(null)
-            .commit()
+        val currentUserId = Firebase.auth.currentUser?.uid
+        if (currentUserId != null) {
+            //fetch username using userid
+            val userRef = Firebase.firestore.collection("users").document(currentUserId)
+            userRef.get().addOnSuccessListener { documentSnapshot ->
+                val username = documentSnapshot.getString("username")
+                if (username != null) {
+                    // check if guess alrd exists
+                    val postRef = Firebase.firestore.collection("posts").document(post.id.toString())
+                    postRef.collection("guesses").whereEqualTo("user", username).get()
+                        .addOnSuccessListener { queryDocumentSnapshots ->
+                            if (queryDocumentSnapshots.isEmpty) {
+                                // no guess, navigate to map
+                                val guessFragment = MapGuessFragment.newInstance(post)
+                                parentFragmentManager.beginTransaction()
+                                    .replace(R.id.fragment_container, guessFragment)
+                                    .addToBackStack(null)
+                                    .commit()
+                            } else {
+                                // theve alrd made guess
+                                Toast.makeText(requireContext(), "You have already made a guess on this post!", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                        .addOnFailureListener { e ->
+                            // error checking guess
+                            Log.e("TAG", "Error fetching user details", e)
+                        }
+                }
+            }.addOnFailureListener { exception ->
+                Log.e("TAG", "Error fetching user details", exception)
+            }
+        }
     }
 
     private fun loadFriendPosts() {

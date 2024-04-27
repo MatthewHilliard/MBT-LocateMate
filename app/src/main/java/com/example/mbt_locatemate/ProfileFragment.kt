@@ -26,6 +26,8 @@ class ProfileFragment: Fragment() {
     private lateinit var layoutManager: RecyclerView.LayoutManager
     private lateinit var adapter: ProfilePostListAdapter
     private lateinit var profilePostRecyclerView: RecyclerView
+    private lateinit var numPostsText: TextView
+    private var numGuesses = 0
 
     private var username: String? = null
     override fun onCreateView(
@@ -38,6 +40,7 @@ class ProfileFragment: Fragment() {
         val user = auth.currentUser
 
         profilePostRecyclerView = view.findViewById(R.id.userPostsRecyclerView)
+        numPostsText = view.findViewById(R.id.txtPostCount)
 
         layoutManager = GridLayoutManager(requireContext(), 2)
         profilePostRecyclerView.layoutManager = layoutManager
@@ -103,6 +106,7 @@ class ProfileFragment: Fragment() {
                     }
                     postList.sortByDescending { it.timestamp }
                     adapter.updatePosts(postList)
+                    numPostsText.text = postList.size.toString()
                 }
         }
     }

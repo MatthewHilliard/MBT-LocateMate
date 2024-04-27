@@ -24,6 +24,7 @@ class CommentListAdapter(private var comments: List<Comment>) : RecyclerView.Ada
     }
 
     fun updateComments(newComments: List<Comment>) {
+        Log.d("NewComments", newComments.toString())
         comments = newComments
         notifyDataSetChanged()
     }

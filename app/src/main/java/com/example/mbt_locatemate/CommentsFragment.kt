@@ -47,6 +47,8 @@ class CommentsFragment : BottomSheetDialogFragment() {
         commentRecyclerView.adapter = adapter
 
         loadComments()
+
+
         return view
     }
 

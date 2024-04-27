@@ -1,10 +1,13 @@
 package com.example.mbt_locatemate
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,12 +18,17 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
+import com.squareup.picasso.Picasso
 import java.util.UUID
 
 class CommentsFragment : BottomSheetDialogFragment() {
     private lateinit var layoutManager: RecyclerView.LayoutManager
     private lateinit var adapter: CommentListAdapter
     private lateinit var commentRecyclerView: RecyclerView
+    private lateinit var newComment: EditText
+    private lateinit var postId: String
+    private lateinit var username: String
+    private lateinit var pfpUrl: String
 
     private lateinit var auth: FirebaseAuth
     private val db = Firebase.firestore
@@ -30,6 +38,7 @@ class CommentsFragment : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_comments_sheet, container, false)
+        newComment = view.findViewById(R.id.comment_text)
         commentRecyclerView = view.findViewById(R.id.comment_recycler_view)
         commentRecyclerView.addItemDecoration(
             DividerItemDecoration(
@@ -46,14 +55,41 @@ class CommentsFragment : BottomSheetDialogFragment() {
         adapter = CommentListAdapter(mutableListOf())
         commentRecyclerView.adapter = adapter
 
-        loadComments()
+        newComment.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                //do nothing
+            }
 
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                //do nothing
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                // update caption in database
+                db.collection("posts").document(postId)
+                    .update("caption", newComment.text.toString())
+                    .addOnSuccessListener {
+                    }
+                    .addOnFailureListener { e ->
+                    }
+            }
+        })
 
         return view
     }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val currPost: Post? = arguments?.getParcelable("post")
+        if (currPost != null) {
+            postId = currPost.id
+            username = currPost.username
+            pfpUrl = currPost.pfpUrl
+            loadComments()
+        }
+    }
 
     private fun loadComments() {
-        db.collection("posts").document("2e8d3529-6f8a-466f-951e-0b5f78802ca8").collection("comments")
+        db.collection("posts").document(postId).collection("comments")
             .get()
             .addOnSuccessListener { documents ->
                 val commentList = mutableListOf<Comment>()

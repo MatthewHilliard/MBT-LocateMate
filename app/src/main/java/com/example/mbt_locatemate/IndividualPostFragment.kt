@@ -25,6 +25,7 @@ class IndividualPostFragment: Fragment() {
     private lateinit var delete: ImageView
     private lateinit var postId: String
     private lateinit var timeAgo: TextView
+    var onCommentsClickListener: ((Post) -> Unit)? = null
     private val db = FirebaseFirestore.getInstance()
 
 
@@ -67,7 +68,12 @@ class IndividualPostFragment: Fragment() {
 
         val commentsButton = view.findViewById<ImageView>(R.id.commentsButton)
         commentsButton.setOnClickListener{
-            val commentsFragment = CommentsFragment()
+            val bundle = Bundle().apply {
+                putParcelable("post", post)
+            }
+            val commentsFragment = CommentsFragment().apply {
+                arguments = bundle
+            }
             commentsFragment.show(parentFragmentManager, "CommentsFragment")
         }
 

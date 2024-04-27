@@ -13,6 +13,7 @@
         android:layout_marginStart="5dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="10dp"
+        android:scaleType="centerCrop"
         android:src="@drawable/profile"
         app:layout_constraintEnd_toStartOf="@+id/post_user"
         app:layout_constraintStart_toStartOf="parent"

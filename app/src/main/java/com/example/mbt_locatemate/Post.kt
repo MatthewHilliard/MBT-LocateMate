@@ -16,5 +16,6 @@ data class Post (
     val imgUrl:String,
     val pfpUrl:String,
     val location: LatLng,
+    val timestamp: Long,
 ) : Parcelable
 

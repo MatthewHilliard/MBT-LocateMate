@@ -95,9 +95,13 @@ class ProfileFragment: Fragment() {
                         val caption = document.getString("caption") ?: ""
                         val imgUrl = document.getString("img_url") ?: ""
                         val pfpUrl = document.getString("pfp_url") ?: ""
-                        val post = Post(postId, username, caption, imgUrl, pfpUrl, LatLng(40.712775, -74.0059717))
+                        val latitude = document.getDouble("latitude") ?: 0.0
+                        val longitude = document.getDouble("longitude") ?: 0.0
+                        val timestamp = document.getLong("timestamp") ?: 0
+                        val post = Post(postId, username, caption, imgUrl, pfpUrl, LatLng(latitude, longitude), timestamp)
                         postList.add(post)
                     }
+                    postList.sortByDescending { it.timestamp }
                     adapter.updatePosts(postList)
                 }
         }

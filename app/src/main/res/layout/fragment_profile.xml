@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ProfileFragment"
-    android:background="@drawable/profile_gradient">
+    android:background="@color/md_theme_surface">
 
     <ImageView
         android:id="@+id/settingsButton"

@@ -10,6 +10,8 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,7 +30,10 @@ class CommentsFragment : BottomSheetDialogFragment() {
     private lateinit var layoutManager: RecyclerView.LayoutManager
     private lateinit var adapter: CommentListAdapter
     private lateinit var commentRecyclerView: RecyclerView
-    private lateinit var newComment: EditText
+    private lateinit var newCommentText: EditText
+    private lateinit var newCommentPfp: ImageView
+    private lateinit var newCommentUsername: TextView
+
     private lateinit var postId: String
     private lateinit var username: String
     private lateinit var pfpUrl: String
@@ -41,7 +46,9 @@ class CommentsFragment : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_comments_sheet, container, false)
-        newComment = view.findViewById(R.id.comment_text)
+        newCommentText = view.findViewById(R.id.comment_text)
+        newCommentPfp = view.findViewById(R.id.pfp_comment)
+        newCommentUsername = view.findViewById(R.id.comment_user)
         commentRecyclerView = view.findViewById(R.id.comment_recycler_view)
         commentRecyclerView.addItemDecoration(
             DividerItemDecoration(
@@ -58,7 +65,7 @@ class CommentsFragment : BottomSheetDialogFragment() {
         adapter = CommentListAdapter(mutableListOf())
         commentRecyclerView.adapter = adapter
 
-        newComment.addTextChangedListener(object : TextWatcher {
+        newCommentText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
                 //do nothing
             }
@@ -71,7 +78,7 @@ class CommentsFragment : BottomSheetDialogFragment() {
                 // needs to check if comments exist yet and if not create a collection
                 // set comment text, pfpUrl, username for a new comment document
                 db.collection("posts").document(postId)
-                    .update("caption", newComment.text.toString())
+                    .update("caption", newCommentText.text.toString())
                     .addOnSuccessListener {
                     }
                     .addOnFailureListener { e ->
@@ -95,6 +102,8 @@ class CommentsFragment : BottomSheetDialogFragment() {
             postId = currPost.id
             username = currPost.username
             pfpUrl = currPost.pfpUrl
+            newCommentUsername.text = username
+            Picasso.get().load(pfpUrl).into(newCommentPfp)
             loadComments()
         }
     }

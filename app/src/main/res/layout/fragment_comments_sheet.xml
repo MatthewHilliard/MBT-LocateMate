@@ -20,6 +20,7 @@
             android:layout_height="425dp"
             android:scrollbars="vertical"/>
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/add_comment_section"
         android:layout_width="match_parent"
         app:layout_constraintTop_toBottomOf="@id/comment_recycler_view"
         android:layout_height="wrap_content">

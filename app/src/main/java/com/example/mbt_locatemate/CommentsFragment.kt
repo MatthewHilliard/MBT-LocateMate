@@ -1,5 +1,6 @@
 package com.example.mbt_locatemate
 
+import android.media.Image
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -33,6 +34,7 @@ class CommentsFragment : BottomSheetDialogFragment() {
     private lateinit var newCommentText: EditText
     private lateinit var newCommentPfp: ImageView
     private lateinit var newCommentUsername: TextView
+    private lateinit var sendComment: ImageView
 
     private lateinit var postId: String
     private lateinit var username: String
@@ -50,6 +52,7 @@ class CommentsFragment : BottomSheetDialogFragment() {
         newCommentPfp = view.findViewById(R.id.pfp_comment)
         newCommentUsername = view.findViewById(R.id.comment_user)
         commentRecyclerView = view.findViewById(R.id.comment_recycler_view)
+        sendComment = view.findViewById(R.id.send_comment)
         commentRecyclerView.addItemDecoration(
             DividerItemDecoration(
                 commentRecyclerView.context,
@@ -77,16 +80,28 @@ class CommentsFragment : BottomSheetDialogFragment() {
             override fun afterTextChanged(s: Editable?) {
                 // needs to check if comments exist yet and if not create a collection
                 // set comment text, pfpUrl, username for a new comment document
-                db.collection("posts").document(postId)
-                    .update("caption", newCommentText.text.toString())
-                    .addOnSuccessListener {
-                    }
-                    .addOnFailureListener { e ->
-                    }
+                if (s.toString() != "") {
+                    sendComment.visibility = View.VISIBLE
+                } else {
+                    sendComment.visibility = View.GONE
+                }
             }
         })
 
+        sendComment.setOnClickListener{
+            addComment(newCommentText.text.toString())
+        }
+
         return view
+    }
+
+    private fun addComment(commentText: String) {
+        db.collection("posts").document(postId)
+            .update("caption", commentText)
+            .addOnSuccessListener {
+            }
+            .addOnFailureListener { e ->
+            }
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

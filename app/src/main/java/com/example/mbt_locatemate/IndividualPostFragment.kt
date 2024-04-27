@@ -25,6 +25,8 @@ class IndividualPostFragment: Fragment() {
     private lateinit var delete: ImageView
     private lateinit var postId: String
     private lateinit var timeAgo: TextView
+    private lateinit var sendCaption: ImageView
+
     var onCommentsClickListener: ((Post) -> Unit)? = null
     private val db = FirebaseFirestore.getInstance()
 
@@ -41,6 +43,7 @@ class IndividualPostFragment: Fragment() {
         pfpImage = view.findViewById(R.id.post_pfp)
         delete = view.findViewById(R.id.delete_button)
         timeAgo = view.findViewById(R.id.time_ago)
+        sendCaption = view.findViewById(R.id.send_caption)
 
         delete.setOnClickListener {
             deletePost()
@@ -56,15 +59,23 @@ class IndividualPostFragment: Fragment() {
 
             override fun afterTextChanged(s: Editable?) {
                 // update caption in database
-                Log.d("PostActions", "attmepting to update caption")
-                db.collection("posts").document(postId)
-                    .update("caption", caption.text.toString())
-                    .addOnSuccessListener {
-                    }
-                    .addOnFailureListener { e ->
-                    }
+                if (s.toString() != "") {
+                    sendCaption.visibility = View.VISIBLE
+                } else {
+                    sendCaption.visibility = View.GONE
+                }
             }
         })
+
+        sendCaption.setOnClickListener{
+            Log.d("PostActions", "attmepting to update caption")
+            db.collection("posts").document(postId)
+                .update("caption", caption.text.toString())
+                .addOnSuccessListener {
+                }
+                .addOnFailureListener { e ->
+                }
+        }
 
         val commentsButton = view.findViewById<ImageView>(R.id.commentsButton)
         commentsButton.setOnClickListener{

@@ -51,7 +51,6 @@ class ExploreFragment: Fragment() {
 
         adapter = PostListAdapter(mutableListOf()).apply {
             onGuessClickListener = { post ->
-
                 navigateToMapGuessFragment(post)
             }
 

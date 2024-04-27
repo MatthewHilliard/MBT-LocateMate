@@ -1,12 +1,18 @@
 package com.example.mbt_locatemate
 
+import android.media.Image
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.LinearLayout
+import android.widget.EditText
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,12 +24,21 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
+import com.squareup.picasso.Picasso
 import java.util.UUID
 
 class CommentsFragment : BottomSheetDialogFragment() {
     private lateinit var layoutManager: RecyclerView.LayoutManager
     private lateinit var adapter: CommentListAdapter
     private lateinit var commentRecyclerView: RecyclerView
+    private lateinit var newCommentText: EditText
+    private lateinit var newCommentPfp: ImageView
+    private lateinit var newCommentUsername: TextView
+    private lateinit var sendComment: ImageView
+
+    private lateinit var postId: String
+    private lateinit var username: String
+    private lateinit var pfpUrl: String
 
     private lateinit var auth: FirebaseAuth
     private val db = Firebase.firestore
@@ -33,7 +48,11 @@ class CommentsFragment : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_comments_sheet, container, false)
+        newCommentText = view.findViewById(R.id.comment_text)
+        newCommentPfp = view.findViewById(R.id.pfp_comment)
+        newCommentUsername = view.findViewById(R.id.comment_user)
         commentRecyclerView = view.findViewById(R.id.comment_recycler_view)
+        sendComment = view.findViewById(R.id.send_comment)
         commentRecyclerView.addItemDecoration(
             DividerItemDecoration(
                 commentRecyclerView.context,
@@ -49,8 +68,52 @@ class CommentsFragment : BottomSheetDialogFragment() {
         adapter = CommentListAdapter(mutableListOf())
         commentRecyclerView.adapter = adapter
 
-        loadComments()
+        newCommentText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                //do nothing
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                //do nothing
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                // needs to check if comments exist yet and if not create a collection
+                // set comment text, pfpUrl, username for a new comment document
+                if (s.toString() != "") {
+                    sendComment.visibility = View.VISIBLE
+                } else {
+                    sendComment.visibility = View.GONE
+                }
+            }
+        })
+
+        sendComment.setOnClickListener{
+            addComment(newCommentText.text.toString())
+        }
+
         return view
+    }
+
+    private fun addComment(commentText: String) {
+        val username = username
+        val pfpUrl = pfpUrl
+        val text = commentText
+        val timestamp = System.currentTimeMillis()
+        val commentInfo = hashMapOf(
+            "username" to username,
+            "pfp_url" to pfpUrl,
+            "text" to text,
+            "timestamp" to timestamp,
+        )
+
+        db.collection("posts").document(postId).collection("comments").document(UUID.randomUUID().toString())
+            .set(commentInfo)
+            .addOnSuccessListener {
+                Log.d("NewComment", "successfully added to db")
+            }
+            .addOnFailureListener { e ->
+            }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -62,10 +125,20 @@ class CommentsFragment : BottomSheetDialogFragment() {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             bottomSheetBehavior.peekHeight = bottomSheet.height
         }
+        
+        val currPost: Post? = arguments?.getParcelable("post")
+        if (currPost != null) {
+            postId = currPost.id
+            username = currPost.username
+            pfpUrl = currPost.pfpUrl
+            newCommentUsername.text = username
+            Picasso.get().load(pfpUrl).into(newCommentPfp)
+            loadComments()
+        }
     }
 
     private fun loadComments() {
-        db.collection("posts").document("2e8d3529-6f8a-466f-951e-0b5f78802ca8").collection("comments")
+        db.collection("posts").document(postId).collection("comments")
             .get()
             .addOnSuccessListener { documents ->
                 val commentList = mutableListOf<Comment>()
@@ -73,10 +146,12 @@ class CommentsFragment : BottomSheetDialogFragment() {
                     val commentText = document.getString("text") ?: ""
                     val username = document.getString("username") ?: ""
                     val pfpUrl = document.getString("pfp_url") ?: ""
-                    val comment = Comment(username, pfpUrl, commentText)
+                    val timeAgo = document.getLong("timestamp") ?: 0
+                    val comment = Comment(username, pfpUrl, commentText, timeAgo)
                     commentList.add(comment)
                 }
                 Log.d("CommentsList", commentList.toString())
+                commentList.sortByDescending { it.timestamp }
                 adapter.updateComments(commentList)
             }
     }

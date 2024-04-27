@@ -77,8 +77,12 @@ class PostListAdapter(private var posts: List<Post>) : RecyclerView.Adapter<Post
             val minutes = TimeUnit.MILLISECONDS.toMinutes(timeDifference)
             val hours = TimeUnit.MILLISECONDS.toHours(timeDifference)
             val days = TimeUnit.MILLISECONDS.toDays(timeDifference)
+            val weeks = days / 7
+            val years = weeks / 52
             if (days.toInt() == 1 || seconds.toInt() == 1 || minutes.toInt() == 1 || hours.toInt() == 1) {
                 return when {
+                    years > 0 -> "$years year ago"
+                    weeks > 0 -> "$weeks week ago"
                     days > 0 -> "$days day ago"
                     hours > 0 -> "$hours hour ago"
                     minutes > 0 -> "$minutes minute ago"
@@ -86,6 +90,8 @@ class PostListAdapter(private var posts: List<Post>) : RecyclerView.Adapter<Post
                 }
             }
             return when {
+                years > 0 -> "$years years ago"
+                weeks > 0 -> "$weeks weeks ago"
                 days > 0 -> "$days days ago"
                 hours > 0 -> "$hours hours ago"
                 minutes > 0 -> "$minutes minutes ago"

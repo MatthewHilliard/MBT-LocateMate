@@ -25,6 +25,9 @@ class IndividualPostFragment: Fragment() {
     private lateinit var delete: ImageView
     private lateinit var postId: String
     private lateinit var timeAgo: TextView
+    private lateinit var sendCaption: ImageView
+
+    var onCommentsClickListener: ((Post) -> Unit)? = null
     private val db = FirebaseFirestore.getInstance()
 
 
@@ -40,6 +43,7 @@ class IndividualPostFragment: Fragment() {
         pfpImage = view.findViewById(R.id.post_pfp)
         delete = view.findViewById(R.id.delete_button)
         timeAgo = view.findViewById(R.id.time_ago)
+        sendCaption = view.findViewById(R.id.send_caption)
 
         delete.setOnClickListener {
             deletePost()
@@ -55,19 +59,32 @@ class IndividualPostFragment: Fragment() {
 
             override fun afterTextChanged(s: Editable?) {
                 // update caption in database
-                Log.d("PostActions", "attmepting to update caption")
-                db.collection("posts").document(postId)
-                    .update("caption", caption.text.toString())
-                    .addOnSuccessListener {
-                    }
-                    .addOnFailureListener { e ->
-                    }
+                if (s.toString() != "") {
+                    sendCaption.visibility = View.VISIBLE
+                } else {
+                    sendCaption.visibility = View.GONE
+                }
             }
         })
 
+        sendCaption.setOnClickListener{
+            Log.d("PostActions", "attmepting to update caption")
+            db.collection("posts").document(postId)
+                .update("caption", caption.text.toString())
+                .addOnSuccessListener {
+                }
+                .addOnFailureListener { e ->
+                }
+        }
+
         val commentsButton = view.findViewById<ImageView>(R.id.commentsButton)
         commentsButton.setOnClickListener{
-            val commentsFragment = CommentsFragment()
+            val bundle = Bundle().apply {
+                putParcelable("post", post)
+            }
+            val commentsFragment = CommentsFragment().apply {
+                arguments = bundle
+            }
             commentsFragment.show(parentFragmentManager, "CommentsFragment")
         }
 
@@ -113,8 +130,12 @@ class IndividualPostFragment: Fragment() {
         val minutes = TimeUnit.MILLISECONDS.toMinutes(timeDifference)
         val hours = TimeUnit.MILLISECONDS.toHours(timeDifference)
         val days = TimeUnit.MILLISECONDS.toDays(timeDifference)
+        val weeks = days / 7
+        val years = weeks / 52
         if (days.toInt() == 1 || seconds.toInt() == 1 || minutes.toInt() == 1 || hours.toInt() == 1) {
             return when {
+                years > 0 -> "$years year ago"
+                weeks > 0 -> "$weeks week ago"
                 days > 0 -> "$days day ago"
                 hours > 0 -> "$hours hour ago"
                 minutes > 0 -> "$minutes minute ago"
@@ -122,6 +143,8 @@ class IndividualPostFragment: Fragment() {
             }
         }
         return when {
+            years > 0 -> "$years years ago"
+            weeks > 0 -> "$weeks weeks ago"
             days > 0 -> "$days days ago"
             hours > 0 -> "$hours hours ago"
             minutes > 0 -> "$minutes minutes ago"

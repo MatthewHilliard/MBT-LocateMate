@@ -110,5 +110,4 @@
         android:textSize="13dp"
         app:layout_constraintStart_toEndOf="@+id/post_pfp"
         app:layout_constraintTop_toBottomOf="@+id/post_user" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

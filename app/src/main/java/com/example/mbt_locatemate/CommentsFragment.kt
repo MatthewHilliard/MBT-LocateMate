@@ -117,7 +117,8 @@ class CommentsFragment : BottomSheetDialogFragment() {
                     val commentText = document.getString("text") ?: ""
                     val username = document.getString("username") ?: ""
                     val pfpUrl = document.getString("pfp_url") ?: ""
-                    val comment = Comment(username, pfpUrl, commentText)
+                    val timeAgo = document.getLong("timestamp") ?: 0
+                    val comment = Comment(username, pfpUrl, commentText, timeAgo)
                     commentList.add(comment)
                 }
                 Log.d("CommentsList", commentList.toString())

@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
+import java.util.concurrent.TimeUnit
 
 class PostListAdapter(private var posts: List<Post>) : RecyclerView.Adapter<PostListAdapter.ViewHolder>() {
     var onCommentsClickListener: ((Post) -> Unit)? = null
@@ -38,6 +39,7 @@ class PostListAdapter(private var posts: List<Post>) : RecyclerView.Adapter<Post
         private val postCaption: TextView = itemView.findViewById(R.id.post_caption)
         private val postImage: ImageView = itemView.findViewById(R.id.post_image)
         private val pfpImage: ImageView = itemView.findViewById(R.id.post_pfp)
+        private val timeAgo: TextView = itemView.findViewById(R.id.time_ago)
 
         private val guessButton: Button = itemView.findViewById(R.id.post_guess)
 
@@ -62,6 +64,26 @@ class PostListAdapter(private var posts: List<Post>) : RecyclerView.Adapter<Post
             postCaption.text = post.caption
             Picasso.get().load(post.imgUrl).into(postImage)
             Picasso.get().load(post.pfpUrl).into(pfpImage)
+            timeAgo.text = calculateTimeAgo(post.timestamp)
+
+        }
+
+        //used ChatGPT to assist with time conversion
+        fun calculateTimeAgo(timestamp: Long): String {
+            val currentTime = System.currentTimeMillis()
+            val timeDifference = currentTime - timestamp
+
+            val seconds = TimeUnit.MILLISECONDS.toSeconds(timeDifference)
+            val minutes = TimeUnit.MILLISECONDS.toMinutes(timeDifference)
+            val hours = TimeUnit.MILLISECONDS.toHours(timeDifference)
+            val days = TimeUnit.MILLISECONDS.toDays(timeDifference)
+
+            return when {
+                days > 0 -> "$days days ago"
+                hours > 0 -> "$hours hours ago"
+                minutes > 0 -> "$minutes minutes ago"
+                else -> "$seconds seconds ago"
+            }
         }
 
     }

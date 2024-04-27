@@ -1,5 +1,6 @@
 package com.example.mbt_locatemate
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,8 +33,10 @@ class CommentListAdapter(private var comments: List<Comment>) : RecyclerView.Ada
         private val pfpImage: ImageView = itemView.findViewById(R.id.pfp_comment)
         private val commentText: TextView = itemView.findViewById(R.id.comment_text)
         fun bind(comment: Comment) {
+            Log.d("CommentBind", comment.toString())
             commentUser.text = comment.username
             Picasso.get().load(comment.pfpUrl).into(pfpImage)
+            commentText.text = comment.text
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.example.mbt_locatemate
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -61,6 +62,7 @@ class CommentsFragment : BottomSheetDialogFragment() {
                     val comment = Comment(username, pfpUrl, commentText)
                     commentList.add(comment)
                 }
+                Log.d("CommentsList", commentList.toString())
                 adapter.updateComments(commentList)
             }
     }

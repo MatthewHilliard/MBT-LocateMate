@@ -7,12 +7,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -80,6 +83,13 @@ class CommentsFragment : BottomSheetDialogFragment() {
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dialog?.setOnShowListener { dialog ->
+            val d = dialog as BottomSheetDialog
+            val bottomSheet = d.findViewById<View>(R.id.standard_bottom_sheet) as LinearLayout
+            val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            bottomSheetBehavior.peekHeight = bottomSheet.height
+        }
         val currPost: Post? = arguments?.getParcelable("post")
         if (currPost != null) {
             postId = currPost.id

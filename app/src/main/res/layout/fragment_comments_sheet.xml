@@ -1,57 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/standard_bottom_sheet"
+    android:orientation="vertical"
+    android:padding="5dp">
+
+    <LinearLayout
+        android:id="@+id/standard_bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="500dp"
-        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-    android:orientation="vertical">
+        android:orientation="vertical"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/comment_recycler_view"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/comment_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="425dp"
+            android:scrollbars="vertical"/>
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constrainedHeight="true"
-        app:layout_constraintTop_toTopOf="@id/standard_bottom_sheet" />
+        app:layout_constraintTop_toBottomOf="@id/comment_recycler_view"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/comment_user"
+            android:layout_width="200dp"
+            android:layout_height="25dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/poppins"
+            android:text="Username"
+            android:textColor="@color/black"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@+id/pfp_comment"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/comment_user"
-        android:layout_width="200dp"
-        android:layout_height="25dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="8dp"
-        android:fontFamily="@font/poppins"
-        android:text="Username"
-        android:textColor="@color/black"
-        android:textSize="20dp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@+id/pfp_comment"
-        app:layout_constraintTop_toTopOf="parent" />
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/pfp_comment"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginBottom="16dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/vacation_test"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:shapeAppearanceOverlay="@style/roundedImageView" />
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/pfp_comment"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:src="@drawable/vacation_test"
-        android:scaleType="centerCrop"
-        app:shapeAppearanceOverlay="@style/roundedImageView"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="3dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
-    <EditText
-        android:id="@+id/comment_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:fontFamily="@font/poppins"
-        android:hint="Add comment..."
-        android:textColor="@color/black"
-        android:textSize="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/pfp_comment"
-        app:layout_constraintTop_toBottomOf="@+id/comment_user" />
-
-</LinearLayout>
+        <EditText
+            android:id="@+id/comment_text"
+            android:layout_width="316dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="10dp"
+            android:fontFamily="@font/poppins"
+            android:hint="Add comment..."
+            android:textColor="@color/black"
+            android:textSize="20dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/pfp_comment"
+            app:layout_constraintTop_toBottomOf="@+id/comment_user" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

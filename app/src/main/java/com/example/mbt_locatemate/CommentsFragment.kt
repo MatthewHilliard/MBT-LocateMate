@@ -96,9 +96,21 @@ class CommentsFragment : BottomSheetDialogFragment() {
     }
 
     private fun addComment(commentText: String) {
-        db.collection("posts").document(postId)
-            .update("caption", commentText)
+        val username = username
+        val pfpUrl = pfpUrl
+        val text = commentText
+        val timestamp = System.currentTimeMillis()
+        val commentInfo = hashMapOf(
+            "username" to username,
+            "pfp_url" to pfpUrl,
+            "text" to text,
+            "timestamp" to timestamp,
+        )
+
+        db.collection("posts").document(postId).collection("comments").document(UUID.randomUUID().toString())
+            .set(commentInfo)
             .addOnSuccessListener {
+                Log.d("NewComment", "successfully added to db")
             }
             .addOnFailureListener { e ->
             }
@@ -137,6 +149,7 @@ class CommentsFragment : BottomSheetDialogFragment() {
                     commentList.add(comment)
                 }
                 Log.d("CommentsList", commentList.toString())
+                commentList.sortByDescending { it.timestamp }
                 adapter.updateComments(commentList)
             }
     }

@@ -65,7 +65,8 @@ class CommentsFragment : BottomSheetDialogFragment() {
             }
 
             override fun afterTextChanged(s: Editable?) {
-                // update caption in database
+                // needs to check if comments exist yet and if not create a collection
+                // set comment text, pfpUrl, username for a new comment document
                 db.collection("posts").document(postId)
                     .update("caption", newComment.text.toString())
                     .addOnSuccessListener {

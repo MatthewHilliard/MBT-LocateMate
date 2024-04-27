@@ -115,6 +115,7 @@ class CommentsFragment : BottomSheetDialogFragment() {
             .addOnFailureListener { e ->
             }
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dialog?.setOnShowListener { dialog ->
@@ -124,6 +125,7 @@ class CommentsFragment : BottomSheetDialogFragment() {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             bottomSheetBehavior.peekHeight = bottomSheet.height
         }
+        
         val currPost: Post? = arguments?.getParcelable("post")
         if (currPost != null) {
             postId = currPost.id

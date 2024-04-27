@@ -98,6 +98,7 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/leaderboardButton" />
+
     <TextView
         android:id="@+id/time_ago"
         android:layout_width="200dp"
@@ -107,7 +108,6 @@
         android:text="0 seconds ago"
         android:textColor="@color/common_google_signin_btn_text_light"
         android:textSize="13dp"
-    app:layout_constraintStart_toEndOf="@+id/post_pfp"
-    app:layout_constraintTop_toBottomOf="@+id/post_user" />
-
+        app:layout_constraintStart_toEndOf="@+id/post_pfp"
+        app:layout_constraintTop_toBottomOf="@+id/post_user" />
 </androidx.constraintlayout.widget.ConstraintLayout>

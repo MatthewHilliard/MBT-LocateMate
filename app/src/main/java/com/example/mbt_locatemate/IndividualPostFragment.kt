@@ -14,6 +14,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.google.firebase.firestore.FirebaseFirestore
 import com.squareup.picasso.Picasso
+import java.util.concurrent.TimeUnit
 
 class IndividualPostFragment: Fragment() {
     private lateinit var post: Post
@@ -23,6 +24,7 @@ class IndividualPostFragment: Fragment() {
     private lateinit var pfpImage: ImageView
     private lateinit var delete: ImageView
     private lateinit var postId: String
+    private lateinit var timeAgo: TextView
     private val db = FirebaseFirestore.getInstance()
 
 
@@ -37,6 +39,7 @@ class IndividualPostFragment: Fragment() {
         postImage = view.findViewById(R.id.post_image)
         pfpImage = view.findViewById(R.id.post_pfp)
         delete = view.findViewById(R.id.delete_button)
+        timeAgo = view.findViewById(R.id.time_ago)
 
         delete.setOnClickListener {
             deletePost()
@@ -98,7 +101,31 @@ class IndividualPostFragment: Fragment() {
             caption.setText(post.caption)
             Picasso.get().load(post.imgUrl).into(postImage)
             Picasso.get().load(post.pfpUrl).into(pfpImage)
+            timeAgo.text = calculateTimeAgo(post.timestamp)
+        }
+    }
 
+    private fun calculateTimeAgo(timestamp: Long): String {
+        val currentTime = System.currentTimeMillis()
+        val timeDifference = currentTime - timestamp
+
+        val seconds = TimeUnit.MILLISECONDS.toSeconds(timeDifference)
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(timeDifference)
+        val hours = TimeUnit.MILLISECONDS.toHours(timeDifference)
+        val days = TimeUnit.MILLISECONDS.toDays(timeDifference)
+        if (days.toInt() == 1 || seconds.toInt() == 1 || minutes.toInt() == 1 || hours.toInt() == 1) {
+            return when {
+                days > 0 -> "$days day ago"
+                hours > 0 -> "$hours hour ago"
+                minutes > 0 -> "$minutes minute ago"
+                else -> "$seconds second ago"
+            }
+        }
+        return when {
+            days > 0 -> "$days days ago"
+            hours > 0 -> "$hours hours ago"
+            minutes > 0 -> "$minutes minutes ago"
+            else -> "$seconds seconds ago"
         }
     }
 }

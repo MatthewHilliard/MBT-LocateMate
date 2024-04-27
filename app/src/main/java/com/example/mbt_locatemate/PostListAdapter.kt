@@ -69,7 +69,7 @@ class PostListAdapter(private var posts: List<Post>) : RecyclerView.Adapter<Post
         }
 
         //used ChatGPT to assist with time conversion
-        fun calculateTimeAgo(timestamp: Long): String {
+        private fun calculateTimeAgo(timestamp: Long): String {
             val currentTime = System.currentTimeMillis()
             val timeDifference = currentTime - timestamp
 
@@ -77,7 +77,14 @@ class PostListAdapter(private var posts: List<Post>) : RecyclerView.Adapter<Post
             val minutes = TimeUnit.MILLISECONDS.toMinutes(timeDifference)
             val hours = TimeUnit.MILLISECONDS.toHours(timeDifference)
             val days = TimeUnit.MILLISECONDS.toDays(timeDifference)
-
+            if (days.toInt() == 1 || seconds.toInt() == 1 || minutes.toInt() == 1 || hours.toInt() == 1) {
+                return when {
+                    days > 0 -> "$days day ago"
+                    hours > 0 -> "$hours hour ago"
+                    minutes > 0 -> "$minutes minute ago"
+                    else -> "$seconds second ago"
+                }
+            }
             return when {
                 days > 0 -> "$days days ago"
                 hours > 0 -> "$hours hours ago"

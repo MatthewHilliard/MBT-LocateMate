@@ -114,6 +114,8 @@ class CommentsFragment : BottomSheetDialogFragment() {
             }
             .addOnFailureListener { e ->
             }
+        newCommentText.setText("")
+        loadComments()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -151,8 +153,8 @@ class CommentsFragment : BottomSheetDialogFragment() {
                     commentList.add(comment)
                 }
                 Log.d("CommentsList", commentList.toString())
-                commentList.sortByDescending { it.timestamp }
-                adapter.updateComments(commentList)
+                val sortedList = commentList.sortedBy { it.timestamp }
+                adapter.updateComments(sortedList)
             }
     }
 }

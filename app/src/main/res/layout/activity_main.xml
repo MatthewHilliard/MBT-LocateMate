@@ -24,6 +24,7 @@
         app:itemIconSize="32dp"
         app:itemIconTint="@color/md_theme_onSecondaryContainer"
         app:labelVisibilityMode="unlabeled"
+        app:itemActiveIndicatorStyle="@style/Custom.Indicator"
         android:background="@color/md_theme_surfaceContainer"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -1,10 +1,12 @@
 package com.example.mbt_locatemate
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -29,6 +31,9 @@ class ExploreFragment: Fragment() {
     private val db = Firebase.firestore
 
     private lateinit var segmentedButton: MaterialButtonToggleGroup
+    private lateinit var friendPostsButton: Button
+    private lateinit var explorePostsButton: Button
+
     private lateinit var friendsButton: ImageView
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -68,16 +73,22 @@ class ExploreFragment: Fragment() {
         }
 
         segmentedButton = view.findViewById(R.id.segmentedButton)
+        friendPostsButton = view.findViewById(R.id.friendsButton)
+        explorePostsButton = view.findViewById(R.id.exploreButton)
         segmentedButton.addOnButtonCheckedListener { group, checkedId, isChecked ->
             if (isChecked) {
                 when (checkedId) {
                     R.id.friendsButton -> {
                         loadFriendPosts()
                         postRecyclerView.smoothScrollToPosition(0)
+                        friendPostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_secondaryContainer))
+                        explorePostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_surface))
                     }
                     R.id.exploreButton -> {
                         loadPublicPosts()
                         postRecyclerView.smoothScrollToPosition(0)
+                        explorePostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_secondaryContainer))
+                        friendPostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_surface))
                     }
                 }
             }

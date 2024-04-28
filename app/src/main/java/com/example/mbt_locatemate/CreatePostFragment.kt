@@ -66,6 +66,7 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
     private lateinit var friendsOnlyButton: Button
     private lateinit var publicButton: Button
     private var isPublicPost = false
+    private lateinit var addSongButton: Button
 //    val locationRequest = LocationRequest.create().apply {
 //        priority = Priority.PRIORITY_HIGH_ACCURACY
 //        interval = 10000 // 10 seconds
@@ -158,6 +159,14 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
                     }
                 }
             }
+        }
+
+        addSongButton = view.findViewById(R.id.post_add_song)
+        addSongButton.setOnClickListener{
+            val songsFragment = SongsFragment().apply {
+
+            }
+            songsFragment.show(parentFragmentManager, "SongsFragment")
         }
 
         segmentedButton.check(R.id.friendsOnlyButton)

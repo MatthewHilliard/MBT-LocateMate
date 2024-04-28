@@ -35,7 +35,8 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var map: GoogleMap
 
-    private val boston = LatLng(42.0, -71.0)
+    //private val boston = LatLng(42.0, -71.0)
+    private lateinit var postLocation: LatLng
     private lateinit var guess: LatLng
 
     private lateinit var post: Post
@@ -49,6 +50,7 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         post = arguments?.getParcelable<Post>(ARG_POST)!!
         val postID = post.id
+        postLocation = post.location
         Toast.makeText(requireContext(), "Post ID: $postID", Toast.LENGTH_SHORT).show()
     }
 
@@ -84,8 +86,8 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
             if (::guess.isInitialized) {
                 val distance = FloatArray(1)
                 Location.distanceBetween(
-                    boston.latitude,
-                    boston.longitude,
+                    postLocation.latitude,
+                    postLocation.longitude,
                     guess.latitude,
                     guess.longitude,
                     distance

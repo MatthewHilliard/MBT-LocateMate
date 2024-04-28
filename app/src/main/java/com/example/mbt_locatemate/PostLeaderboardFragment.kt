@@ -59,12 +59,12 @@ class PostLeaderboardFragment : Fragment() {
             .get()
             .addOnSuccessListener { documents ->
                 val guesses = documents.map { doc ->
-                    Guess(doc.getString("userId") ?: "", doc.getDouble("distance") ?: 0.0)
+                    Guess(doc.getString("username") ?: "", doc.getDouble("distance") ?: 0.0)
                 }
-                //adapter.setGuesses(guesses) im gonna come back to this
+                adapter.setGuesses(guesses)
             }
             .addOnFailureListener { exception ->
-                Toast.makeText(context, "Failure ??", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Error loading guesses: ${exception.message}", Toast.LENGTH_SHORT).show()
             }
     }
 

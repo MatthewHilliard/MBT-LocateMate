@@ -83,7 +83,7 @@ class CommentsFragment : BottomSheetDialogFragment() {
                 if (s.toString() != "") {
                     sendComment.visibility = View.VISIBLE
                 } else {
-                    sendComment.visibility = View.GONE
+                    sendComment.visibility = View.INVISIBLE
                 }
             }
         })

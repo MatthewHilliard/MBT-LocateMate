@@ -99,8 +99,13 @@ class ExploreFragment: Fragment() {
     }
 
     private fun openCommentsSheet(post: Post) {
-        val bottomSheetFragment = CommentsFragment()
-        bottomSheetFragment.show(parentFragmentManager, bottomSheetFragment.tag)
+        val bundle = Bundle().apply {
+            putParcelable("post", post)
+        }
+        val commentsFragment = CommentsFragment().apply {
+            arguments = bundle
+        }
+        commentsFragment.show(parentFragmentManager, "CommentsFragment")
     }
 
     private fun navigateToMapGuessFragment(post: Post) {

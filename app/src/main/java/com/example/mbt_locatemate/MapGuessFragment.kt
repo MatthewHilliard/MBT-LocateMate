@@ -67,16 +67,18 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
         }
 
         db.collection("posts").document(post.id).get().addOnSuccessListener {document ->
-            val songUrl = document.getString("song_url").toString()
-            if(songUrl != "") {
-                mediaPlayer = MediaPlayer().apply {
-                    setDataSource(songUrl)
-                    prepareAsync()
-                    setOnPreparedListener {
-                        it.start()
-                    }
-                    setOnErrorListener { mp, what, extra ->
-                        false
+            if (document.contains("song_url")) {
+                val songUrl = document.getString("song_url").toString()
+                if (songUrl != "") {
+                    mediaPlayer = MediaPlayer().apply {
+                        setDataSource(songUrl)
+                        prepareAsync()
+                        setOnPreparedListener {
+                            it.start()
+                        }
+                        setOnErrorListener { mp, what, extra ->
+                            false
+                        }
                     }
                 }
             }

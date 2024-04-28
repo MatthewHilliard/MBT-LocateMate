@@ -28,7 +28,7 @@
         android:fontFamily="@font/poppins"
         android:textStyle="bold"
         android:text="Username"
-        android:textColor="@color/black"
+        android:textColor="@color/md_theme_onSurface"
         android:textSize="20dp"
         app:layout_constraintStart_toEndOf="@+id/pfp_friend"
         app:layout_constraintTop_toTopOf="parent" />

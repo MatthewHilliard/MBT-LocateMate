@@ -63,6 +63,8 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
     private lateinit var auth: FirebaseAuth
     private lateinit var imageBitmap: Bitmap
     private lateinit var segmentedButton: MaterialButtonToggleGroup
+    private lateinit var friendsOnlyButton: Button
+    private lateinit var publicButton: Button
     private var isPublicPost = false
 //    val locationRequest = LocationRequest.create().apply {
 //        priority = Priority.PRIORITY_HIGH_ACCURACY
@@ -138,15 +140,21 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext())
 
+        friendsOnlyButton = view.findViewById(R.id.friendsOnlyButton)
+        publicButton = view.findViewById(R.id.publicButton)
         segmentedButton = view.findViewById(R.id.postTypeButton)
         segmentedButton.addOnButtonCheckedListener { group, checkedId, isChecked ->
             if (isChecked) {
                 when (checkedId) {
                     R.id.friendsOnlyButton -> {
                         isPublicPost = false
+                        friendsOnlyButton.setBackgroundColor(resources.getColor(R.color.md_theme_secondaryContainer))
+                        publicButton.setBackgroundColor(resources.getColor(R.color.md_theme_surface))
                     }
                     R.id.publicButton -> {
                         isPublicPost = true
+                        publicButton.setBackgroundColor(resources.getColor(R.color.md_theme_secondaryContainer))
+                        friendsOnlyButton.setBackgroundColor(resources.getColor(R.color.md_theme_surface))
                     }
                 }
             }

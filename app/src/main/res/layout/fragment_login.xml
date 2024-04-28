@@ -16,7 +16,7 @@
         android:textStyle="bold"
         android:gravity="center"
         android:text="Sign in to LocateMate to begin exploring!"
-        android:textColor="@color/black"
+        android:textColor="@color/md_theme_onSurface"
         android:textSize="35dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

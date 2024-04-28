@@ -11,7 +11,8 @@
         android:layout_margin="10dp"
         android:focusable="true"
         android:elevation="7dp"
-        app:cardCornerRadius="15dp">
+        app:cardCornerRadius="15dp"
+        app:cardBackgroundColor="@color/md_theme_surfaceContainerLow">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -32,7 +33,7 @@
                 android:fontFamily="@font/poppins"
                 android:gravity="center"
                 android:text="Caption placeholder"
-                android:textColor="@color/black"
+                android:textColor="@color/md_theme_onSurface"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 

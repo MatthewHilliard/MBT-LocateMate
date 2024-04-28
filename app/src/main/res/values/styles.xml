@@ -2,10 +2,24 @@
 <resources>
     <style name="RoundedImageViewStyle">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">16dp</item> <!-- Adjust the corner radius as needed -->
+        <item name="cornerSize">16dp</item>
     </style>
     <style name="roundedImageView">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
+    </style>
+    <style name="Custom.Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/md_theme_secondaryContainer</item>
+    </style>
+    <style name="SegmentedButtonStyle" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:color">@color/md_theme_secondaryContainer</item>
+    </style>
+    <style name="Widget.App.TabLayout" parent="Widget.Material3.TabLayout">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.TabLayout</item>
+    </style>
+
+    <style name="ThemeOverlay.App.TabLayout" parent="">
+        <item name="colorPrimary">@color/md_theme_primary</item>
+        <item name="colorOnSurfaceVariant">@color/md_theme_onSurfaceVariant</item>
     </style>
 </resources>

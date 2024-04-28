@@ -28,7 +28,7 @@
         android:fontFamily="@font/poppins"
         android:textStyle="bold"
         android:text="Username"
-        android:textColor="@color/black"
+        android:textColor="@color/md_theme_onSurface"
         android:textSize="20dp"
         app:layout_constraintStart_toEndOf="@+id/pfp_comment"
         app:layout_constraintTop_toTopOf="parent" />
@@ -41,7 +41,7 @@
         android:fontFamily="@font/poppins"
         android:padding="3dp"
         android:text="0s"
-        android:textColor="@color/common_google_signin_btn_text_light"
+        android:textColor="@color/md_theme_onSurfaceVariant"
         android:textSize="13dp"
         app:layout_constraintBottom_toBottomOf="@id/comment_user"
         app:layout_constraintStart_toEndOf="@id/comment_user" />
@@ -53,7 +53,7 @@
         android:layout_marginStart="10dp"
         android:fontFamily="@font/poppins"
         android:text="text"
-        android:textColor="@color/black"
+        android:textColor="@color/md_theme_onSurface"
         android:textSize="20dp"
         app:layout_constraintStart_toEndOf="@+id/pfp_comment"
         app:layout_constraintTop_toBottomOf="@+id/comment_user" />

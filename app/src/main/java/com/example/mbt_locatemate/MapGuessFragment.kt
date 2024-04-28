@@ -95,13 +95,16 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
                         .addOnSuccessListener { documentSnapshot ->
                             if (documentSnapshot.exists()) {
                                 val username = documentSnapshot.getString("username")
+                                val pfpUrl = documentSnapshot.getString("pfpUrl")
+                                Log.d("MapGuessFragment", "Loading image from URL: ${pfpUrl}")
                                 // check for username
                                 if (username != null) {
                                     // add guess to subcollection
                                     CoroutineScope(Dispatchers.IO).launch {
                                         val newGuess = hashMapOf(
                                             "user" to username,
-                                            "distance" to distanceInMeters
+                                            "distance" to distanceInMeters,
+                                            "pfpUrl" to pfpUrl
                                         )
 
                                         val postRef = db.collection("posts").document(post.id.toString())

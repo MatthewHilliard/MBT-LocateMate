@@ -7,7 +7,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/pfp_friend"
+        android:id="@+id/pfp_guess"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:src="@drawable/vacation_test"
@@ -19,7 +19,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/friend_user"
+        android:id="@+id/guess_user"
         android:layout_width="200dp"
         android:layout_height="25dp"
         android:layout_marginStart="10dp"
@@ -29,11 +29,11 @@
         android:text="Username"
         android:textColor="@color/black"
         android:textSize="20dp"
-        app:layout_constraintStart_toEndOf="@+id/pfp_friend"
+        app:layout_constraintStart_toEndOf="@+id/pfp_guess"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/friend_guess"
+        android:id="@+id/guess_distance"
         android:layout_width="200dp"
         android:layout_height="25dp"
         android:layout_marginStart="10dp"

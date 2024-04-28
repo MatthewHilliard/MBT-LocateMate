@@ -90,6 +90,7 @@ class CommentsFragment : BottomSheetDialogFragment() {
 
         sendComment.setOnClickListener{
             addComment(newCommentText.text.toString())
+            sendComment.clearFocus()
         }
 
         return view

@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit
 class PostListAdapter(private var posts: List<Post>) : RecyclerView.Adapter<PostListAdapter.ViewHolder>() {
     var onCommentsClickListener: ((Post) -> Unit)? = null
     var onGuessClickListener: ((Post) -> Unit)? = null
+    var onLeaderboardClickListener: ((Post) -> Unit)? = null
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.list_item_post, parent, false)
         return ViewHolder(v)
@@ -55,6 +56,13 @@ class PostListAdapter(private var posts: List<Post>) : RecyclerView.Adapter<Post
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
                     onCommentsClickListener?.invoke(posts[position])
+                }
+            }
+
+            leaderboardButton.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    onLeaderboardClickListener?.invoke(posts[position])
                 }
             }
         }

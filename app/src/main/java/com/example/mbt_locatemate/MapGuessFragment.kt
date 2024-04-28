@@ -10,8 +10,6 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.example.mbt_locatemate.ExploreFragment
-import com.example.mbt_locatemate.R
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -20,22 +18,19 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
-import com.google.firebase.firestore.FieldValue
 import kotlinx.coroutines.CoroutineScope
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.UUID
 
 class MapGuessFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var map: GoogleMap
 
-    private val boston = LatLng(42.0, -71.0)
+    //private val boston = LatLng(42.0, -71.0)
+    private lateinit var postLocation: LatLng
     private lateinit var guess: LatLng
 
     private lateinit var post: Post
@@ -49,6 +44,7 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         post = arguments?.getParcelable<Post>(ARG_POST)!!
         val postID = post.id
+        postLocation = post.location
         Toast.makeText(requireContext(), "Post ID: $postID", Toast.LENGTH_SHORT).show()
     }
 
@@ -84,8 +80,8 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
             if (::guess.isInitialized) {
                 val distance = FloatArray(1)
                 Location.distanceBetween(
-                    boston.latitude,
-                    boston.longitude,
+                    postLocation.latitude,
+                    postLocation.longitude,
                     guess.latitude,
                     guess.longitude,
                     distance
@@ -153,14 +149,14 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun navigateToPostLeaderboardFragment(post: Post) {
-        val leaderboardFragment = PostLeaderboardFragment.newInstance(post.id)
+        val leaderboardFragment = PostLeaderboardFragment.newInstance(post)
         parentFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, leaderboardFragment)
             .commit()
     }
 
     companion object {
-        private const val ARG_POST = "post"
+        const val ARG_POST = "post"
 
         // Change the method to accept a Post object
         fun newInstance(post: Post): MapGuessFragment {

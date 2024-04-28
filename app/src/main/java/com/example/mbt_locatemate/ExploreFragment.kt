@@ -20,7 +20,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import java.util.UUID
-import kotlin.concurrent.timerTask
 
 class ExploreFragment: Fragment() {
     private lateinit var layoutManager: RecyclerView.LayoutManager
@@ -62,6 +61,10 @@ class ExploreFragment: Fragment() {
             onCommentsClickListener = { post ->
                 openCommentsSheet(post)
             }
+
+            onLeaderboardClickListener = { post ->
+                navigateToPostLeaderboardFragment(post)
+            }
         }
         postRecyclerView.adapter = adapter
 
@@ -96,6 +99,13 @@ class ExploreFragment: Fragment() {
 
         segmentedButton.check(R.id.friendsButton)
         return view
+    }
+
+    private fun navigateToPostLeaderboardFragment(post: Post) {
+        val leaderboardFragment = PostLeaderboardFragment.newInstance(post)
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, leaderboardFragment)
+            .commit()
     }
 
     private fun openCommentsSheet(post: Post) {

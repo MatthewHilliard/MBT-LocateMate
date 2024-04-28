@@ -5,8 +5,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.firestore.QuerySnapshot
 
-class GuessListAdapter(private val guesses: List<Guess>) : RecyclerView.Adapter<GuessListAdapter.ViewHolder>() {
+class GuessListAdapter(private var guesses: List<Guess>) : RecyclerView.Adapter<GuessListAdapter.ViewHolder>() {
     var onGuessClickListener: ((Post) -> Unit)? = null
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -26,4 +27,9 @@ class GuessListAdapter(private val guesses: List<Guess>) : RecyclerView.Adapter<
     }
 
     override fun getItemCount() = guesses.size
+
+    fun setGuesses(guesses: List<Guess>) {
+        this.guesses = guesses // Reassign with the new list
+        notifyDataSetChanged() // Notify the adapter to refresh the list
+    }
 }

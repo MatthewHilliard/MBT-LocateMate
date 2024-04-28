@@ -81,8 +81,8 @@ class PostLeaderboardFragment : Fragment() {
     companion object {
         const val ARG_POST = "post"
 
-        fun newInstance(post: Post): MapGuessFragment {
-            val fragment = MapGuessFragment()
+        fun newInstance(post: Post): PostLeaderboardFragment {
+            val fragment = PostLeaderboardFragment()
             val args = Bundle().apply {
                 putParcelable(ARG_POST, post)
             }

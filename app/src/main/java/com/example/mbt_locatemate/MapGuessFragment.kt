@@ -10,8 +10,6 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.example.mbt_locatemate.ExploreFragment
-import com.example.mbt_locatemate.R
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -20,16 +18,12 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
-import com.google.firebase.firestore.FieldValue
 import kotlinx.coroutines.CoroutineScope
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.UUID
 
 class MapGuessFragment : Fragment(), OnMapReadyCallback {
 
@@ -155,14 +149,14 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun navigateToPostLeaderboardFragment(post: Post) {
-        val leaderboardFragment = PostLeaderboardFragment.newInstance(post.id)
+        val leaderboardFragment = PostLeaderboardFragment.newInstance(post)
         parentFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, leaderboardFragment)
             .commit()
     }
 
     companion object {
-        private const val ARG_POST = "post"
+        const val ARG_POST = "post"
 
         // Change the method to accept a Post object
         fun newInstance(post: Post): MapGuessFragment {

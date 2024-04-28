@@ -1,30 +1,32 @@
 package com.example.mbt_locatemate
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
-import java.util.UUID
 
 class PostLeaderboardFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: GuessListAdapter
-    private var postId: String? = null
+    private lateinit var post: Post
+    private lateinit var postId: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            postId = it.getString(ARG_POST_ID)
+        post = arguments?.getParcelable<Post>(MapGuessFragment.ARG_POST)!!
+        postId = post.id
+        if (postId == null) {
+            Log.e("PostLeaderboardFragment", "Post ID is null")
         }
+        Toast.makeText(requireContext(), "Post ID: $postId", Toast.LENGTH_SHORT).show()
     }
 
     override fun onCreateView(
@@ -38,7 +40,8 @@ class PostLeaderboardFragment : Fragment() {
         adapter = GuessListAdapter(mutableListOf())
         recyclerView.adapter = adapter
 
-        postId?.let { loadLeaderboard(it) }
+        //postId?.let { loadLeaderboard(it) }
+        loadLeaderboard(postId)
 
         val backButton = view.findViewById<ImageView>(R.id.leaderboardBackButton)
         backButton.setOnClickListener(){
@@ -52,34 +55,38 @@ class PostLeaderboardFragment : Fragment() {
 
 
     private fun loadLeaderboard(postId: String) {
+        Log.d("PostLeaderboardFragment", "Loading leaderboard for post: $postId")
         val db = FirebaseFirestore.getInstance()
         db.collection("posts").document(postId)
             .collection("guesses")
             .orderBy("distance")
             .get()
             .addOnSuccessListener { documents ->
-                val guesses = documents.map { doc ->
-                    Guess(doc.getString("username") ?: "", doc.getDouble("distance") ?: 0.0)
+                Log.d("PostLeaderboardFragment", "Number of guesses loaded: ${documents.size()}")
+                if (documents.isEmpty) {
+                    Toast.makeText(context, "No guesses to show", Toast.LENGTH_SHORT).show()
+                } else {
+                    val guesses = documents.map { doc ->
+                        Guess(doc.getString("username") ?: "Unknown", doc.getDouble("distance") ?: 0.0)
+                    }
+                    adapter.setGuesses(guesses)
                 }
-                adapter.setGuesses(guesses)
             }
             .addOnFailureListener { exception ->
+                Log.e("PostLeaderboardFragment", "Error loading guesses", exception)
                 Toast.makeText(context, "Error loading guesses: ${exception.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
     companion object {
-        private const val ARG_POST_ID = "post_id"
+        const val ARG_POST = "post"
 
-        fun newInstance(postId: String) = PostLeaderboardFragment().apply {
-            return PostLeaderboardFragment()
-        }
-
-        fun newInstanceWithArgs(someId: String): PostLeaderboardFragment {
-            val bundle = Bundle()
-            bundle.putString("some_key", someId)
-            val fragment = PostLeaderboardFragment()
-            fragment.arguments = bundle
+        fun newInstance(post: Post): MapGuessFragment {
+            val fragment = MapGuessFragment()
+            val args = Bundle().apply {
+                putParcelable(ARG_POST, post)
+            }
+            fragment.arguments = args
             return fragment
         }
     }

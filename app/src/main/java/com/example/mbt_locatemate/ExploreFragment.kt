@@ -18,7 +18,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import java.util.UUID
-import kotlin.concurrent.timerTask
 
 class ExploreFragment: Fragment() {
     private lateinit var layoutManager: RecyclerView.LayoutManager
@@ -93,7 +92,7 @@ class ExploreFragment: Fragment() {
     }
 
     private fun navigateToPostLeaderboardFragment(post: Post) {
-        val leaderboardFragment = PostLeaderboardFragment.newInstance(post.id)
+        val leaderboardFragment = PostLeaderboardFragment.newInstance(post)
         parentFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, leaderboardFragment)
             .commit()

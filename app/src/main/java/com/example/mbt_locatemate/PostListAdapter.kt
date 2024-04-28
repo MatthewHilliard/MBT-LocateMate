@@ -60,7 +60,7 @@ class PostListAdapter(private var posts: List<Post>) : RecyclerView.Adapter<Post
             leaderboardButton.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
-                    onCommentsClickListener?.invoke(posts[position])
+                    onLeaderboardClickListener?.invoke(posts[position])
                 }
             }
         }

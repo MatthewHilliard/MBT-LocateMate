@@ -14,4 +14,12 @@
     <style name="SegmentedButtonStyle" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:color">@color/md_theme_secondaryContainer</item>
     </style>
+    <style name="Widget.App.TabLayout" parent="Widget.Material3.TabLayout">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.TabLayout</item>
+    </style>
+
+    <style name="ThemeOverlay.App.TabLayout" parent="">
+        <item name="colorPrimary">@color/md_theme_primary</item>
+        <item name="colorOnSurfaceVariant">@color/md_theme_onSurfaceVariant</item>
+    </style>
 </resources>

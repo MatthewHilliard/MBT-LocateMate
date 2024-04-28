@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:padding="5dp">
+    android:padding="5dp"
+    android:background="@color/md_theme_surface">
 
     <LinearLayout
         android:id="@+id/standard_bottom_sheet"
@@ -26,7 +27,7 @@
             android:layout_marginTop="8dp"
             android:fontFamily="@font/poppins"
             android:text="Username"
-            android:textColor="@color/black"
+            android:textColor="@color/md_theme_onSurface"
             android:textSize="20dp"
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@+id/pfp_comment"

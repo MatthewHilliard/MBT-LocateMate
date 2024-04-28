@@ -58,6 +58,10 @@ class ExploreFragment: Fragment() {
             onCommentsClickListener = { post ->
                 openCommentsSheet(post)
             }
+
+            onLeaderboardClickListener = { post ->
+                navigateToPostLeaderboardFragment(post)
+            }
         }
         postRecyclerView.adapter = adapter
 
@@ -86,6 +90,13 @@ class ExploreFragment: Fragment() {
 
         segmentedButton.check(R.id.friendsButton)
         return view
+    }
+
+    private fun navigateToPostLeaderboardFragment(post: Post) {
+        val leaderboardFragment = PostLeaderboardFragment.newInstance(post.id)
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, leaderboardFragment)
+            .commit()
     }
 
     private fun openCommentsSheet(post: Post) {

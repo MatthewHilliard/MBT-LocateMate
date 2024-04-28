@@ -67,7 +67,7 @@ class PostLeaderboardFragment : Fragment() {
                     Toast.makeText(context, "No guesses to show", Toast.LENGTH_SHORT).show()
                 } else {
                     val guesses = documents.map { doc ->
-                        Guess(doc.getString("username") ?: "Unknown", doc.getDouble("distance") ?: 0.0)
+                        Guess(doc.getString("user") ?: "Unknown", doc.getDouble("distance") ?: 0.0)
                     }
                     adapter.setGuesses(guesses)
                 }

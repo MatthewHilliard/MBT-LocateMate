@@ -12,6 +12,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.google.android.material.button.MaterialButton
 import com.google.firebase.firestore.FirebaseFirestore
 import com.squareup.picasso.Picasso
 import java.util.concurrent.TimeUnit
@@ -25,7 +26,7 @@ class IndividualPostFragment: Fragment() {
     private lateinit var delete: ImageView
     private lateinit var postId: String
     private lateinit var timeAgo: TextView
-    private lateinit var sendCaption: ImageView
+    private lateinit var sendCaption: MaterialButton
 
     var onCommentsClickListener: ((Post) -> Unit)? = null
     private val db = FirebaseFirestore.getInstance()
@@ -75,6 +76,8 @@ class IndividualPostFragment: Fragment() {
                 }
                 .addOnFailureListener { e ->
                 }
+            sendCaption.clearFocus()
+
         }
 
         val commentsButton = view.findViewById<ImageView>(R.id.commentsButton)

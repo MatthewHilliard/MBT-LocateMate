@@ -39,6 +39,7 @@ class CommentsFragment : BottomSheetDialogFragment() {
     private lateinit var postId: String
     private lateinit var username: String
     private lateinit var pfpUrl: String
+    private lateinit var userPfpUrl: String
 
     private lateinit var auth: FirebaseAuth
     private val db = Firebase.firestore
@@ -90,14 +91,15 @@ class CommentsFragment : BottomSheetDialogFragment() {
 
         sendComment.setOnClickListener{
             addComment(newCommentText.text.toString())
+            sendComment.clearFocus()
         }
 
         return view
     }
 
     private fun addComment(commentText: String) {
-        val username = username
-        val pfpUrl = pfpUrl
+        val username = newCommentUsername.text.toString()
+        val pfpUrl = userPfpUrl
         val text = commentText
         val timestamp = System.currentTimeMillis()
         val commentInfo = hashMapOf(
@@ -114,6 +116,8 @@ class CommentsFragment : BottomSheetDialogFragment() {
             }
             .addOnFailureListener { e ->
             }
+        newCommentText.setText("")
+        loadComments()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -125,14 +129,25 @@ class CommentsFragment : BottomSheetDialogFragment() {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             bottomSheetBehavior.peekHeight = bottomSheet.height
         }
-        
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            db.collection("users").document(currentUser.uid)
+                .get()
+                .addOnSuccessListener { document ->
+                    val username = document.getString("username") ?: ""
+                    val pfpUrl = document.getString("pfp_url") ?: ""
+                    newCommentUsername.text = username
+                    Picasso.get().load(pfpUrl).into(newCommentPfp)
+                    userPfpUrl = pfpUrl
+                    }
+                }
+
+
         val currPost: Post? = arguments?.getParcelable("post")
         if (currPost != null) {
             postId = currPost.id
             username = currPost.username
             pfpUrl = currPost.pfpUrl
-            newCommentUsername.text = username
-            Picasso.get().load(pfpUrl).into(newCommentPfp)
             loadComments()
         }
     }
@@ -151,8 +166,8 @@ class CommentsFragment : BottomSheetDialogFragment() {
                     commentList.add(comment)
                 }
                 Log.d("CommentsList", commentList.toString())
-                commentList.sortByDescending { it.timestamp }
-                adapter.updateComments(commentList)
+                val sortedList = commentList.sortedBy { it.timestamp }
+                adapter.updateComments(sortedList)
             }
     }
 }

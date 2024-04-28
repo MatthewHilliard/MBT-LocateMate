@@ -106,6 +106,5 @@ class PostListAdapter(private var posts: List<Post>) : RecyclerView.Adapter<Post
                 else -> "$seconds seconds ago"
             }
         }
-
     }
 }

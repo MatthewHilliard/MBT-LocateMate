@@ -43,20 +43,20 @@ class SongsFragment : BottomSheetDialogFragment() {
         adapter = SongListAdapter(mutableListOf())
         songRecyclerView.adapter = adapter
 
-//        searchView = view.findViewById(R.id.song_search)
-//        searchView.clearFocus()
-//        searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
-//            override fun onQueryTextSubmit(query: String?): Boolean {
-//                if (query != null) {
-//
-//                }
-//                return true
-//            }
-//
-//            override fun onQueryTextChange(newText: String?): Boolean {
-//                return true
-//            }
-//        })
+        searchView = view.findViewById(R.id.song_search)
+        searchView.clearFocus()
+        searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                if (query != null) {
+                    searchSongs(query)
+                }
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                return true
+            }
+        })
 
         dialog?.setOnShowListener { dialog ->
             val d = dialog as BottomSheetDialog
@@ -68,6 +68,11 @@ class SongsFragment : BottomSheetDialogFragment() {
 
         showRandomSongs()
         return view
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        adapter.stopMediaPlayer()
     }
 
     private fun showRandomSongs() {
@@ -87,19 +92,19 @@ class SongsFragment : BottomSheetDialogFragment() {
         })
     }
 
-//    private fun searchSongs(query: String){
-//        val call: Call<NewsResponse> = api.getEverything(query)
-//        call.enqueue(object : Callback<NewsResponse> {
-//            override fun onResponse(call: Call<NewsResponse>, response: Response<NewsResponse>) {
-//                if (response.isSuccessful) {
-//                    val articles = response.body()?.articles ?: emptyList()
-//                    updateAdapter(articles)
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<NewsResponse>, t: Throwable) {
-//                Log.d("ArticleListFragment", "Failed to fetch articles")
-//            }
-//        })
-//    }
+    private fun searchSongs(query: String){
+        val call: Call<SongResponse> = api.getSongs(query)
+        call.enqueue(object : Callback<SongResponse> {
+            override fun onResponse(call: Call<SongResponse>, response: Response<SongResponse>) {
+                if (response.isSuccessful) {
+                    val songs = response.body()?.results ?: emptyList()
+                    adapter.updateSongs(songs)
+                }
+            }
+
+            override fun onFailure(call: Call<SongResponse>, t: Throwable) {
+                Log.d("SongsFragment", "Failed to fetch songs")
+            }
+        })
+    }
 }

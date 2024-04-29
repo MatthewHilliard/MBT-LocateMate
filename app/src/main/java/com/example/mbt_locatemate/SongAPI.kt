@@ -12,7 +12,7 @@ interface SongAPI {
         @Query("client_id")
         clientId: String = JAMENDO_KEY,
         @Query("limit")
-        limit: String = "25",
+        limit: String = "40",
 
     ): Call<SongResponse>
 }

@@ -19,12 +19,14 @@
                 app:iconifiedByDefault="false"
                 app:queryHint="Search for songs..."
                 android:layout_width="match_parent"
-                android:layout_height="40dp"/>
+                android:layout_height="40dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/song_recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="460dp"
+            android:layout_height="450dp"
             android:scrollbars="vertical"/>
     </LinearLayout>
 

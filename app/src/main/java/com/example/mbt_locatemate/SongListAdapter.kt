@@ -33,9 +33,15 @@ class SongListAdapter(private var songs: List<Result>) : RecyclerView.Adapter<So
         notifyDataSetChanged()
     }
 
+    fun stopMediaPlayer() {
+        mediaPlayer?.release()
+        mediaPlayer = null
+    }
+
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val songTitle: TextView = itemView.findViewById(R.id.song_title)
         private val songImage: ImageView = itemView.findViewById(R.id.song_image)
+        private val acceptButton: ImageView = itemView.findViewById(R.id.add_song)
 
         init {
             itemView.setOnClickListener {
@@ -67,6 +73,10 @@ class SongListAdapter(private var songs: List<Result>) : RecyclerView.Adapter<So
                 itemView.setBackgroundResource(R.color.md_theme_surfaceContainerHigh)
             } else {
                 itemView.setBackgroundResource(android.R.color.transparent)
+            }
+
+            acceptButton.setOnClickListener{
+
             }
         }
     }

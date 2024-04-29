@@ -16,6 +16,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
@@ -178,6 +179,11 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
  */
 
     private fun drawPolyline() {
+        map.addMarker(MarkerOptions()
+            .position(postLocation)
+            .title("Real Location")
+            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)))
+
         val polyline = map.addPolyline(
             PolylineOptions()
                 .add(postLocation)
@@ -193,7 +199,7 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
         val bounds = builder.build()
 
         // move the camera and stop the user from being able to interact
-        map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100), object : GoogleMap.CancelableCallback {
+        map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 2000), object : GoogleMap.CancelableCallback {
             override fun onFinish() {
                 disableMapInteractions()
             }

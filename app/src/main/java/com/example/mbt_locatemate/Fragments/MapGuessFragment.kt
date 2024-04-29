@@ -121,8 +121,8 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
                         .addOnSuccessListener { documentSnapshot ->
                             if (documentSnapshot.exists()) {
                                 val username = documentSnapshot.getString("username")
-                                val pfpUrl = documentSnapshot.getString("pfpUrl")
-                                Log.d("MapGuessFragment", "Loading image from URL: ${pfpUrl}")
+                                val pfpUrl = documentSnapshot.getString("pfp_url")
+                                Log.d("MapGuessFragment", "Loading image from URL: $pfpUrl")
                                 // check for username
                                 if (username != null) {
                                     // add guess to subcollection

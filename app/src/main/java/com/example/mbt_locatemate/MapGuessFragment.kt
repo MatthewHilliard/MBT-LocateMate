@@ -1,5 +1,6 @@
 package com.example.mbt_locatemate
 
+import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
@@ -15,6 +16,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PolylineOptions
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -39,6 +41,7 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
     private lateinit var storage: FirebaseStorage
     private val db = Firebase.firestore
 
+    private var guessMade = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,7 +110,9 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
                                         val postRef = db.collection("posts").document(post.id.toString())
                                         postRef.collection("guesses").add(newGuess).addOnSuccessListener {
                                             // success
-                                            navigateToPostLeaderboardFragment(post)
+                                            guessMade = true
+                                            drawPolyline()
+                                            //navigateToPostLeaderboardFragment(post)
                                         }.addOnFailureListener { e ->
                                             Log.w("TAG", "Error adding document", e)
                                         }
@@ -126,6 +131,16 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
                 Toast.makeText(context, "Please select a location first!", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun drawPolyline() {
+        map.addPolyline(
+            PolylineOptions()
+                .add(postLocation)
+                .add(guess)
+                .width(5f)
+                .color(Color.RED)
+        )
     }
 
     private fun showDistanceToast(distance: Float) {

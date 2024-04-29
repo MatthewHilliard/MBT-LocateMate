@@ -63,7 +63,7 @@ class IndividualPostFragment: Fragment() {
                 if (s.toString() != "") {
                     sendCaption.visibility = View.VISIBLE
                 } else {
-                    sendCaption.visibility = View.GONE
+
                 }
             }
         })
@@ -91,7 +91,20 @@ class IndividualPostFragment: Fragment() {
             commentsFragment.show(parentFragmentManager, "CommentsFragment")
         }
 
+        pfpImage.setOnClickListener {
+            goToProfile()
+        }
+        usernameTV.setOnClickListener {
+            goToProfile()
+        }
         return view
+    }
+
+    private fun goToProfile() {
+        val profileFragment = ProfileFragment()
+        parentFragmentManager.beginTransaction().replace(R.id.fragment_container, profileFragment).commit()
+        (activity as MainActivity).bottomNavBar.selectedItemId =
+            R.id.profileTab
     }
 
     private fun deletePost() {
@@ -105,10 +118,7 @@ class IndividualPostFragment: Fragment() {
             .addOnFailureListener { e ->
                 Log.d("PostActions", "Error deleting post $postId")
             }
-        val profileFragment = ProfileFragment()
-        parentFragmentManager.beginTransaction().replace(R.id.fragment_container, profileFragment).commit()
-        (activity as MainActivity).bottomNavBar.selectedItemId =
-            R.id.profileTab
+        goToProfile()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

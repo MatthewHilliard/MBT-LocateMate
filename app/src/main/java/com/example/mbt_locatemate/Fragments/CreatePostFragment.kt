@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
@@ -19,13 +20,10 @@ import android.widget.ImageView
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -33,7 +31,6 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -65,6 +62,7 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
     private lateinit var segmentedButton: MaterialButtonToggleGroup
     private lateinit var friendsOnlyButton: Button
     private lateinit var publicButton: Button
+    private lateinit var imageName: String
     private var isPublicPost = false
 //    val locationRequest = LocationRequest.create().apply {
 //        priority = Priority.PRIORITY_HIGH_ACCURACY
@@ -85,9 +83,11 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
 
     val resultContract = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
-            val bitmap = result.data?.extras?.get("data") as Bitmap
-            imageBitmap = bitmap
-            image.setImageBitmap(bitmap)
+            val capturedImage = BitmapFactory.decodeFile(output!!.absolutePath)
+            image.setImageBitmap(capturedImage)
+//            val bitmap = result.data?.extras?.get("data") as Bitmap
+            imageBitmap = capturedImage
+//            image.setImageBitmap(bitmap)
         }
     }
     companion object {
@@ -108,14 +108,18 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
         takePic.setOnClickListener {
             GlobalScope.launch(Dispatchers.IO) {
                 val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                //the commented out stuff is for fixing image quality, haven't quite figured it out yet
-//                val dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
-//
-//                output = File(dir, "CameraContentDemo.jpeg")
-//                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(output))
-
-//                startActivityForResult(intent, CONTENT_REQUEST)
-//                val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                val dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
+                imageName = UUID.randomUUID().toString() + ".jpeg"
+                val currOutput = File(dir, imageName)
+                output = currOutput
+                val uri = context?.let { it1 ->
+                    FileProvider.getUriForFile(
+                        it1,
+                        "com.example.mbt_locatemate.fileprovider",
+                        currOutput
+                    )
+                }
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
                 resultContract.launch(intent)
             }
         }

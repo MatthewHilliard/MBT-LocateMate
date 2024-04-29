@@ -8,12 +8,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 private var mediaPlayer: MediaPlayer? = null
 
-class SongListAdapter(private var songs: List<Result>) : RecyclerView.Adapter<SongListAdapter.ViewHolder>() {
+class SongListAdapter(private var songs: List<Result>, private val listener: SongClickListener) : RecyclerView.Adapter<SongListAdapter.ViewHolder>() {
     private var clickedPosition: Int = RecyclerView.NO_POSITION
+
+    interface SongClickListener {
+        fun onAcceptClicked(audioUrl: String)
+    }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.list_item_song, parent, false)
         return ViewHolder(v)
@@ -76,7 +81,7 @@ class SongListAdapter(private var songs: List<Result>) : RecyclerView.Adapter<So
             }
 
             acceptButton.setOnClickListener{
-
+                listener.onAcceptClicked(song.audio)
             }
         }
     }

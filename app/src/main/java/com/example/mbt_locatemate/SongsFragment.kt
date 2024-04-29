@@ -1,11 +1,13 @@
 package com.example.mbt_locatemate
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,11 +19,15 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class SongsFragment : BottomSheetDialogFragment() {
+class SongsFragment : BottomSheetDialogFragment(), SongListAdapter.SongClickListener {
     private lateinit var layoutManager: RecyclerView.LayoutManager
     private lateinit var adapter: SongListAdapter
     private lateinit var songRecyclerView: RecyclerView
     private lateinit var searchView: SearchView
+    private var songSelectionListener: SongSelectionListener? = null
+    interface SongSelectionListener {
+        fun onSongSelected(audioUrl: String)
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -40,7 +46,7 @@ class SongsFragment : BottomSheetDialogFragment() {
         layoutManager = LinearLayoutManager(requireContext())
         songRecyclerView.layoutManager = layoutManager
 
-        adapter = SongListAdapter(mutableListOf())
+        adapter = SongListAdapter(mutableListOf(), this)
         songRecyclerView.adapter = adapter
 
         searchView = view.findViewById(R.id.song_search)
@@ -70,6 +76,16 @@ class SongsFragment : BottomSheetDialogFragment() {
         return view
     }
 
+    override fun onAcceptClicked(audioUrl: String) {
+        Toast.makeText(context, "Song added to post!", Toast.LENGTH_SHORT).show()
+        songSelectionListener?.onSongSelected(audioUrl)
+        dismiss()
+    }
+
+    fun setSongSelectionListener(listener: SongSelectionListener) {
+        this.songSelectionListener = listener
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         adapter.stopMediaPlayer()
@@ -81,7 +97,6 @@ class SongsFragment : BottomSheetDialogFragment() {
             override fun onResponse(call: Call<SongResponse>, response: Response<SongResponse>) {
                 if (response.isSuccessful) {
                     val songs = response.body()?.results ?: emptyList()
-                    Log.d("SongsFragment", "$songs")
                     adapter.updateSongs(songs)
                 }
             }

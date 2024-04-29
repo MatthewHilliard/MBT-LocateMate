@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -49,7 +50,7 @@ import java.io.File
 import java.util.UUID
 
 
-class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener, SongsFragment.SongSelectionListener {
 
     private lateinit var nMap: GoogleMap
     private val CONTENT_REQUEST = 1337
@@ -67,6 +68,7 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
     private lateinit var publicButton: Button
     private var isPublicPost = false
     private lateinit var addSongButton: Button
+    private var songUrl = ""
 //    val locationRequest = LocationRequest.create().apply {
 //        priority = Priority.PRIORITY_HIGH_ACCURACY
 //        interval = 10000 // 10 seconds
@@ -82,7 +84,6 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
 //            }
 //        }
 //    }
-
 
     val resultContract = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
@@ -163,9 +164,8 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
 
         addSongButton = view.findViewById(R.id.post_add_song)
         addSongButton.setOnClickListener{
-            val songsFragment = SongsFragment().apply {
-
-            }
+            val songsFragment = SongsFragment()
+            songsFragment.setSongSelectionListener(this)
             songsFragment.show(parentFragmentManager, "SongsFragment")
         }
 
@@ -207,8 +207,8 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
                                             "img_url" to imageUrl,
                                             "location" to location,
                                             "timestamp" to timestamp,
-                                            "public" to isPublicPost
-
+                                            "public" to isPublicPost,
+                                            "song_url" to songUrl
                                         )
                                         db.collection("posts").document(postId)
                                             .set(postInfo)
@@ -263,6 +263,11 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
         markerOptions.title("$latLong")
         nMap.addMarker(markerOptions)
         nMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLong, 12f))
+    }
+
+    override fun onSongSelected(audioUrl: String) {
+        songUrl = audioUrl
+        Log.d("CreatePostFragment", "Song has been accepted, $songUrl")
     }
 
     override fun onMarkerClick(p0: Marker): Boolean = false

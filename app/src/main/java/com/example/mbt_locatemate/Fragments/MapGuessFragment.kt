@@ -12,10 +12,12 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.firebase.Firebase
@@ -163,6 +165,7 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+/*
     private fun drawPolyline() {
         map.addPolyline(
             PolylineOptions()
@@ -171,6 +174,43 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
                 .width(5f)
                 .color(Color.RED)
         )
+    }
+ */
+
+    private fun drawPolyline() {
+        val polyline = map.addPolyline(
+            PolylineOptions()
+                .add(postLocation)
+                .add(guess)
+                .width(5f)
+                .color(Color.RED)
+        )
+
+        // get bounds
+        val builder = LatLngBounds.Builder()
+        builder.include(postLocation)
+        builder.include(guess)
+        val bounds = builder.build()
+
+        // move the camera and stop the user from being able to interact
+        map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100), object : GoogleMap.CancelableCallback {
+            override fun onFinish() {
+                disableMapInteractions()
+            }
+
+            override fun onCancel() {
+                disableMapInteractions()
+            }
+        })
+    }
+
+    private fun disableMapInteractions() {
+        map.uiSettings.apply {
+            isScrollGesturesEnabled = false
+            isZoomGesturesEnabled = false
+            isTiltGesturesEnabled = false
+            isRotateGesturesEnabled = false
+        }
     }
 
     private fun showDistanceToast(distance: Float) {

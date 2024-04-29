@@ -5,11 +5,13 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,13 +21,10 @@ import android.widget.ImageView
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -33,7 +32,6 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -49,7 +47,7 @@ import java.io.File
 import java.util.UUID
 
 
-class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener, SongsFragment.SongSelectionListener {
 
     private lateinit var nMap: GoogleMap
     private val CONTENT_REQUEST = 1337
@@ -63,7 +61,12 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
     private lateinit var auth: FirebaseAuth
     private lateinit var imageBitmap: Bitmap
     private lateinit var segmentedButton: MaterialButtonToggleGroup
+    private lateinit var friendsOnlyButton: Button
+    private lateinit var publicButton: Button
+    private lateinit var imageName: String
     private var isPublicPost = false
+    private lateinit var addSongButton: Button
+    private var songUrl = ""
 //    val locationRequest = LocationRequest.create().apply {
 //        priority = Priority.PRIORITY_HIGH_ACCURACY
 //        interval = 10000 // 10 seconds
@@ -80,12 +83,13 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
 //        }
 //    }
 
-
     val resultContract = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
-            val bitmap = result.data?.extras?.get("data") as Bitmap
-            imageBitmap = bitmap
-            image.setImageBitmap(bitmap)
+            val capturedImage = BitmapFactory.decodeFile(output!!.absolutePath)
+            image.setImageBitmap(capturedImage)
+//            val bitmap = result.data?.extras?.get("data") as Bitmap
+            imageBitmap = capturedImage
+//            image.setImageBitmap(bitmap)
         }
     }
     companion object {
@@ -106,14 +110,18 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
         takePic.setOnClickListener {
             GlobalScope.launch(Dispatchers.IO) {
                 val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                //the commented out stuff is for fixing image quality, haven't quite figured it out yet
-//                val dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
-//
-//                output = File(dir, "CameraContentDemo.jpeg")
-//                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(output))
-
-//                startActivityForResult(intent, CONTENT_REQUEST)
-//                val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                val dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
+                imageName = UUID.randomUUID().toString() + ".jpeg"
+                val currOutput = File(dir, imageName)
+                output = currOutput
+                val uri = context?.let { it1 ->
+                    FileProvider.getUriForFile(
+                        it1,
+                        "com.example.mbt_locatemate.fileprovider",
+                        currOutput
+                    )
+                }
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
                 resultContract.launch(intent)
             }
         }
@@ -138,18 +146,31 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext())
 
+        friendsOnlyButton = view.findViewById(R.id.friendsOnlyButton)
+        publicButton = view.findViewById(R.id.publicButton)
         segmentedButton = view.findViewById(R.id.postTypeButton)
         segmentedButton.addOnButtonCheckedListener { group, checkedId, isChecked ->
             if (isChecked) {
                 when (checkedId) {
                     R.id.friendsOnlyButton -> {
                         isPublicPost = false
+                        friendsOnlyButton.setBackgroundColor(resources.getColor(R.color.md_theme_secondaryContainer))
+                        publicButton.setBackgroundColor(resources.getColor(R.color.md_theme_surface))
                     }
                     R.id.publicButton -> {
                         isPublicPost = true
+                        publicButton.setBackgroundColor(resources.getColor(R.color.md_theme_secondaryContainer))
+                        friendsOnlyButton.setBackgroundColor(resources.getColor(R.color.md_theme_surface))
                     }
                 }
             }
+        }
+
+        addSongButton = view.findViewById(R.id.post_add_song)
+        addSongButton.setOnClickListener{
+            val songsFragment = SongsFragment()
+            songsFragment.setSongSelectionListener(this)
+            songsFragment.show(parentFragmentManager, "SongsFragment")
         }
 
         segmentedButton.check(R.id.friendsOnlyButton)
@@ -190,8 +211,8 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
                                             "img_url" to imageUrl,
                                             "location" to location,
                                             "timestamp" to timestamp,
-                                            "public" to isPublicPost
-
+                                            "public" to isPublicPost,
+                                            "song_url" to songUrl
                                         )
                                         db.collection("posts").document(postId)
                                             .set(postInfo)
@@ -246,6 +267,11 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
         markerOptions.title("$latLong")
         nMap.addMarker(markerOptions)
         nMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLong, 12f))
+    }
+
+    override fun onSongSelected(audioUrl: String) {
+        songUrl = audioUrl
+        Log.d("CreatePostFragment", "Song has been accepted, $songUrl")
     }
 
     override fun onMarkerClick(p0: Marker): Boolean = false

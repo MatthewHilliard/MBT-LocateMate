@@ -3,15 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="4dp">
 
     <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/pfp_guess"
+        android:id="@+id/song_image"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:src="@drawable/vacation_test"
-        app:shapeAppearanceOverlay="@style/roundedImageView"
+        android:scaleType="centerCrop"
         android:layout_marginStart="5dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="3dp"
@@ -19,30 +19,26 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/guess_user"
-        android:layout_width="200dp"
-        android:layout_height="25dp"
+        android:id="@+id/song_title"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginTop="8dp"
         android:fontFamily="@font/poppins"
         android:textStyle="bold"
-        android:text="Username"
-        android:textColor="@color/black"
+        android:text="Song Name"
+        android:textColor="@color/md_theme_onSurface"
         android:textSize="20dp"
-        app:layout_constraintStart_toEndOf="@+id/pfp_guess"
+        app:layout_constraintStart_toEndOf="@+id/song_image"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/guess_distance"
-        android:layout_width="200dp"
-        android:layout_height="25dp"
-        android:layout_marginStart="10dp"
+    <ImageView
+        android:id="@+id/add_song"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_marginTop="8dp"
-        android:fontFamily="@font/poppins"
-        android:textStyle="bold"
-        android:text="Guess Distance"
-        android:textColor="@color/black"
-        android:textSize="20dp"
+        android:layout_marginEnd="10dp"
+        android:src="@drawable/baseline_check_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

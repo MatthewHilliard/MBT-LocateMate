@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/md_theme_surface">
 
     <ImageView
         android:id="@+id/settingsBackButton"
@@ -24,7 +25,7 @@
         android:layout_marginEnd="105dp"
         android:fontFamily="@font/poppins"
         android:text="Edit Profile"
-        android:textColor="@color/black"
+        android:textColor="@color/md_theme_onSurface"
         android:textSize="50dp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -72,7 +73,8 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/usernameEditText"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.button.MaterialButton
@@ -82,7 +84,8 @@
         android:layout_marginStart="106dp"
         android:layout_marginEnd="105dp"
         android:layout_marginBottom="80dp"
-        android:backgroundTint="#C14141"
+        android:backgroundTint="@color/md_theme_error"
+        android:textColor="@color/md_theme_onError"
         android:text="Delete Account"
         android:textSize="21dp"
         app:cornerRadius="5dp"
@@ -97,7 +100,8 @@
         android:layout_marginStart="130dp"
         android:layout_marginEnd="131dp"
         android:layout_marginBottom="80dp"
-        android:backgroundTint="@color/cool_blue"
+        android:backgroundTint="@color/md_theme_secondary"
+        android:textColor="@color/md_theme_onSecondary"
         android:text="Logout"
         android:textSize="21dp"
         app:cornerRadius="5dp"
@@ -112,9 +116,10 @@
         android:layout_marginStart="106dp"
         android:layout_marginEnd="105dp"
         android:layout_marginBottom="29dp"
-        android:backgroundTint="#568545"
+        android:backgroundTint="@color/md_theme_primary"
         android:text="Save Changes"
         android:textSize="21dp"
+        android:textColor="@color/md_theme_onPrimary"
         app:cornerRadius="5dp"
         app:layout_constraintBottom_toTopOf="@+id/logoutButton"
         app:layout_constraintEnd_toEndOf="parent"

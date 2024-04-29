@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/md_theme_surface">
 
     <ImageView
         android:id="@+id/exploreLogo"
@@ -28,7 +29,7 @@
         android:fontFamily="@font/poppins"
         android:textStyle="bold"
         android:text="LocateMate"
-        android:textColor="@color/black"
+        android:textColor="@color/md_theme_onSurface"
         android:textSize="35dp"
         app:layout_constraintBottom_toTopOf="@+id/segmentedButton"
         app:layout_constraintStart_toEndOf="@+id/exploreLogo"
@@ -61,14 +62,16 @@
             style="?attr/materialButtonOutlinedStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Friends" />
+            android:text="Friends"
+            android:textColor="@color/md_theme_onSecondaryContainer"/>
 
         <Button
             android:id="@+id/exploreButton"
             style="?attr/materialButtonOutlinedStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Explore" />
+            android:text="Explore"
+            android:textColor="@color/md_theme_onSecondaryContainer"/>
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
     <androidx.recyclerview.widget.RecyclerView

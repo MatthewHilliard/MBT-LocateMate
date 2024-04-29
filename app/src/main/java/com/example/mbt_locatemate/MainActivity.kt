@@ -1,5 +1,6 @@
 package com.example.mbt_locatemate
 
+import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -11,6 +12,7 @@ import com.google.firebase.auth.auth
 class MainActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     lateinit var bottomNavBar: BottomNavigationView
+    private var mediaPlayer: MediaPlayer? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

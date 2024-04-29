@@ -2,6 +2,7 @@ package com.example.mbt_locatemate
 
 import android.graphics.Color
 import android.location.Location
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -43,6 +44,7 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
 
     private var guessMade = false
 
+    private var mediaPlayer: MediaPlayer? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         post = arguments?.getParcelable<Post>(ARG_POST)!!
@@ -60,14 +62,39 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
 
         val backButton = view.findViewById<ImageView>(R.id.guessBackButton)
         backButton.setOnClickListener(){
+            mediaPlayer?.release()
+            mediaPlayer = null
             val exploreFragment = ExploreFragment()
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, exploreFragment).commit()
+
         }
 
+        db.collection("posts").document(post.id).get().addOnSuccessListener {document ->
+            if (document.contains("song_url")) {
+                val songUrl = document.getString("song_url").toString()
+                if (songUrl != "") {
+                    mediaPlayer = MediaPlayer().apply {
+                        setDataSource(songUrl)
+                        prepareAsync()
+                        setOnPreparedListener {
+                            it.start()
+                        }
+                        setOnErrorListener { mp, what, extra ->
+                            false
+                        }
+                    }
+                }
+            }
+        }
         return view
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer?.release()
+        mediaPlayer = null
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -98,13 +125,16 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
                         .addOnSuccessListener { documentSnapshot ->
                             if (documentSnapshot.exists()) {
                                 val username = documentSnapshot.getString("username")
+                                val pfpUrl = documentSnapshot.getString("pfp_url")
+                                Log.d("MapGuessFragment", "Loading image from URL: $pfpUrl")
                                 // check for username
                                 if (username != null) {
                                     // add guess to subcollection
                                     CoroutineScope(Dispatchers.IO).launch {
                                         val newGuess = hashMapOf(
                                             "user" to username,
-                                            "distance" to distanceInMeters
+                                            "distance" to distanceInMeters,
+                                            "pfpUrl" to pfpUrl
                                         )
 
                                         val postRef = db.collection("posts").document(post.id.toString())
@@ -164,6 +194,8 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun navigateToPostLeaderboardFragment(post: Post) {
+        mediaPlayer?.release()
+        mediaPlayer = null
         val leaderboardFragment = PostLeaderboardFragment.newInstance(post)
         parentFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, leaderboardFragment)

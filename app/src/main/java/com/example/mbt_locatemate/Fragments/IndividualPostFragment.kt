@@ -12,8 +12,10 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.google.android.material.button.MaterialButton
 import com.google.firebase.firestore.FirebaseFirestore
 import com.squareup.picasso.Picasso
+import java.util.concurrent.TimeUnit
 
 class IndividualPostFragment: Fragment() {
     private lateinit var post: Post
@@ -23,6 +25,10 @@ class IndividualPostFragment: Fragment() {
     private lateinit var pfpImage: ImageView
     private lateinit var delete: ImageView
     private lateinit var postId: String
+    private lateinit var timeAgo: TextView
+    private lateinit var sendCaption: MaterialButton
+
+    var onCommentsClickListener: ((Post) -> Unit)? = null
     private val db = FirebaseFirestore.getInstance()
 
 
@@ -37,6 +43,8 @@ class IndividualPostFragment: Fragment() {
         postImage = view.findViewById(R.id.post_image)
         pfpImage = view.findViewById(R.id.post_pfp)
         delete = view.findViewById(R.id.delete_button)
+        timeAgo = view.findViewById(R.id.time_ago)
+        sendCaption = view.findViewById(R.id.send_caption)
 
         delete.setOnClickListener {
             deletePost()
@@ -52,23 +60,51 @@ class IndividualPostFragment: Fragment() {
 
             override fun afterTextChanged(s: Editable?) {
                 // update caption in database
-                Log.d("PostActions", "attmepting to update caption")
-                db.collection("posts").document(postId)
-                    .update("caption", caption.text.toString())
-                    .addOnSuccessListener {
-                    }
-                    .addOnFailureListener { e ->
-                    }
+                if (s.toString() != "") {
+                    sendCaption.visibility = View.VISIBLE
+                } else {
+
+                }
             }
         })
 
+        sendCaption.setOnClickListener{
+            Log.d("PostActions", "attmepting to update caption")
+            db.collection("posts").document(postId)
+                .update("caption", caption.text.toString())
+                .addOnSuccessListener {
+                }
+                .addOnFailureListener { e ->
+                }
+            sendCaption.clearFocus()
+
+        }
+
         val commentsButton = view.findViewById<ImageView>(R.id.commentsButton)
         commentsButton.setOnClickListener{
-            val commentsFragment = CommentsFragment()
+            val bundle = Bundle().apply {
+                putParcelable("post", post)
+            }
+            val commentsFragment = CommentsFragment().apply {
+                arguments = bundle
+            }
             commentsFragment.show(parentFragmentManager, "CommentsFragment")
         }
 
+        pfpImage.setOnClickListener {
+            goToProfile()
+        }
+        usernameTV.setOnClickListener {
+            goToProfile()
+        }
         return view
+    }
+
+    private fun goToProfile() {
+        val profileFragment = ProfileFragment()
+        parentFragmentManager.beginTransaction().replace(R.id.fragment_container, profileFragment).commit()
+        (activity as MainActivity).bottomNavBar.selectedItemId =
+            R.id.profileTab
     }
 
     private fun deletePost() {
@@ -82,10 +118,7 @@ class IndividualPostFragment: Fragment() {
             .addOnFailureListener { e ->
                 Log.d("PostActions", "Error deleting post $postId")
             }
-        val profileFragment = ProfileFragment()
-        parentFragmentManager.beginTransaction().replace(R.id.fragment_container, profileFragment).commit()
-        (activity as MainActivity).bottomNavBar.selectedItemId =
-            R.id.profileTab
+        goToProfile()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -98,7 +131,37 @@ class IndividualPostFragment: Fragment() {
             caption.setText(post.caption)
             Picasso.get().load(post.imgUrl).into(postImage)
             Picasso.get().load(post.pfpUrl).into(pfpImage)
+            timeAgo.text = calculateTimeAgo(post.timestamp)
+        }
+    }
 
+    private fun calculateTimeAgo(timestamp: Long): String {
+        val currentTime = System.currentTimeMillis()
+        val timeDifference = currentTime - timestamp
+
+        val seconds = TimeUnit.MILLISECONDS.toSeconds(timeDifference)
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(timeDifference)
+        val hours = TimeUnit.MILLISECONDS.toHours(timeDifference)
+        val days = TimeUnit.MILLISECONDS.toDays(timeDifference)
+        val weeks = days / 7
+        val years = weeks / 52
+        if (days.toInt() == 1 || seconds.toInt() == 1 || minutes.toInt() == 1 || hours.toInt() == 1) {
+            return when {
+                years > 0 -> "$years year ago"
+                weeks > 0 -> "$weeks week ago"
+                days > 0 -> "$days day ago"
+                hours > 0 -> "$hours hour ago"
+                minutes > 0 -> "$minutes minute ago"
+                else -> "$seconds second ago"
+            }
+        }
+        return when {
+            years > 0 -> "$years years ago"
+            weeks > 0 -> "$weeks weeks ago"
+            days > 0 -> "$days days ago"
+            hours > 0 -> "$hours hours ago"
+            minutes > 0 -> "$minutes minutes ago"
+            else -> "$seconds seconds ago"
         }
     }
 }

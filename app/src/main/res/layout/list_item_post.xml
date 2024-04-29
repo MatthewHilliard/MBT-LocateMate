@@ -28,7 +28,7 @@
         android:layout_marginTop="10dp"
         android:fontFamily="@font/poppins"
         android:text="Username"
-        android:textColor="@color/black"
+        android:textColor="@color/md_theme_onSurface"
         android:textSize="23dp"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@+id/post_pfp"
@@ -40,9 +40,10 @@
         android:layout_height="44dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="5dp"
-        android:backgroundTint="@color/cool_blue"
-        android:fontFamily="@font/fredoka_one"
+        android:backgroundTint="@color/md_theme_primary"
+        android:fontFamily="@font/poppins"
         android:text="Guess"
+        android:textColor="@color/md_theme_onPrimary"
         android:textSize="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -91,7 +92,7 @@
         android:layout_marginEnd="10dp"
         android:fontFamily="@font/poppins"
         android:text="Caption goes here"
-        android:textColor="@color/black"
+        android:textColor="@color/md_theme_onSurface"
         android:textSize="18dp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -99,4 +100,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/leaderboardButton" />
 
+    <TextView
+        android:id="@+id/time_ago"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:fontFamily="@font/poppins"
+        android:text="0 seconds ago"
+        android:textColor="@color/md_theme_onSurfaceVariant"
+        android:textSize="13dp"
+        app:layout_constraintStart_toEndOf="@+id/post_pfp"
+        app:layout_constraintTop_toBottomOf="@+id/post_user" />
 </androidx.constraintlayout.widget.ConstraintLayout>

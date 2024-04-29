@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ProfileFragment"
-    android:background="@drawable/profile_gradient">
+    android:background="@color/md_theme_surface">
 
     <ImageView
         android:id="@+id/settingsButton"
@@ -38,7 +38,7 @@
         android:textSize="24sp"
         android:textStyle="bold"
         android:fontFamily="@font/poppins"
-        android:textColor="@color/black"
+        android:textColor="@color/md_theme_onSurface"
         app:layout_constraintEnd_toEndOf="@+id/imgProfile"
         app:layout_constraintStart_toStartOf="@+id/imgProfile"
         app:layout_constraintTop_toBottomOf="@+id/imgProfile" />
@@ -63,7 +63,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/poppins"
             android:text="24"
-            android:textColor="@color/black"
+            android:textColor="@color/md_theme_onSurface"
             android:textSize="20sp" />
 
         <TextView
@@ -72,7 +72,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/poppins"
             android:text="Posts"
-            android:textColor="@color/black"
+            android:textColor="@color/md_theme_onSurface"
             android:textSize="16sp" />
     </LinearLayout>
 
@@ -94,7 +94,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/poppins"
             android:text="84"
-            android:textColor="@color/black"
+            android:textColor="@color/md_theme_onSurface"
             android:textSize="20sp" />
 
         <TextView
@@ -103,7 +103,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/poppins"
             android:text="Guesses"
-            android:textColor="@color/black"
+            android:textColor="@color/md_theme_onSurface"
             android:textSize="16sp" />
     </LinearLayout>
 

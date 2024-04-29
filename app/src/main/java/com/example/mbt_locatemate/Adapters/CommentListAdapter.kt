@@ -1,5 +1,6 @@
 package com.example.mbt_locatemate
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,6 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
+import java.util.concurrent.TimeUnit
 
 class CommentListAdapter(private var comments: List<Comment>) : RecyclerView.Adapter<CommentListAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -23,6 +25,7 @@ class CommentListAdapter(private var comments: List<Comment>) : RecyclerView.Ada
     }
 
     fun updateComments(newComments: List<Comment>) {
+        Log.d("NewComments", newComments.toString())
         comments = newComments
         notifyDataSetChanged()
     }
@@ -31,9 +34,34 @@ class CommentListAdapter(private var comments: List<Comment>) : RecyclerView.Ada
         private val commentUser: TextView = itemView.findViewById(R.id.comment_user)
         private val pfpImage: ImageView = itemView.findViewById(R.id.pfp_comment)
         private val commentText: TextView = itemView.findViewById(R.id.comment_text)
+        private val commentTime: TextView = itemView.findViewById(R.id.time_ago)
         fun bind(comment: Comment) {
+            Log.d("CommentBind", comment.toString())
             commentUser.text = comment.username
             Picasso.get().load(comment.pfpUrl).into(pfpImage)
+            commentText.text = comment.text
+            commentTime.text = calculateCommentTime(comment.timestamp)
+        }
+
+        private fun calculateCommentTime(timestamp: Long): String {
+            val currentTime = System.currentTimeMillis()
+            val timeDifference = currentTime - timestamp
+
+            val seconds = TimeUnit.MILLISECONDS.toSeconds(timeDifference)
+            val minutes = TimeUnit.MILLISECONDS.toMinutes(timeDifference)
+            val hours = TimeUnit.MILLISECONDS.toHours(timeDifference)
+            val days = TimeUnit.MILLISECONDS.toDays(timeDifference)
+            val weeks = days / 7
+            val years = weeks / 52
+
+            return when {
+                years > 0 -> "$years" + "y"
+                weeks > 0 -> "$weeks" + "w"
+                days > 0 -> "$days" + "d"
+                hours > 0 -> "$hours" + "h"
+                minutes > 0 -> "$minutes" + "m"
+                else -> "$seconds" + "s"
+            }
         }
     }
 }

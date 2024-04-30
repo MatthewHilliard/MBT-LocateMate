@@ -148,6 +148,8 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
                                             // success
                                             guessMade = true
                                             drawPolyline()
+                                            //adjustCameraBounds(postLocation, guess)
+                                            //adjustCameraZoom(distanceInMeters)
                                             guessButton.text = "See the Leaderboard"
                                             //navigateToPostLeaderboardFragment(post)
                                         }.addOnFailureListener { e ->
@@ -188,6 +190,10 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
             .title("Real Location")
             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)))
 
+        map.addMarker(MarkerOptions()
+            .position(guess)
+            .title("Guess Location"))
+
         val polyline = map.addPolyline(
             PolylineOptions()
                 .add(postLocation)
@@ -196,14 +202,15 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
                 .color(Color.RED)
         )
 
-        // get bounds
         val builder = LatLngBounds.Builder()
         builder.include(postLocation)
         builder.include(guess)
         val bounds = builder.build()
 
-        // move the camera and stop the user from being able to interact
-        map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 540), object : GoogleMap.CancelableCallback {
+        // use dynamic padding function
+        val padding = calculateDynamicPadding()
+
+        map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding), object : GoogleMap.CancelableCallback {
             override fun onFinish() {
                 disableMapClickListener()
                 disableMapInteractions()
@@ -228,6 +235,39 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
             isRotateGesturesEnabled = false
             isZoomControlsEnabled = false
         }
+    }
+
+    private fun calculateDynamicPadding(): Int {
+        val distance = FloatArray(1)
+        Location.distanceBetween(postLocation.latitude, postLocation.longitude, guess.latitude, guess.longitude, distance)
+        val kmDistance = distance[0] / 1000
+
+        // increase padding as the distance increases
+        return (50 + kmDistance * 10).toInt().coerceAtLeast(100).coerceAtMost(400)  // Ensures a minimum of 100px and a maximum of 400px padding
+    }
+
+    private fun adjustCameraZoom(distance: Float) {
+        val zoomLevel = when {
+            distance < 200 -> 16f  // zoom in closer for very close guesses
+            distance < 1000 -> 14f  // slightly zoomed out
+            distance < 5000 -> 12f  // moderate zoom out
+            else -> 10f  // zoom out for distant guesses
+        }
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(guess, zoomLevel))
+    }
+
+    private fun adjustCameraBounds(postLocation: LatLng, guess: LatLng) {
+        val builder = LatLngBounds.Builder()
+        builder.include(postLocation)
+        builder.include(guess)
+        val bounds = builder.build()
+
+        // Calculate padding based on distance
+        val distance = FloatArray(1)
+        Location.distanceBetween(postLocation.latitude, postLocation.longitude, guess.latitude, guess.longitude, distance)
+        val padding = (distance[0] / 1000).toInt() * 50  // Increase padding as distance increases
+
+        map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding))
     }
 
     private fun showDistanceToast(distance: Float) {

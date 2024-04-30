@@ -110,7 +110,10 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
 
         val guessButton: Button = view.findViewById(R.id.guessButton)
         guessButton.setOnClickListener {
-            if (::guess.isInitialized) {
+            if (guessMade) {
+                navigateToPostLeaderboardFragment(post)
+            }
+            if (::guess.isInitialized){
                 val distance = FloatArray(1)
                 Location.distanceBetween(
                     postLocation.latitude,
@@ -145,6 +148,7 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
                                             // success
                                             guessMade = true
                                             drawPolyline()
+                                            guessButton.text = "See the Leaderboard"
                                             //navigateToPostLeaderboardFragment(post)
                                         }.addOnFailureListener { e ->
                                             Log.w("TAG", "Error adding document", e)
@@ -199,7 +203,7 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
         val bounds = builder.build()
 
         // move the camera and stop the user from being able to interact
-        map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 2000), object : GoogleMap.CancelableCallback {
+        map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 540), object : GoogleMap.CancelableCallback {
             override fun onFinish() {
                 disableMapInteractions()
             }

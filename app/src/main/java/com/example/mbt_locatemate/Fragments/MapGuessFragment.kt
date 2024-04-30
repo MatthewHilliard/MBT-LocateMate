@@ -205,13 +205,19 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
         // move the camera and stop the user from being able to interact
         map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 540), object : GoogleMap.CancelableCallback {
             override fun onFinish() {
+                disableMapClickListener()
                 disableMapInteractions()
             }
 
             override fun onCancel() {
+                disableMapClickListener()
                 disableMapInteractions()
             }
         })
+    }
+
+    private fun disableMapClickListener() {
+        map.setOnMapClickListener(null)
     }
 
     private fun disableMapInteractions() {
@@ -220,6 +226,7 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
             isZoomGesturesEnabled = false
             isTiltGesturesEnabled = false
             isRotateGesturesEnabled = false
+            isZoomControlsEnabled = false
         }
     }
 

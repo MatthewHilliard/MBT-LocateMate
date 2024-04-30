@@ -53,7 +53,7 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
         post = arguments?.getParcelable<Post>(ARG_POST)!!
         val postID = post.id
         postLocation = post.location
-        Toast.makeText(requireContext(), "Post ID: $postID", Toast.LENGTH_SHORT).show()
+        //Toast.makeText(requireContext(), "Post ID: $postID", Toast.LENGTH_SHORT).show()
     }
 
     override fun onCreateView(
@@ -255,7 +255,7 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
     companion object {
         const val ARG_POST = "post"
 
-        // Change the method to accept a Post object
+        // changing the method to accept a Post object
         fun newInstance(post: Post): MapGuessFragment {
             val fragment = MapGuessFragment()
             val args = Bundle().apply {

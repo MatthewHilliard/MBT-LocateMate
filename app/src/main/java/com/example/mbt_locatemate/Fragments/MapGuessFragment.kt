@@ -113,7 +113,7 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
             if (guessMade) {
                 navigateToPostLeaderboardFragment(post)
             }
-            if (::guess.isInitialized){
+            else if (::guess.isInitialized){
                 val distance = FloatArray(1)
                 Location.distanceBetween(
                     postLocation.latitude,

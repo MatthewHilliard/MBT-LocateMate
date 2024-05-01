@@ -45,6 +45,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/notification"
+        android:layout_width="18dp"
+        android:layout_height="21dp"
+        android:visibility="invisible"
+        android:src="@drawable/red_circle_svgrepo_com"
+        app:layout_constraintEnd_toEndOf="@+id/friendsIcon"
+        app:layout_constraintTop_toTopOf="@+id/friendsIcon" />
+
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/segmentedButton"
         android:layout_width="wrap_content"

@@ -10,6 +10,8 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -25,6 +27,8 @@ class ExploreFragment: Fragment() {
     private lateinit var layoutManager: RecyclerView.LayoutManager
     private lateinit var adapter: PostListAdapter
     private lateinit var postRecyclerView: RecyclerView
+    private val sharedViewModel: SharedViewModel by activityViewModels()
+    private lateinit var notification: ImageView
 
     private lateinit var auth: FirebaseAuth
     private val db = Firebase.firestore
@@ -96,6 +100,16 @@ class ExploreFragment: Fragment() {
                 }
             }
         }
+        notification = view.findViewById(R.id.notification)
+        sharedViewModel.requestList.observe(viewLifecycleOwner, Observer { requests ->
+            if (requests.isNotEmpty()) {
+                //have pending friend requests
+                notification.visibility = View.VISIBLE
+            } else {
+                //do not have pending friend requests
+                notification.visibility = View.INVISIBLE
+            }
+        })
 
         segmentedButton.check(R.id.friendsButton)
         return view

@@ -27,7 +27,6 @@ class ExploreFragment: Fragment() {
     private lateinit var layoutManager: RecyclerView.LayoutManager
     private lateinit var adapter: PostListAdapter
     private lateinit var postRecyclerView: RecyclerView
-    private val sharedViewModel: SharedViewModel by activityViewModels()
     private lateinit var notification: ImageView
 
     private lateinit var auth: FirebaseAuth
@@ -38,6 +37,7 @@ class ExploreFragment: Fragment() {
     private lateinit var explorePostsButton: Button
 
     private lateinit var friendsButton: ImageView
+    private var friendRequestsCount = 0
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -100,19 +100,35 @@ class ExploreFragment: Fragment() {
                 }
             }
         }
+
         notification = view.findViewById(R.id.notification)
-        sharedViewModel.requestList.observe(viewLifecycleOwner, Observer { requests ->
-            if (requests.isNotEmpty()) {
-                //have pending friend requests
-                notification.visibility = View.VISIBLE
-            } else {
-                //do not have pending friend requests
-                notification.visibility = View.INVISIBLE
-            }
-        })
+        loadFriendRequestsCount()
+
 
         segmentedButton.check(R.id.friendsButton)
         return view
+    }
+    private fun loadFriendRequestsCount() {
+        val userId = auth.currentUser?.uid
+        if (userId != null) {
+            db.collection("friends").document(userId)
+                .collection("incoming_requests")
+                .get()
+                .addOnSuccessListener { snapshot ->
+                    // Update the count of friend requests
+                    friendRequestsCount = snapshot.size()
+                    if (friendRequestsCount > 0) {
+                        //have pending friend requests
+                        notification.visibility = View.VISIBLE
+                    } else {
+                        //do not have pending friend requests
+                        notification.visibility = View.INVISIBLE
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    // Handle errors
+                }
+        }
     }
 
     private fun navigateToPostLeaderboardFragment(post: Post) {

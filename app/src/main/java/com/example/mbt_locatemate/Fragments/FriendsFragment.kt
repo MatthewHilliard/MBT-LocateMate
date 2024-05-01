@@ -24,8 +24,6 @@ class FriendsFragment : Fragment() {
     private lateinit var tabLayout: TabLayout
     private lateinit var searchView: SearchView
     private lateinit var searchText: String
-    private val sharedViewModel: SharedViewModel by activityViewModels()
-
     private var onFriends = true
     private var onRequest = false
     private var onAdd = false
@@ -334,7 +332,6 @@ class FriendsFragment : Fragment() {
                                         requestList.add(friend)
                                     }
                                 }
-                                sharedViewModel.updateRequestList(requestList)
                                 adapter.updateRequestFriends(requestList)
                             }
                     }
@@ -364,7 +361,6 @@ class FriendsFragment : Fragment() {
                                         requestList.add(friend)
                                     }
                                 }
-                                sharedViewModel.updateRequestList(requestList)
                                 adapter.updateRequestFriends(requestList)
                             }
                     }

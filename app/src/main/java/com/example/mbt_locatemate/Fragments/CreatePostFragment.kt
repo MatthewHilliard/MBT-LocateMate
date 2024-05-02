@@ -114,7 +114,7 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
         takePic.setOnClickListener {
             GlobalScope.launch(Dispatchers.IO) {
                 val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                val dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
+                val dir = context?.getExternalFilesDir(Environment.DIRECTORY_DCIM)
                 imageName = UUID.randomUUID().toString() + ".jpeg"
                 val currOutput = File(dir, imageName)
                 output = currOutput

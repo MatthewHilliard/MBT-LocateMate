@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.mbt_locatemate.Fragments.FriendsLeaderboardFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -23,6 +24,8 @@ class FriendsFragment : Fragment() {
     private lateinit var tabLayout: TabLayout
     private lateinit var searchView: SearchView
     private lateinit var searchText: String
+
+    private lateinit var leaderboardButton: ImageView
 
     private var onFriends = true
     private var onRequest = false
@@ -43,6 +46,13 @@ class FriendsFragment : Fragment() {
                 DividerItemDecoration.VERTICAL
             )
         )
+
+        leaderboardButton = view.findViewById(R.id.leaderboardButton)
+        leaderboardButton.setOnClickListener(){
+            val friendsLeaderboardFragment = FriendsLeaderboardFragment()
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, friendsLeaderboardFragment).commit()
+        }
 
         layoutManager = LinearLayoutManager(requireContext())
         friendRecyclerView.layoutManager = layoutManager

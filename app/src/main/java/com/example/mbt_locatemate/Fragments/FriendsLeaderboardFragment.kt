@@ -1,4 +1,6 @@
 package com.example.mbt_locatemate.Fragments
 
-class FriendsLeaderboardFragment {
+import androidx.fragment.app.Fragment
+
+class FriendsLeaderboardFragment : Fragment() {
 }

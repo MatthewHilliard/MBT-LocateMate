@@ -8,6 +8,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
 class PostListAdapter(private var posts: List<Post>) : RecyclerView.Adapter<PostListAdapter.ViewHolder>() {
@@ -68,12 +72,15 @@ class PostListAdapter(private var posts: List<Post>) : RecyclerView.Adapter<Post
         }
 
         fun bind(post: Post) {
-            postUser.text = post.username
-            postCaption.text = post.caption
-            Picasso.get().load(post.imgUrl).into(postImage)
-            Picasso.get().load(post.pfpUrl).into(pfpImage)
-            timeAgo.text = calculateTimeAgo(post.timestamp)
-
+            CoroutineScope(Dispatchers.IO).launch {
+                postUser.text = post.username
+                postCaption.text = post.caption
+                withContext(Dispatchers.Main) {
+                    Picasso.get().load(post.imgUrl).into(postImage)
+                    Picasso.get().load(post.pfpUrl).into(pfpImage)
+                }
+                timeAgo.text = calculateTimeAgo(post.timestamp)
+            }
         }
 
         //used ChatGPT to assist with time conversion

@@ -55,8 +55,8 @@ class ProfilePostListAdapter(
             CoroutineScope(Dispatchers.IO).launch {
                 withContext(Dispatchers.Main) {
                     Picasso.get().load(post.imgUrl).into(postImage)
+                    postCaption.text = post.caption
                 }
-                postCaption.text = post.caption
             }
         }
     }

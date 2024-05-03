@@ -71,21 +71,7 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
     private var isPublicPost = false
     private lateinit var addSongButton: Button
     private var songUrl = ""
-//    val locationRequest = LocationRequest.create().apply {
-//        priority = Priority.PRIORITY_HIGH_ACCURACY
-//        interval = 10000 // 10 seconds
-//        fastestInterval = 5000 // 5 seconds
-//    }
-//    val locationCallback = object : LocationCallback() {
-//        override fun onLocationResult(locationResult: LocationResult) {
-//            locationResult ?: return
-//            for (location in locationResult.locations) {
-//                // Handle received location
-//                val currentLatLong = LatLng(location.latitude, location.longitude)
-//                placeMarker(currentLatLong)
-//            }
-//        }
-//    }
+
 
     val resultContract = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
@@ -103,9 +89,7 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
             }
             val capturedImage = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
             image.setImageBitmap(capturedImage)
-//            val bitmap = result.data?.extras?.get("data") as Bitmap
             imageBitmap = capturedImage
-//            image.setImageBitmap(bitmap)
         }
     }
     companion object {

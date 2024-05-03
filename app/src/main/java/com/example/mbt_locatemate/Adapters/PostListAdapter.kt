@@ -73,13 +73,13 @@ class PostListAdapter(private var posts: List<Post>) : RecyclerView.Adapter<Post
 
         fun bind(post: Post) {
             CoroutineScope(Dispatchers.IO).launch {
-                postUser.text = post.username
-                postCaption.text = post.caption
                 withContext(Dispatchers.Main) {
+                    postUser.text = post.username
+                    postCaption.text = post.caption
                     Picasso.get().load(post.imgUrl).into(postImage)
                     Picasso.get().load(post.pfpUrl).into(pfpImage)
+                    timeAgo.text = calculateTimeAgo(post.timestamp)
                 }
-                timeAgo.text = calculateTimeAgo(post.timestamp)
             }
         }
 

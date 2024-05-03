@@ -17,6 +17,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 class ProfileFragment: Fragment() {
@@ -63,12 +66,14 @@ class ProfileFragment: Fragment() {
         val usernameText = view.findViewById<TextView>(R.id.txtUsername)
         val pfpImage = view.findViewById<ImageView>(R.id.imgProfile)
         if (user != null) {
+            CoroutineScope(Dispatchers.IO).launch {
             db.collection("users").document(user.uid).get().addOnSuccessListener { document ->
                 username = document.getString("username")
                 val pfpUrl = document.getString("pfp_url")
                 usernameText.text = username
                 Picasso.get().load(pfpUrl).into(pfpImage)
                 loadUserPosts()
+                }
             }
         }
 

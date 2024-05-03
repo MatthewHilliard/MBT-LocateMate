@@ -21,6 +21,9 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 class ExploreFragment: Fragment() {
@@ -67,7 +70,9 @@ class ExploreFragment: Fragment() {
             }
 
             onLeaderboardClickListener = { post ->
-                navigateToPostLeaderboardFragment(post)
+                CoroutineScope(Dispatchers.IO).launch {
+                    navigateToPostLeaderboardFragment(post)
+                }
             }
         }
         postRecyclerView.adapter = adapter
@@ -86,24 +91,29 @@ class ExploreFragment: Fragment() {
             if (isChecked) {
                 when (checkedId) {
                     R.id.friendsButton -> {
-                        loadFriendPosts()
-                        postRecyclerView.smoothScrollToPosition(0)
-                        friendPostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_secondaryContainer))
-                        explorePostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_surface))
+                        CoroutineScope(Dispatchers.IO).launch {
+                            loadFriendPosts()
+                            postRecyclerView.smoothScrollToPosition(0)
+                            friendPostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_secondaryContainer))
+                            explorePostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_surface))
+                        }
                     }
                     R.id.exploreButton -> {
-                        loadPublicPosts()
-                        postRecyclerView.smoothScrollToPosition(0)
-                        explorePostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_secondaryContainer))
-                        friendPostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_surface))
+                        CoroutineScope(Dispatchers.IO).launch {
+                            loadPublicPosts()
+                            postRecyclerView.smoothScrollToPosition(0)
+                            explorePostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_secondaryContainer))
+                            friendPostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_surface))
+                        }
                     }
                 }
             }
         }
 
         notification = view.findViewById(R.id.notification)
-        loadFriendRequestsCount()
-
+        CoroutineScope(Dispatchers.IO).launch {
+            loadFriendRequestsCount()
+        }
 
         segmentedButton.check(R.id.friendsButton)
         return view
@@ -115,7 +125,6 @@ class ExploreFragment: Fragment() {
                 .collection("incoming_requests")
                 .get()
                 .addOnSuccessListener { snapshot ->
-                    // Update the count of friend requests
                     friendRequestsCount = snapshot.size()
                     if (friendRequestsCount > 0) {
                         //have pending friend requests
@@ -126,7 +135,6 @@ class ExploreFragment: Fragment() {
                     }
                 }
                 .addOnFailureListener { exception ->
-                    // Handle errors
                 }
         }
     }

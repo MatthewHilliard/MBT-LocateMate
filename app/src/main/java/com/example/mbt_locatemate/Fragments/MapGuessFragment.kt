@@ -126,34 +126,44 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
                 showDistanceToast(distanceInMeters)
 
                 if (currentUserId != null) {
-                    // fetching username
+                    // fetching user details
                     db.collection("users").document(currentUserId).get()
                         .addOnSuccessListener { documentSnapshot ->
                             if (documentSnapshot.exists()) {
                                 val username = documentSnapshot.getString("username")
                                 val pfpUrl = documentSnapshot.getString("pfp_url")
+                                val postId = post.id.toString()  // Ensure you have the postId from your post object
                                 Log.d("MapGuessFragment", "Loading image from URL: $pfpUrl")
-                                // check for username
+
                                 if (username != null) {
-                                    // add guess to subcollection
                                     CoroutineScope(Dispatchers.IO).launch {
-                                        val newGuess = hashMapOf(
+                                        val userGuess = hashMapOf(
+                                            "postId" to postId,
+                                            "distance" to distanceInMeters
+                                        )
+                                        val postGuess = hashMapOf(
                                             "user" to username,
                                             "distance" to distanceInMeters,
                                             "pfpUrl" to pfpUrl
                                         )
 
-                                        val postRef = db.collection("posts").document(post.id.toString())
-                                        postRef.collection("guesses").add(newGuess).addOnSuccessListener {
-                                            // success
+                                        // add guess to guesses subcollection under the post document
+                                        val postRef = db.collection("posts").document(postId)
+                                        postRef.collection("guesses").add(postGuess).addOnSuccessListener {
+                                            // success, handle UI update or navigation
+                                        }.addOnFailureListener { e ->
+                                            Log.w("TAG", "Error adding document to post guesses", e)
+                                        }
+
+                                        // add guess to guesses subcollection under the user document
+                                        val userRef = db.collection("users").document(currentUserId)
+                                        userRef.collection("guesses").add(userGuess).addOnSuccessListener {
                                             guessMade = true
                                             drawPolyline()
-                                            //adjustCameraBounds(postLocation, guess)
-                                            //adjustCameraZoom(distanceInMeters)
                                             guessButton.text = "See the Leaderboard"
-                                            //navigateToPostLeaderboardFragment(post)
+                                            Log.d("MapGuessFragment", "Guess added to user's collection")
                                         }.addOnFailureListener { e ->
-                                            Log.w("TAG", "Error adding document", e)
+                                            Log.w("TAG", "Error adding document to user guesses", e)
                                         }
                                     }
                                 } else {
@@ -163,7 +173,7 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
                                 Log.w("TAG", "no user?")
                             }
                         }.addOnFailureListener { exception ->
-                            Log.w("TAG", "error idk", exception)
+                            Log.w("TAG", "error fetching user document", exception)
                         }
                 }
             } else {

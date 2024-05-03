@@ -25,7 +25,7 @@
         android:layout_marginTop="3dp"
         android:layout_marginEnd="56dp"
         android:fontFamily="@font/poppins"
-        android:text="Post Leaderboard"
+        android:text="Friends Leaderboard"
         android:textColor="@color/md_theme_onSurface"
         android:textSize="50dp"
         android:textStyle="bold"

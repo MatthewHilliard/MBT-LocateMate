@@ -41,7 +41,6 @@ class RegisterFragment : Fragment() {
         storage = Firebase.storage
 
         val registerButton = view.findViewById<Button>(R.id.registerButton)
-        val pickImageButton = view.findViewById<Button>(R.id.pickImageButton)
         val profilePicture = view.findViewById<ImageView>(R.id.profilePicture)
         val usernameInput = view.findViewById<EditText>(R.id.usernameInput)
 
@@ -52,7 +51,7 @@ class RegisterFragment : Fragment() {
             }
         }
 
-        pickImageButton.setOnClickListener(){
+        profilePicture.setOnClickListener(){
             pickImage.launch("image/*")
         }
 
@@ -69,7 +68,6 @@ class RegisterFragment : Fragment() {
                     } else {
                         val user = auth.currentUser
                         if (user !== null) {
-                            //TODO: Make it so that pfp crops into circle
                             uri?.let {
                                 storage.reference.child("images/${user.uid}.jpg").putFile(it)
                                     .addOnSuccessListener { task->

@@ -1,5 +1,9 @@
 package com.example.mbt_locatemate
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.media.ExifInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -61,7 +65,9 @@ class SettingsFragment : Fragment() {
 
         val pickImage = registerForActivityResult(ActivityResultContracts.GetContent()) {
             if (pfpUrl?.equals(it) != true && it != null) {
-                profilePicture.setImageURI(it)
+                val orientation = getExifOrientation(it)
+                val rotatedBitmap = rotateBitmap(it, orientation)
+                profilePicture.setImageBitmap(rotatedBitmap)
                 uri = it
                 pfpUpdated = true
             }
@@ -135,7 +141,28 @@ class SettingsFragment : Fragment() {
             }
         }
             return view
+    }
+
+    private fun getExifOrientation(uri: Uri): Int {
+        val inputStream = context?.contentResolver?.openInputStream(uri)
+        val exif = inputStream?.use { ExifInterface(it) }
+        return exif?.getAttributeInt(
+            ExifInterface.TAG_ORIENTATION,
+            ExifInterface.ORIENTATION_UNDEFINED
+        ) ?: ExifInterface.ORIENTATION_UNDEFINED
+    }
+
+    private fun rotateBitmap(uri: Uri, orientation: Int): Bitmap {
+        val inputStream = context?.contentResolver?.openInputStream(uri)
+        val bitmap = BitmapFactory.decodeStream(inputStream)
+        val matrix = Matrix()
+        when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
+            ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)
+            ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
         }
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+    }
 
     private fun updatePostUsernames(prevUsername: String, newUsername: String){
         val user = auth.currentUser

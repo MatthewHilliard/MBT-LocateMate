@@ -10,7 +10,6 @@
         android:id="@+id/song_image"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:src="@drawable/vacation_test"
         android:scaleType="centerCrop"
         android:layout_marginStart="5dp"
         android:layout_marginTop="8dp"

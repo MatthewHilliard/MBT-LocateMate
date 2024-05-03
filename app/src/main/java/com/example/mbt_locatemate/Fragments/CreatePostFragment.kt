@@ -23,6 +23,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -39,6 +40,7 @@ import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.storage
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -138,7 +140,12 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
         }
         val post = view.findViewById<ImageView>(R.id.postButton)
         post.setOnClickListener {
-            savePost()
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    savePost()
+                } catch (e: Exception) {
+                }
+            }
             val exploreFragment = ExploreFragment()
             parentFragmentManager.beginTransaction().replace(R.id.fragment_container, exploreFragment).commit()
             (activity as MainActivity).bottomNavBar.selectedItemId =

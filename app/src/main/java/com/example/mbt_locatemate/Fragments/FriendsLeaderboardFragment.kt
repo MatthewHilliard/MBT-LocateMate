@@ -96,20 +96,24 @@ class FriendsLeaderboardFragment : Fragment() {
         adapter = LeaderboardListAdapter(sortedEntries)
         recyclerView.adapter = adapter
     }
-
-    /*
-    override fun onBindViewHolder(holder: LeaderboardListAdapter.LeaderboardViewHolder, position: Int) {
-        val leaderboard = sortedEntries[position]
-        holder.rank.text = leaderboard.rank.toString()
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val leaderboard = entries[position]
         holder.username.text = leaderboard.username
-        holder.score.text = String.format("%.2f km", leaderboard.average)
-        Glide.with(holder.imageView.context).load(leaderboard.pfpUrl).into(holder.imageView)
+        holder.score.text = if (leaderboard.average != null) String.format("%.2f km", leaderboard.average / 1000) else "No guesses"
 
-        when (position) {
-            0 -> holder.medalView.setImageResource(R.drawable.ic_medal_gold)
-            1 -> holder.medalView.setImageResource(R.drawable.ic_medal_silver)
-            2 -> holder.medalView.setImageResource(R.drawable.ic_medal_bronze)
-            else -> holder.medalView.visibility = View.GONE  // Hide the medal view for other positions
+        // Set medal image if present
+        holder.medalImage.visibility = if (leaderboard.medal != null) View.VISIBLE else View.GONE
+        when (leaderboard.medal) {
+            "Gold" -> holder.medalImage.setImageResource(R.drawable.ic_medal_gold)
+            "Silver" -> holder.medalImage.setImageResource(R.drawable.ic_medal_silver)
+            "Bronze" -> holder.medalImage.setImageResource(R.drawable.ic_medal_bronze)
+        }
+
+        // Highlight if current user
+        if (leaderboard.isCurrentUser) {
+            holder.itemView.setBackgroundColor(Color.YELLOW)  // Or any other highlight color
+        } else {
+            holder.itemView.setBackgroundColor(Color.TRANSPARENT)  // Normal background
         }
     }
 

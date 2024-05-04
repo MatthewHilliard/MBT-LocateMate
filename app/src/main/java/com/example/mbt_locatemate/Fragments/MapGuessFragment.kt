@@ -21,6 +21,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.gms.maps.model.RoundCap
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -199,7 +200,10 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
             PolylineOptions()
                 .add(postLocation)
                 .add(guess)
-                .width(5f)
+                .width(10f)
+                .geodesic(true)
+                .endCap(RoundCap())
+                .startCap(RoundCap())
                 .color(Color.RED)
         )
 
@@ -214,12 +218,12 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
         map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding), object : GoogleMap.CancelableCallback {
             override fun onFinish() {
                 disableMapClickListener()
-                disableMapInteractions()
+                //disableMapInteractions()
             }
 
             override fun onCancel() {
                 disableMapClickListener()
-                disableMapInteractions()
+                //disableMapInteractions()
             }
         })
     }

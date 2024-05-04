@@ -35,7 +35,11 @@ class LeaderboardListAdapter (private val friendsList: List<Leaderboard>) :
             holder.rank.text = leaderboard.rank.toString()
         }
         holder.username.text = leaderboard.username
-        holder.score.text = String.format("%.2f km", (leaderboard.average ?: 0.0) / 1000)
+        if (leaderboard.average != null) {
+            holder.score.text = String.format("%.2f km", leaderboard.average / 1000)
+        } else {
+            holder.score.text = "No guesses yet!"
+        }
 
         Log.d("LoadImage", "Loading image from URL: ${leaderboard.pfpUrl}")
 

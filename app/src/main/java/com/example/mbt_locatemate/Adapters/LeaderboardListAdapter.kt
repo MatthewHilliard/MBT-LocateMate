@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
+import java.text.DecimalFormat
 
 class LeaderboardListAdapter (private var friendsList: List<Leaderboard>) : RecyclerView.Adapter<LeaderboardListAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -35,9 +36,14 @@ class LeaderboardListAdapter (private var friendsList: List<Leaderboard>) : Recy
         fun bind(leaderboard: Leaderboard) {
             rank.text = leaderboard.rank.toString()
             username.text = leaderboard.username
-            score.text = score.text
+            if(leaderboard.average == -1.0){
+                score.text = "Has no guesses"
+            } else{
+                val formatter = DecimalFormat("#,###.##")
+                val formattedNumber = formatter.format(leaderboard.average)
+                score.text = formattedNumber.toString() + " km"
+            }
             Picasso.get().load(leaderboard.pfpUrl).into(pfpImage)
-            Log.d("LeaderboardListAdapter", leaderboard.username)
 
             when (leaderboard.rank) {
                 1 -> {

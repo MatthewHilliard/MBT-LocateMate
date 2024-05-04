@@ -2,6 +2,7 @@ package com.example.mbt_locatemate.Fragments
 
 import androidx.fragment.app.Fragment
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -63,30 +64,84 @@ class FriendsLeaderboardFragment : Fragment() {
                                                 sum += guessDistance
                                             }
 
-                                            val average = if (size > 0) sum / size else 0.0
-                                            val friend = Leaderboard(username, average, pfpUrl, -1, false)
-                                            friendList.add(friend)
+                                            val average = if (size > 0) (sum / size) / 1000.0 else 0.0
+                                            if(average == 0.0){
+                                                val friend = Leaderboard(username, -1.0, pfpUrl, -1, false)
+                                                friendList.add(friend)
+                                            } else {
+                                                val friend = Leaderboard(username, average, pfpUrl, -1, false)
+                                                friendList.add(friend)
+                                            }
 
                                             if (friendList.size == friendUsernames.size) {
-                                                val sortedEntries = friendList.sortedByDescending { it.average }
-                                                var rank = 1
-                                                sortedEntries.forEach { leaderboard ->
-                                                    leaderboard.rank = rank
-                                                    rank++
+                                                val currentUserDocument = db.collection("users").document(currentUserId)
+                                                currentUserDocument.get().addOnSuccessListener { userDocument ->
+                                                    val userUsername = userDocument.getString("username") ?: ""
+                                                    val userPfpUrl = userDocument.getString("pfp_url") ?: ""
+                                                    db.collection("users").document(currentUserId)
+                                                        .collection("guesses")
+                                                        .get()
+                                                        .addOnSuccessListener { userGuesses ->
+                                                            val size = userGuesses.size()
+                                                            var sum = 0.0
+                                                            for (guess in userGuesses) {
+                                                                val guessDistance = guess.getDouble("distance") ?: 0.0
+                                                                sum += guessDistance
+                                                            }
+                                                            val average = if (size > 0) (sum / size) / 1000.0 else 0.0
+
+                                                            if(average == 0.0){
+                                                                val currentUserLeaderboard = Leaderboard(userUsername, -1.0, userPfpUrl, -1, true)
+                                                                friendList.add(currentUserLeaderboard)
+                                                            } else {
+                                                                val currentUserLeaderboard = Leaderboard(userUsername, average, userPfpUrl, -1, true)
+                                                                friendList.add(currentUserLeaderboard)
+                                                            }
+
+                                                            val sortedEntries = friendList.sortedWith(compareBy { if (it.average == -1.0) Double.MAX_VALUE else it.average })
+                                                            var rank = 1
+                                                            sortedEntries.forEach { leaderboard ->
+                                                                leaderboard.rank = rank
+                                                                rank++
+                                                            }
+                                                            adapter.updateLeaderboard(sortedEntries)
+                                                        }
                                                 }
-                                                adapter.updateLeaderboard(sortedEntries)
                                             }
                                         }
                                 }
                             }
                     } else {
                         val friendList = mutableListOf<Leaderboard>()
-//                        db.collection("users").document(currentUserId).get().addOnSuccessListener { user ->
-//                            val username = user.getString("username") ?: ""
-//                            val pfpUrl = user.getString("pfp_url") ?: ""
-//                            val
-//                        }
-                        adapter.updateLeaderboard(friendList)
+                        val currentUserDocument = db.collection("users").document(currentUserId)
+                        currentUserDocument.get().addOnSuccessListener { userDocument ->
+                            val userUsername = userDocument.getString("username") ?: ""
+                            val userPfpUrl = userDocument.getString("pfp_url") ?: ""
+                            db.collection("users").document(currentUserId)
+                                .collection("guesses")
+                                .get()
+                                .addOnSuccessListener { userGuesses ->
+                                    val size = userGuesses.size()
+                                    var sum = 0.0
+                                    for (guess in userGuesses) {
+                                        val guessDistance = guess.getDouble("distance") ?: 0.0
+                                        sum += guessDistance
+                                    }
+                                    val average = if (size > 0) (sum / size) / 1000.0 else 0.0
+
+                                    val currentUserLeaderboard = Leaderboard(userUsername, average, userPfpUrl, -1, true)
+                                    friendList.add(currentUserLeaderboard)
+
+                                    val sortedEntries =
+                                        friendList.sortedByDescending { it.average }
+                                    var rank = 1
+                                    sortedEntries.forEach { leaderboard ->
+                                        leaderboard.rank = rank
+                                        rank++
+                                    }
+                                    adapter.updateLeaderboard(sortedEntries)
+                                }
+                        }
                     }
                 }
         }

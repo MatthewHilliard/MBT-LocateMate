@@ -9,43 +9,49 @@
         android:id="@+id/leaderboardRank"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:text="1."
+        android:text="1"
         android:textStyle="bold"
-        android:textSize="20sp"
+        android:textSize="16sp"
+        app:layout_constraintVertical_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/pfp_leaderboard"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:src="@drawable/vacation_test"
         app:shapeAppearanceOverlay="@style/roundedImageView"
         app:layout_constraintStart_toEndOf="@+id/leaderboardRank"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/leaderboardRank"
+        app:layout_constraintBottom_toBottomOf="@+id/leaderboardRank"
+        android:layout_marginStart="10dp" />
 
     <TextView
         android:id="@+id/leaderboardUser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:text="Username"
+        android:text="picoting"
         android:textStyle="bold"
-        android:textSize="20sp"
+        android:textSize="16sp"
         app:layout_constraintStart_toEndOf="@+id/pfp_leaderboard"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/pfp_leaderboard"
+        app:layout_constraintBottom_toBottomOf="@+id/pfp_leaderboard"
+        android:layout_marginStart="10dp" />
 
     <TextView
         android:id="@+id/leaderboardScore"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
         android:text="4021.48 km"
         android:textStyle="bold"
-        android:textSize="20sp"
+        android:textSize="16sp"
         app:layout_constraintStart_toEndOf="@+id/leaderboardUser"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/leaderboardUser"
+        app:layout_constraintBottom_toBottomOf="@+id/leaderboardUser"
+        android:layout_marginStart="10dp"
         app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

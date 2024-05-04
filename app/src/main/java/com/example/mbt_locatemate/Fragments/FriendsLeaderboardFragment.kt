@@ -10,6 +10,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.mbt_locatemate.CommentListAdapter
 import com.example.mbt_locatemate.ExploreFragment
 import com.example.mbt_locatemate.Friend
 import com.example.mbt_locatemate.Leaderboard
@@ -96,7 +97,7 @@ class FriendsLeaderboardFragment : Fragment() {
         adapter = LeaderboardListAdapter(sortedEntries)
         recyclerView.adapter = adapter
     }
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val leaderboard = entries[position]
         holder.username.text = leaderboard.username
         holder.score.text = if (leaderboard.average != null) String.format("%.2f km", leaderboard.average / 1000) else "No guesses"
@@ -104,9 +105,9 @@ class FriendsLeaderboardFragment : Fragment() {
         // Set medal image if present
         holder.medalImage.visibility = if (leaderboard.medal != null) View.VISIBLE else View.GONE
         when (leaderboard.medal) {
-            "Gold" -> holder.medalImage.setImageResource(R.drawable.ic_medal_gold)
-            "Silver" -> holder.medalImage.setImageResource(R.drawable.ic_medal_silver)
-            "Bronze" -> holder.medalImage.setImageResource(R.drawable.ic_medal_bronze)
+            "Gold" -> holder.medalImage.setImageResource(R.drawable.ic_gold_medal)
+            "Silver" -> holder.medalImage.setImageResource(R.drawable.ic_silver_medal)
+            "Bronze" -> holder.medalImage.setImageResource(R.drawable.ic_bronze_medal)
         }
 
         // Highlight if current user

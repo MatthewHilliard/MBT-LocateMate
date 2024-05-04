@@ -12,13 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mbt_locatemate.ExploreFragment
 import com.example.mbt_locatemate.Friend
-import com.example.mbt_locatemate.Guess
-import com.example.mbt_locatemate.GuessListAdapter
 import com.example.mbt_locatemate.Leaderboard
 import com.example.mbt_locatemate.LeaderboardListAdapter
-import com.example.mbt_locatemate.MapGuessFragment
-import com.example.mbt_locatemate.Post
-import com.example.mbt_locatemate.PostLeaderboardFragment
 import com.example.mbt_locatemate.R
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore

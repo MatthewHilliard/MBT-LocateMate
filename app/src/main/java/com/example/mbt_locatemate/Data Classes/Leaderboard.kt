@@ -9,4 +9,6 @@ data class Leaderboard(
     val username: @RawValue String,
     val average: @RawValue Double,
     val pfpUrl: String
-) : Parcelable
+    var rank: Int
+) : Parcelable {
+}

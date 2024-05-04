@@ -72,9 +72,7 @@ class ExploreFragment: Fragment() {
             }
 
             onLeaderboardClickListener = { post ->
-                CoroutineScope(Dispatchers.IO).launch {
-                    navigateToPostLeaderboardFragment(post)
-                }
+                navigateToPostLeaderboardFragment(post)
             }
         }
         postRecyclerView.adapter = adapter
@@ -94,29 +92,23 @@ class ExploreFragment: Fragment() {
                 when (checkedId) {
                     //load the friend or public posts based on segmented button
                     R.id.friendsButton -> {
-                        CoroutineScope(Dispatchers.IO).launch {
                             loadFriendPosts()
                             postRecyclerView.smoothScrollToPosition(0)
                             friendPostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_secondaryContainer))
                             explorePostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_surface))
-                        }
                     }
                     R.id.exploreButton -> {
-                        CoroutineScope(Dispatchers.IO).launch {
                             loadPublicPosts()
                             postRecyclerView.smoothScrollToPosition(0)
                             explorePostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_secondaryContainer))
                             friendPostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_surface))
-                        }
                     }
                 }
             }
         }
         //if a friend request is pending, show a red dot on friends icon
         notification = view.findViewById(R.id.notification)
-        CoroutineScope(Dispatchers.IO).launch {
-            loadFriendRequestsCount()
-        }
+        loadFriendRequestsCount()
 
         segmentedButton.check(R.id.friendsButton)
         return view
@@ -126,31 +118,35 @@ class ExploreFragment: Fragment() {
     private fun loadFriendRequestsCount() {
         val userId = auth.currentUser?.uid
         if (userId != null) {
-            db.collection("friends").document(userId)
-                .collection("incoming_requests")
-                .get()
-                .addOnSuccessListener { snapshot ->
-                    friendRequestsCount = snapshot.size()
-                    if (friendRequestsCount > 0) {
-                        //have pending friend requests
-                        notification.visibility = View.VISIBLE
-                    } else {
-                        //do not have pending friend requests
-                        notification.visibility = View.INVISIBLE
+            CoroutineScope(Dispatchers.IO).launch {
+                db.collection("friends").document(userId)
+                    .collection("incoming_requests")
+                    .get()
+                    .addOnSuccessListener { snapshot ->
+                        friendRequestsCount = snapshot.size()
+                        if (friendRequestsCount > 0) {
+                            //have pending friend requests
+                            notification.visibility = View.VISIBLE
+                        } else {
+                            //do not have pending friend requests
+                            notification.visibility = View.INVISIBLE
+                        }
                     }
-                }
-                .addOnFailureListener { exception ->
-                }
+                    .addOnFailureListener { exception ->
+                    }
+            }
         }
     }
 
     private fun navigateToPostLeaderboardFragment(post: Post) {
-        val leaderboardFragment = PostLeaderboardFragment.newInstance(post)
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, leaderboardFragment)
-            //allows us to go back to this fragment because it is in the back stack
-            .addToBackStack(null)
-            .commit()
+        CoroutineScope(Dispatchers.IO).launch {
+            val leaderboardFragment = PostLeaderboardFragment.newInstance(post)
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, leaderboardFragment)
+                //allows us to go back to this fragment because it is in the back stack
+                .addToBackStack(null)
+                .commit()
+        }
     }
 
     private fun openCommentsSheet(post: Post) {
@@ -202,39 +198,51 @@ class ExploreFragment: Fragment() {
         val userId = auth.currentUser?.uid
         if (userId != null) {
             //get all friend posts and add them to the adapter list through the friends document for current user
-            db.collection("friends").document(userId)
-                .collection("friend_usernames")
-                .get()
-                .addOnSuccessListener { friendsSnapshot ->
-                    val friendUsernames = friendsSnapshot.documents.map { it.id }
+            CoroutineScope(Dispatchers.IO).launch {
+                db.collection("friends").document(userId)
+                    .collection("friend_usernames")
+                    .get()
+                    .addOnSuccessListener { friendsSnapshot ->
+                        val friendUsernames = friendsSnapshot.documents.map { it.id }
 
-                    if(friendUsernames.isNotEmpty()) {
-                        db.collection("posts")
-                            .whereIn("username", friendUsernames)
-                            .get()
-                            .addOnSuccessListener { postsSnapshot ->
-                                val postList = mutableListOf<Post>()
-                                for (document in postsSnapshot) {
-                                    val postId = document.getString("id") ?: UUID.randomUUID().toString()
-                                    val username = document.getString("username") ?: ""
-                                    val caption = document.getString("caption") ?: ""
-                                    val imgUrl = document.getString("img_url") ?: ""
-                                    val pfpUrl = document.getString("pfp_url") ?: ""
-                                    val latitude = document.getDouble("latitude") ?: 0.0
-                                    val longitude = document.getDouble("longitude") ?: 0.0
-                                    val timestamp = document.getLong("timestamp") ?: 0
-                                    val post = Post(postId, username, caption, imgUrl, pfpUrl, latitude, longitude, timestamp)
-                                    postList.add(post)
+                        if (friendUsernames.isNotEmpty()) {
+                            db.collection("posts")
+                                .whereIn("username", friendUsernames)
+                                .get()
+                                .addOnSuccessListener { postsSnapshot ->
+                                    val postList = mutableListOf<Post>()
+                                    for (document in postsSnapshot) {
+                                        val postId =
+                                            document.getString("id") ?: UUID.randomUUID().toString()
+                                        val username = document.getString("username") ?: ""
+                                        val caption = document.getString("caption") ?: ""
+                                        val imgUrl = document.getString("img_url") ?: ""
+                                        val pfpUrl = document.getString("pfp_url") ?: ""
+                                        val latitude = document.getDouble("latitude") ?: 0.0
+                                        val longitude = document.getDouble("longitude") ?: 0.0
+                                        val timestamp = document.getLong("timestamp") ?: 0
+                                        val post = Post(
+                                            postId,
+                                            username,
+                                            caption,
+                                            imgUrl,
+                                            pfpUrl,
+                                            latitude,
+                                            longitude,
+                                            timestamp
+                                        )
+                                        postList.add(post)
+                                    }
+                                    //sort posts descending by timestamp (newest posts first)
+                                    postList.sortByDescending { it.timestamp }
+                                    adapter.updatePosts(postList)
                                 }
-                                //sort posts descending by timestamp (newest posts first)
-                                postList.sortByDescending { it.timestamp }
-                                adapter.updatePosts(postList)
-                            }
-                    } else {
-                        val postList = mutableListOf<Post>()
-                        adapter.updatePosts(postList)
+                        } else {
+                            val postList = mutableListOf<Post>()
+                            adapter.updatePosts(postList)
+                        }
                     }
-                }
+            }
         }
     }
 
@@ -243,38 +251,50 @@ class ExploreFragment: Fragment() {
         val userId = auth.currentUser?.uid
         val userFriends = mutableListOf<String>()
         if (userId != null) {
-            db.collection("users").document(userId).get().addOnSuccessListener { currUser ->
-                val userUsername = currUser.getString("username")
-                db.collection("friends").document(userId)
-                    .collection("friend_usernames")
-                    .get()
-                    .addOnSuccessListener { friendsSnapshot ->
-                        userFriends.addAll(friendsSnapshot.documents.map { it.id })
-                    }
-                db.collection("posts")
-                    .whereEqualTo("public", true)
-                    .get()
-                    .addOnSuccessListener { documents ->
-                        val postList = mutableListOf<Post>()
-                        for (document in documents) {
-                            val postId = document.getString("id") ?: UUID.randomUUID().toString()
-                            val username = document.getString("username") ?: ""
-                            val caption = document.getString("caption") ?: ""
-                            val imgUrl = document.getString("img_url") ?: ""
-                            val pfpUrl = document.getString("pfp_url") ?: ""
-                            val latitude = document.getDouble("latitude") ?: 0.0
-                            val longitude = document.getDouble("longitude") ?: 0.0
-                            val timestamp = document.getLong("timestamp") ?: 0
-                            val post = Post(postId, username, caption, imgUrl, pfpUrl, latitude, longitude, timestamp)
-                            if (username != userUsername && username !in userFriends) {
-                                postList.add(post)
-                            }
+            CoroutineScope(Dispatchers.IO).launch {
+                db.collection("users").document(userId).get().addOnSuccessListener { currUser ->
+                    val userUsername = currUser.getString("username")
+                    db.collection("friends").document(userId)
+                        .collection("friend_usernames")
+                        .get()
+                        .addOnSuccessListener { friendsSnapshot ->
+                            userFriends.addAll(friendsSnapshot.documents.map { it.id })
                         }
-                        postList.sortByDescending { it.timestamp }
-                        adapter.updatePosts(postList)
-
+                    db.collection("posts")
+                        .whereEqualTo("public", true)
+                        .get()
+                        .addOnSuccessListener { documents ->
+                            val postList = mutableListOf<Post>()
+                            for (document in documents) {
+                                val postId =
+                                    document.getString("id") ?: UUID.randomUUID().toString()
+                                val username = document.getString("username") ?: ""
+                                val caption = document.getString("caption") ?: ""
+                                val imgUrl = document.getString("img_url") ?: ""
+                                val pfpUrl = document.getString("pfp_url") ?: ""
+                                val latitude = document.getDouble("latitude") ?: 0.0
+                                val longitude = document.getDouble("longitude") ?: 0.0
+                                val timestamp = document.getLong("timestamp") ?: 0
+                                val post = Post(
+                                    postId,
+                                    username,
+                                    caption,
+                                    imgUrl,
+                                    pfpUrl,
+                                    latitude,
+                                    longitude,
+                                    timestamp
+                                )
+                                if (username != userUsername && username !in userFriends) {
+                                    postList.add(post)
+                                }
                             }
-                    }
+                            postList.sortByDescending { it.timestamp }
+                            adapter.updatePosts(postList)
+
+                        }
+                }
             }
+        }
         }
     }

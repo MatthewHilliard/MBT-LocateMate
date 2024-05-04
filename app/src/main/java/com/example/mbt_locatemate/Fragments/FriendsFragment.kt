@@ -29,8 +29,6 @@ class FriendsFragment : Fragment() {
     private lateinit var searchView: SearchView
     private lateinit var searchText: String
 
-    private lateinit var leaderboardButton: ImageView
-  
     private var onFriends = true
     private var onRequest = false
     private var onAdd = false
@@ -50,31 +48,6 @@ class FriendsFragment : Fragment() {
                 DividerItemDecoration.VERTICAL
             )
         )
-
-        leaderboardButton = view.findViewById(R.id.leaderboardButton)
-        leaderboardButton.setOnClickListener {
-            val userId = FirebaseAuth.getInstance().currentUser?.uid
-            if (userId != null) {
-                fetchLeaderboardList(userId, object : DataReadyListener {
-                    override fun onDataReady(friendsList: MutableList<Friend>) {
-                        if (friendsList.isNotEmpty()) {
-                            val friendsLeaderboardFragment = FriendsLeaderboardFragment().apply {
-                                arguments = Bundle().apply {
-                                    putParcelableArrayList("friendsList", ArrayList(friendsList))
-                                }
-                            }
-                            parentFragmentManager.beginTransaction()
-                                .replace(R.id.fragment_container, friendsLeaderboardFragment)
-                                .commit()
-                        }
-                    }
-
-                    override fun onError(error: Exception) {
-                        Log.e("FriendsFragment", "Error fetching data: ${error.message}")
-                    }
-                })
-            }
-        }
 
         layoutManager = LinearLayoutManager(requireContext())
         friendRecyclerView.layoutManager = layoutManager

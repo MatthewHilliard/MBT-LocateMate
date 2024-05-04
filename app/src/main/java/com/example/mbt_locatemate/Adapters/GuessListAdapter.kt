@@ -1,5 +1,6 @@
 package com.example.mbt_locatemate
 
+import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -14,9 +15,11 @@ class GuessListAdapter(private var guesses: List<Guess>) : RecyclerView.Adapter<
     var onGuessClickListener: ((Post) -> Unit)? = null
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val textViewRank: TextView = view.findViewById(R.id.leaderboardRank)
         val textViewUsername: TextView = view.findViewById(R.id.guess_user)
         val textViewDistance: TextView = view.findViewById(R.id.guess_distance)
         val pfpImage: ImageView = itemView.findViewById(R.id.pfp_guess)
+        val medalImageView: ImageView = itemView.findViewById(R.id.medalImageView)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -27,10 +30,33 @@ class GuessListAdapter(private var guesses: List<Guess>) : RecyclerView.Adapter<
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val guess = guesses[position]
         Log.d("GuessListAdapter", "Loading image from URL: ${guess.pfpUrl}")
+        holder.textViewRank.text = guess.rank.toString()
         holder.textViewUsername.text = guess.username
         holder.textViewDistance.text = String.format("%.2f km", guess.distance / 1000)
 
         Picasso.get().load(guess.pfpUrl).into(holder.pfpImage)
+
+        when (guess.rank) {
+            1 -> {
+                holder.medalImageView.setImageResource(R.drawable.ic_gold_medal)
+                holder.medalImageView.visibility = View.VISIBLE
+            }
+            2 -> {
+                holder.medalImageView.setImageResource(R.drawable.ic_silver_medal)
+                holder.medalImageView.visibility = View.VISIBLE
+            }
+            3 -> {
+                holder.medalImageView.setImageResource(R.drawable.ic_bronze_medal)
+                holder.medalImageView.visibility = View.VISIBLE
+            }
+            else -> holder.medalImageView.visibility = View.GONE
+        }
+
+        if (guess.isCurrentUser) {
+            holder.itemView.setBackgroundColor(Color.parseColor("#409440D3"))
+        } else {
+            holder.itemView.setBackgroundColor(Color.TRANSPARENT)
+        }
     }
 
     override fun getItemCount() = guesses.size

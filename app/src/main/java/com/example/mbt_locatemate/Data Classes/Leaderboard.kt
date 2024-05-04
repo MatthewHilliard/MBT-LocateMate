@@ -6,8 +6,8 @@ import kotlinx.parcelize.RawValue
 
 @Parcelize
 data class Leaderboard(
-    val username: @RawValue String,
-    val average: @RawValue Double?,
+    val username: String,
+    val average: Double?,
     val pfpUrl: String,
     var rank: Int,
     var isCurrentUser: Boolean = false

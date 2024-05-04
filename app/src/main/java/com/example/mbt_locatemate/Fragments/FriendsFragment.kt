@@ -26,7 +26,7 @@ class FriendsFragment : Fragment() {
     private lateinit var searchText: String
 
     private lateinit var leaderboardButton: ImageView
-    private lateinit var friendList: MutableList<Friend>
+    private var friendList: MutableList<Friend>? = null
 
     private var onFriends = true
     private var onRequest = false
@@ -47,6 +47,8 @@ class FriendsFragment : Fragment() {
                 DividerItemDecoration.VERTICAL
             )
         )
+
+        loadFriends()
 
         leaderboardButton = view.findViewById(R.id.leaderboardButton)
         leaderboardButton.setOnClickListener(){
@@ -171,13 +173,12 @@ class FriendsFragment : Fragment() {
                                         val username = document.getString("username") ?: ""
                                         val pfpUrl = document.getString("pfp_url") ?: ""
                                         val friend = Friend(id, username, pfpUrl)
-                                        friendList.add(friend)
+                                        friendList?.add(friend)
                                     }
-                                    adapter.updateFriends(friendList)
+                                    adapter.updateFriends(friendList ?: mutableListOf())
                                 }
                         } else {
-                            val friendList = mutableListOf<Friend>()
-                            adapter.updateFriends(friendList)
+                            adapter.updateFriends(friendList ?: mutableListOf())
                         }
                     }
             } else {

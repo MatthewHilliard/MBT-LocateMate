@@ -13,6 +13,7 @@ class LeaderboardListAdapter (private val friendsList: List<Leaderboard>) :
     RecyclerView.Adapter<LeaderboardListAdapter.LeaderboardViewHolder>() {
 
     class LeaderboardViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val rank: TextView = view.findViewById(R.id.leaderboardRank)
         val username: TextView = view.findViewById(R.id.leaderboardUser)
         val score: TextView = view.findViewById(R.id.leaderboardScore)
         val pfpImage: ImageView = itemView.findViewById(R.id.pfp_guess)
@@ -27,6 +28,7 @@ class LeaderboardListAdapter (private val friendsList: List<Leaderboard>) :
     override fun onBindViewHolder(holder: LeaderboardViewHolder, position: Int) {
         val leaderboard = friendsList[position]
         Log.d("LeaderboardListAdapter", "Loading image from URL: ${leaderboard.pfpUrl}")
+        holder.rank.text = leaderboard.username
         holder.username.text = leaderboard.username
         holder.score.text = String.format("%.2f km", leaderboard.average / 1000)
 

@@ -24,6 +24,7 @@ class FriendsLeaderboardFragment : Fragment() {
     private lateinit var adapter: LeaderboardListAdapter
     private lateinit var friends: List<Friend>
     private lateinit var leaderboardEntries: MutableList<Leaderboard>
+    private lateinit var sortedEntries: List<Leaderboard>
 
     private var rank: Int = 0
 
@@ -69,7 +70,7 @@ class FriendsLeaderboardFragment : Fragment() {
         loadLeaderboard(leaderboardEntries)
 
         val backButton = view.findViewById<ImageView>(R.id.leaderboardBackButton)
-        backButton.setOnClickListener(){
+        backButton.setOnClickListener() {
             val exploreFragment = ExploreFragment()
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, exploreFragment).commit()
@@ -90,9 +91,25 @@ class FriendsLeaderboardFragment : Fragment() {
         recyclerView.adapter = adapter
     }
 
+    /*
+    override fun onBindViewHolder(holder: LeaderboardListAdapter.LeaderboardViewHolder, position: Int) {
+        val leaderboard = sortedEntries[position]
+        holder.rank.text = leaderboard.rank.toString()
+        holder.username.text = leaderboard.username
+        holder.score.text = String.format("%.2f km", leaderboard.average)
+        Glide.with(holder.imageView.context).load(leaderboard.pfpUrl).into(holder.imageView)
 
+        when (position) {
+            0 -> holder.medalView.setImageResource(R.drawable.ic_medal_gold)
+            1 -> holder.medalView.setImageResource(R.drawable.ic_medal_silver)
+            2 -> holder.medalView.setImageResource(R.drawable.ic_medal_bronze)
+            else -> holder.medalView.visibility = View.GONE  // Hide the medal view for other positions
+        }
+    }
 
-/*
+    */
+
+    /*
     companion object {
         const val ARG_POST = "post"
 
@@ -107,4 +124,4 @@ class FriendsLeaderboardFragment : Fragment() {
     }
 }
 */
- */
+}

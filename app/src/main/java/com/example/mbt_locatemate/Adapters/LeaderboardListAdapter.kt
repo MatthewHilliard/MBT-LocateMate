@@ -32,7 +32,11 @@ class LeaderboardListAdapter (private val friendsList: List<Leaderboard>) :
         holder.username.text = leaderboard.username
         holder.score.text = String.format("%.2f km", leaderboard.average / 1000)
 
-        Picasso.get().load(leaderboard.pfpUrl).into(holder.pfpImage)
+        if (leaderboard.pfpUrl.isNotEmpty()) {
+            Picasso.get().load(leaderboard.pfpUrl).into(holder.pfpImage)
+        } else {
+            holder.pfpImage.setImageResource(R.drawable.vacation_test)
+        }
     }
 
     override fun getItemCount() = friendsList.size

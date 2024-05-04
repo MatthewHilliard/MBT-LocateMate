@@ -66,9 +66,9 @@ class FriendsLeaderboardFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val view = inflater.inflate(R.layout.fragment_post_leaderboard, container, false)
+        val view = inflater.inflate(R.layout.fragment_friend_leaderboard, container, false)
 
-        recyclerView = view.findViewById(R.id.guess_recycler_view)
+        recyclerView = view.findViewById(R.id.leaderboard_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(context)
         adapter = LeaderboardListAdapter(mutableListOf())
         recyclerView.adapter = adapter

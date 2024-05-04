@@ -52,7 +52,8 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         post = arguments?.getParcelable<Post>(ARG_POST)!!
         val postID = post.id
-        postLocation = post.location
+        postLocation = LatLng(post.latitude, post.longitude)
+        Log.d("Location", postLocation.toString())
         //Toast.makeText(requireContext(), "Post ID: $postID", Toast.LENGTH_SHORT).show()
     }
 

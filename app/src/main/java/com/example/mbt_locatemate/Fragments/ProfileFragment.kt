@@ -106,7 +106,7 @@ class ProfileFragment: Fragment() {
                         val latitude = document.getDouble("latitude") ?: 0.0
                         val longitude = document.getDouble("longitude") ?: 0.0
                         val timestamp = document.getLong("timestamp") ?: 0
-                        val post = Post(postId, username, caption, imgUrl, pfpUrl, LatLng(latitude, longitude), timestamp)
+                        val post = Post(postId, username, caption, imgUrl, pfpUrl, latitude, longitude, timestamp)
                         postList.add(post)
                     }
                     postList.sortByDescending { it.timestamp }

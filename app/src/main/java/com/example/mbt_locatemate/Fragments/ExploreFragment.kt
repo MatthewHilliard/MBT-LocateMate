@@ -143,6 +143,7 @@ class ExploreFragment: Fragment() {
         val leaderboardFragment = PostLeaderboardFragment.newInstance(post)
         parentFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, leaderboardFragment)
+            .addToBackStack(null)
             .commit()
     }
 
@@ -214,9 +215,8 @@ class ExploreFragment: Fragment() {
                                     val pfpUrl = document.getString("pfp_url") ?: ""
                                     val latitude = document.getDouble("latitude") ?: 0.0
                                     val longitude = document.getDouble("longitude") ?: 0.0
-                                    val location = LatLng(latitude, longitude)
                                     val timestamp = document.getLong("timestamp") ?: 0
-                                    val post = Post(postId, username, caption, imgUrl, pfpUrl, location, timestamp)
+                                    val post = Post(postId, username, caption, imgUrl, pfpUrl, latitude, longitude, timestamp)
                                     postList.add(post)
                                 }
                                 postList.sortByDescending { it.timestamp }
@@ -255,9 +255,8 @@ class ExploreFragment: Fragment() {
                             val pfpUrl = document.getString("pfp_url") ?: ""
                             val latitude = document.getDouble("latitude") ?: 0.0
                             val longitude = document.getDouble("longitude") ?: 0.0
-                            val location = LatLng(latitude, longitude)
                             val timestamp = document.getLong("timestamp") ?: 0
-                            val post = Post(postId, username, caption, imgUrl, pfpUrl, location, timestamp)
+                            val post = Post(postId, username, caption, imgUrl, pfpUrl, latitude, longitude, timestamp)
                             if (username != userUsername && username !in userFriends) {
                                 postList.add(post)
                             }

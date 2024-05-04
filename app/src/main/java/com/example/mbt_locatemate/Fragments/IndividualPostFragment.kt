@@ -3,6 +3,7 @@ package com.example.mbt_locatemate
 import android.media.Image
 import android.media.MediaPlayer
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -14,7 +15,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.type.LatLng
 import com.squareup.picasso.Picasso
 import java.util.concurrent.TimeUnit
 
@@ -27,7 +30,9 @@ class IndividualPostFragment: Fragment() {
     private lateinit var delete: ImageView
     private lateinit var postId: String
     private lateinit var timeAgo: TextView
-    private lateinit var sendCaption: MaterialButton
+    private lateinit var leaderboard: ImageView
+//    private lateinit var sendCaption: MaterialButton
+    private lateinit var captionView: TextInputLayout
 
     var onCommentsClickListener: ((Post) -> Unit)? = null
     private val db = FirebaseFirestore.getInstance()
@@ -40,36 +45,34 @@ class IndividualPostFragment: Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_individual_post, container, false)
         usernameTV = view.findViewById(R.id.post_user)
+        captionView = view.findViewById(R.id.captionField)
         caption = view.findViewById(R.id.post_caption)
         postImage = view.findViewById(R.id.post_image)
         pfpImage = view.findViewById(R.id.post_pfp)
         delete = view.findViewById(R.id.delete_button)
         timeAgo = view.findViewById(R.id.time_ago)
-        sendCaption = view.findViewById(R.id.send_caption)
+//        sendCaption = view.findViewById(R.id.send_caption)
+        leaderboard = view.findViewById(R.id.leaderboardButton)
 
+        //used ChatGPT to help with dialog
         delete.setOnClickListener {
-            deletePost()
-        }
-        caption.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                //do nothing
-            }
+                val builder = AlertDialog.Builder(requireContext())
+                builder.setTitle("Confirm Deletion")
+                builder.setMessage("Are you sure you want to delete this post?")
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                //do nothing
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-                // update caption in database
-                if (s.toString() != "") {
-                    sendCaption.visibility = View.VISIBLE
-                } else {
-
+                builder.setPositiveButton("Yes") { dialog, _ ->
+                    deletePost()
+                    dialog.dismiss()
                 }
-            }
-        })
+                builder.setNegativeButton("No") { dialog, _ ->
+                    dialog.dismiss()
+                }
 
-        sendCaption.setOnClickListener{
+                val dialog = builder.create()
+                dialog.show()
+            }
+        captionView.setEndIconOnClickListener {
+            // Respond to end icon presses
             Log.d("PostActions", "attmepting to update caption")
             db.collection("posts").document(postId)
                 .update("caption", caption.text.toString())
@@ -77,9 +80,31 @@ class IndividualPostFragment: Fragment() {
                 }
                 .addOnFailureListener { e ->
                 }
-            sendCaption.clearFocus()
-
+            caption.clearFocus()
         }
+//        caption.addTextChangedListener(object : TextWatcher {
+//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+//                //do nothing
+//            }
+//
+//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+//                //do nothing
+//            }
+//
+//            override fun afterTextChanged(s: Editable?) {
+//                // update caption in database
+//                if (s.toString() != "") {
+//                    sendCaption.visibility = View.VISIBLE
+//                } else {
+//
+//                }
+//            }
+//        })
+
+//        sendCaption.setOnClickListener{
+//
+//
+//        }
 
         val commentsButton = view.findViewById<ImageView>(R.id.commentsButton)
         commentsButton.setOnClickListener{
@@ -98,6 +123,14 @@ class IndividualPostFragment: Fragment() {
         usernameTV.setOnClickListener {
             goToProfile()
         }
+        leaderboard.setOnClickListener {
+            val leaderboardFragment = PostLeaderboardFragment.newInstance(post)
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, leaderboardFragment)
+                .addToBackStack(null)
+                .commit()
+        }
+
         return view
     }
 
@@ -132,7 +165,10 @@ class IndividualPostFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val currPost: Post? = arguments?.getParcelable("post")
         if (currPost != null) {
+            val location = com.google.android.gms.maps.model.LatLng(currPost.latitude, currPost.longitude)
+            Log.d("Location", location.toString())
             postId = currPost.id
+            Log.d("display", "post $postId")
             post = currPost
             usernameTV.text = post.username
             caption.setText(post.caption)

@@ -10,11 +10,13 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.mbt_locatemate.CommentListAdapter
 import com.example.mbt_locatemate.ExploreFragment
 import com.example.mbt_locatemate.Friend
 import com.example.mbt_locatemate.Leaderboard
 import com.example.mbt_locatemate.LeaderboardListAdapter
 import com.example.mbt_locatemate.R
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 
@@ -32,32 +34,33 @@ class FriendsLeaderboardFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let { bundle ->
-            val friends = bundle.getParcelableArrayList<Friend>("friendsList")
-            friends?.let { friendList ->
-                val db = FirebaseFirestore.getInstance()
-                var fetchCount = 0
+            friends = bundle.getParcelableArrayList<Friend>("friendsList") ?: emptyList()
 
-                for (friend in friendList) {
-                    db.collection("users").document(friend.id).collection("guesses")
-                        .get()
-                        .addOnSuccessListener { documents ->
-                            val distances = documents.mapNotNull { it.getDouble("distance") }
-                            val score = distances.average().takeIf { !distances.isEmpty() } ?: 0.0
+            val db = FirebaseFirestore.getInstance()
+            val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+            var fetchCount = 0
 
-                            leaderboardEntries.add(
-                                Leaderboard(
-                                    rank = 0,
-                                    username = friend.username,
-                                    pfpUrl = friend.pfpUrl,
-                                    average = score
-                                )
+            friends.forEach { friend ->
+                db.collection("users").document(friend.id).collection("guesses")
+                    .get()
+                    .addOnSuccessListener { documents ->
+                        val distances = documents.mapNotNull { it.getDouble("distance") }
+                        val score = distances.average().takeIf { !distances.isEmpty() }
+
+                        leaderboardEntries.add(
+                            Leaderboard(
+                                rank = 0, // Will be assigned later
+                                username = friend.username,
+                                pfpUrl = friend.pfpUrl,
+                                average = score,
+                                isCurrentUser = friend.id == currentUserId
                             )
-                            fetchCount++
-                            if (fetchCount == friendList.size) {
-                                loadLeaderboard(leaderboardEntries)
-                            }
+                        )
+                        fetchCount++
+                        if (fetchCount == friends.size) {
+                            loadLeaderboard(leaderboardEntries)
                         }
-                }
+                    }
             }
         }
     }
@@ -84,34 +87,23 @@ class FriendsLeaderboardFragment : Fragment() {
     }
 
     private fun loadLeaderboard(leaderboardEntries: MutableList<Leaderboard>) {
-        val sortedEntries = leaderboardEntries.sortedBy { it.average }
+        val sortedEntries = leaderboardEntries.sortedWith(compareBy(nullsLast<Double>()) { it.average })
 
-        //assign ranks
-        sortedEntries.forEachIndexed { index, leaderboard ->
-            leaderboard.rank = index + 1
+        var rank = 1
+        sortedEntries.forEach { leaderboard ->
+            leaderboard.rank = if (leaderboard.average != null) rank else -1
+            leaderboard.medal = when (rank) {
+                1 -> "Gold"
+                2 -> "Silver"
+                3 -> "Bronze"
+                else -> null
+            }
+            if (leaderboard.average != null) rank++
         }
 
         adapter = LeaderboardListAdapter(sortedEntries)
         recyclerView.adapter = adapter
     }
-
-    /*
-    override fun onBindViewHolder(holder: LeaderboardListAdapter.LeaderboardViewHolder, position: Int) {
-        val leaderboard = sortedEntries[position]
-        holder.rank.text = leaderboard.rank.toString()
-        holder.username.text = leaderboard.username
-        holder.score.text = String.format("%.2f km", leaderboard.average)
-        Glide.with(holder.imageView.context).load(leaderboard.pfpUrl).into(holder.imageView)
-
-        when (position) {
-            0 -> holder.medalView.setImageResource(R.drawable.ic_medal_gold)
-            1 -> holder.medalView.setImageResource(R.drawable.ic_medal_silver)
-            2 -> holder.medalView.setImageResource(R.drawable.ic_medal_bronze)
-            else -> holder.medalView.visibility = View.GONE  // Hide the medal view for other positions
-        }
-    }
-
-    */
 
     /*
     companion object {

@@ -1,5 +1,6 @@
 package com.example.mbt_locatemate
 
+import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.QuerySnapshot
 import com.squareup.picasso.Picasso
+
 class LeaderboardListAdapter (private val friendsList: List<Leaderboard>) :
     RecyclerView.Adapter<LeaderboardListAdapter.LeaderboardViewHolder>() {
 
@@ -27,17 +29,33 @@ class LeaderboardListAdapter (private val friendsList: List<Leaderboard>) :
 
     override fun onBindViewHolder(holder: LeaderboardViewHolder, position: Int) {
         val leaderboard = friendsList[position]
+
         Log.d("LeaderboardListAdapter", "Loading image from URL: ${leaderboard.pfpUrl}")
-        holder.rank.text = leaderboard.rank.toString()
+
+        holder.rank.text = if (leaderboard.rank == -1) "" else leaderboard.rank.toString()
+
         holder.username.text = leaderboard.username
-        holder.score.text = String.format("%.2f km", leaderboard.average / 1000)
+
+        holder.score.text = if (leaderboard.average != null) {
+            String.format("%.2f km", leaderboard.average / 1000)
+        } else {
+            "No guesses yet!"
+        }
 
         if (leaderboard.pfpUrl.isNotEmpty()) {
             Picasso.get().load(leaderboard.pfpUrl).into(holder.pfpImage)
         } else {
             holder.pfpImage.setImageResource(R.drawable.vacation_test)
         }
+
+        // Optionally highlight the current user's view
+        if (leaderboard.isCurrentUser) {
+            holder.itemView.setBackgroundColor(Color.parseColor("#409440D3"))
+        } else {
+            holder.itemView.setBackgroundColor(Color.TRANSPARENT)
+        }
     }
+
 
     override fun getItemCount() = friendsList.size
 }

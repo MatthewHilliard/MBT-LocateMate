@@ -144,4 +144,7 @@
     <color name="md_theme_surfaceContainer_highContrast">#E9EFF0</color>
     <color name="md_theme_surfaceContainerHigh_highContrast">#E3E9EB</color>
     <color name="md_theme_surfaceContainerHighest_highContrast">#DEE3E5</color>
+    <color name="gold">#FFD700</color>
+    <color name="silver">#C0C0C0</color>
+    <color name="bronze">#CD7F32</color>
 </resources>

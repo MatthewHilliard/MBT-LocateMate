@@ -2,6 +2,7 @@ package com.example.mbt_locatemate
 
 import android.media.Image
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -64,10 +65,23 @@ class IndividualPostFragment: Fragment() {
 //        sendCaption = view.findViewById(R.id.send_caption)
         leaderboard = view.findViewById(R.id.leaderboardButton)
 
-
+        //used ChatGPT to help with dialog
         delete.setOnClickListener {
-            deletePost()
-        }
+                val builder = AlertDialog.Builder(requireContext())
+                builder.setTitle("Confirm Deletion")
+                builder.setMessage("Are you sure you want to delete this post?")
+
+                builder.setPositiveButton("Yes") { dialog, _ ->
+                    deletePost()
+                    dialog.dismiss()
+                }
+                builder.setNegativeButton("No") { dialog, _ ->
+                    dialog.dismiss()
+                }
+
+                val dialog = builder.create()
+                dialog.show()
+            }
         captionView.setEndIconOnClickListener {
             // Respond to end icon presses
             Log.d("PostActions", "attmepting to update caption")

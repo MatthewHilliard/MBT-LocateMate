@@ -92,12 +92,6 @@ class FriendsLeaderboardFragment : Fragment() {
         var rank = 1
         sortedEntries.forEach { leaderboard ->
             leaderboard.rank = if (leaderboard.average != null) rank else -1
-            leaderboard.medal = when (rank) {
-                1 -> "Gold"
-                2 -> "Silver"
-                3 -> "Bronze"
-                else -> null
-            }
             if (leaderboard.average != null) rank++
         }
 

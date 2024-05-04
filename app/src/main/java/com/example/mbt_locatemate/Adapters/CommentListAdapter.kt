@@ -51,6 +51,8 @@ class CommentListAdapter(private var comments: List<Comment>) : RecyclerView.Ada
             }
         }
 
+        //converting timestamp into a string for comment list items
+        //used ChatGPT to assist with time conversion
         private fun calculateCommentTime(timestamp: Long): String {
             val currentTime = System.currentTimeMillis()
             val timeDifference = currentTime - timestamp

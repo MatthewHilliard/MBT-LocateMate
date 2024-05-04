@@ -49,6 +49,7 @@ class PostListAdapter(private var posts: List<Post>) : RecyclerView.Adapter<Post
         private val guessButton: Button = itemView.findViewById(R.id.post_guess)
 
         init {
+            //navigate to comments, guess, or leaderboard fragments when clicked
             guessButton.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {

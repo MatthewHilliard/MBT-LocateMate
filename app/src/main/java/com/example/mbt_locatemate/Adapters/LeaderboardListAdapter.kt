@@ -32,11 +32,11 @@ class LeaderboardListAdapter (private val friendsList: List<Leaderboard>) :
         val leaderboard = friendsList[position]
 
         Log.d("LeaderboardListAdapter", "Loading image from URL: ${leaderboard.pfpUrl}")
-
+        //setting rank of friend
         holder.rank.text = if (leaderboard.rank == -1) "" else leaderboard.rank.toString()
 
         holder.username.text = leaderboard.username
-
+        //setting average guess distance
         holder.score.text = if (leaderboard.average != null) {
             String.format("%.2f km", leaderboard.average / 1000)
         } else {
@@ -49,6 +49,7 @@ class LeaderboardListAdapter (private val friendsList: List<Leaderboard>) :
             holder.pfpImage.setImageResource(R.drawable.vacation_test)
         }
 
+        //set gold silver and bronze medals for ranks 1-3
         when (leaderboard.rank) {
             1 -> {
                 holder.medalImageView.setImageResource(R.drawable.ic_gold_medal)
@@ -65,14 +66,13 @@ class LeaderboardListAdapter (private val friendsList: List<Leaderboard>) :
             else -> holder.medalImageView.visibility = View.GONE
         }
 
-        // Optionally highlight the current user's view
+        // highlight current user
         if (leaderboard.isCurrentUser) {
             holder.itemView.setBackgroundColor(Color.parseColor("#409440D3"))
         } else {
             holder.itemView.setBackgroundColor(Color.TRANSPARENT)
         }
     }
-
 
     override fun getItemCount() = friendsList.size
 }

@@ -41,7 +41,7 @@ class ProfilePostListAdapter(
         private val postImage: ImageView = itemView.findViewById(R.id.cardPost)
         init {
             itemView.setOnClickListener {
-
+                //navigate to individual post when clicked
                 val position = adapterPosition
 
                 if (position != RecyclerView.NO_POSITION) {

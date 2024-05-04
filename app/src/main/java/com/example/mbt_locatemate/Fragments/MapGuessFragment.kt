@@ -228,28 +228,16 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
         map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding), object : GoogleMap.CancelableCallback {
             override fun onFinish() {
                 disableMapClickListener()
-                //disableMapInteractions()
             }
 
             override fun onCancel() {
                 disableMapClickListener()
-                //disableMapInteractions()
             }
         })
     }
 
     private fun disableMapClickListener() {
         map.setOnMapClickListener(null)
-    }
-
-    private fun disableMapInteractions() {
-        map.uiSettings.apply {
-            isScrollGesturesEnabled = false
-            isZoomGesturesEnabled = false
-            isTiltGesturesEnabled = false
-            isRotateGesturesEnabled = false
-            isZoomControlsEnabled = false
-        }
     }
 
     private fun calculateDynamicPadding(): Int {

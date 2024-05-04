@@ -83,7 +83,7 @@ class FriendsFragment : Fragment() {
 
         adapter = FriendListAdapter(mutableListOf())
         friendRecyclerView.adapter = adapter
-
+        //tabs for friends, friend requests, and add friends
         tabLayout = view.findViewById(R.id.tabLayout)
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
@@ -124,14 +124,14 @@ class FriendsFragment : Fragment() {
             override fun onTabReselected(tab: TabLayout.Tab?) {
             }
         })
-
+        //go back to explore
         val backButton = view.findViewById<ImageView>(R.id.friendBackButton)
         backButton.setOnClickListener{
             val exploreFragment = ExploreFragment()
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, exploreFragment).commit()
         }
-
+        //search for friends
         searchView = view.findViewById(R.id.friendSearch)
         searchView.clearFocus()
         searchText = ""
@@ -167,7 +167,6 @@ class FriendsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //auth = Firebase.auth
 
         loadFriends()
     }
@@ -177,6 +176,7 @@ class FriendsFragment : Fragment() {
         val userId = auth.currentUser?.uid
         if (userId != null) {
             if (searchText.isEmpty()) {
+                //loading all friend usernames without search
                 db.collection("friends").document(userId)
                     .collection("friend_usernames")
                     .get()
@@ -204,6 +204,7 @@ class FriendsFragment : Fragment() {
                         }
                     }
             } else {
+                //loading all usernames that match the search
                 db.collection("friends").document(userId)
                     .collection("friend_usernames")
                     .get()

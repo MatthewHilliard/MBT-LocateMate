@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.mbt_locatemate.Fragments.FriendsLeaderboardFragment
 import com.example.mbt_locatemate.databinding.FragmentProfileBinding
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.Firebase
@@ -31,7 +32,7 @@ class ProfileFragment: Fragment() {
     private lateinit var profilePostRecyclerView: RecyclerView
     private lateinit var numPostsText: TextView
     private lateinit var numGuessesText: TextView
-    private var numGuesses = 0
+    private lateinit var leaderboardButton: ImageView
 
     private var username: String? = null
     override fun onCreateView(
@@ -91,6 +92,18 @@ class ProfileFragment: Fragment() {
             val settingsFragment = SettingsFragment()
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, settingsFragment).commit()
+        }
+
+        leaderboardButton = view.findViewById(R.id.leaderboardButton)
+        leaderboardButton.setOnClickListener {
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+            if (userId != null) {
+                val friendsLeaderboardFragment = FriendsLeaderboardFragment().apply {
+                }
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, friendsLeaderboardFragment)
+                    .commit()
+                        }
         }
 
         return view

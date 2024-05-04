@@ -406,18 +406,17 @@ class FriendsFragment : Fragment() {
     fun fetchLeaderboardList(userId: String, listener: DataReadyListener) {
         val friendsList = mutableListOf<Friend>()
 
-        // Fetch the current user's details
         db.collection("users").document(userId).get()
             .addOnSuccessListener { userDocument ->
-                // Manually extract data from the document
-                val id = userDocument.id  // Use the document ID as the user ID
-                val username = userDocument.getString("username") ?: "Unknown"  // Provide default value if null
-                val pfpUrl = userDocument.getString("pfpUrl") ?: ""  // Provide default value if null
+                //get friends fields from user document
+                val id = userDocument.id
+                val username = userDocument.getString("username") ?: "Unknown"
+                val pfpUrl = userDocument.getString("pfpUrl") ?: ""
 
                 val currentUser = Friend(id, username, pfpUrl)
-                friendsList.add(currentUser)  // Add current user to the list
+                friendsList.add(currentUser)
 
-                // Proceed to fetch the friends
+                // fetch friends
                 fetchFriends(userId, friendsList, listener)
             }
             .addOnFailureListener { e ->
@@ -430,7 +429,7 @@ class FriendsFragment : Fragment() {
             .addOnSuccessListener { friendsSnapshot ->
                 val count = friendsSnapshot.documents.size
                 if (count == 0) {
-                    listener.onDataReady(friendsList)  // Call listener if there are no friends
+                    listener.onDataReady(friendsList)
                 }
 
                 var processedCount = 0
@@ -446,7 +445,7 @@ class FriendsFragment : Fragment() {
 
                             processedCount++
                             if (processedCount == count) {
-                                listener.onDataReady(friendsList)  // Only call listener when all friends are processed
+                                listener.onDataReady(friendsList)  //only call once all friends have been added
                             }
                         }
                         .addOnFailureListener { e ->

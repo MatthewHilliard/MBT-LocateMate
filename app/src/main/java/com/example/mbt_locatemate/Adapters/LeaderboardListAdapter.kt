@@ -65,7 +65,7 @@ class LeaderboardListAdapter (private val friendsList: List<Leaderboard>) :
             else -> holder.medalImageView.visibility = View.GONE
         }
 
-        // Optionally highlight the current user's view
+        //highlight the current user's view
         if (leaderboard.isCurrentUser) {
             holder.itemView.setBackgroundColor(Color.parseColor("#409440D3"))
         } else {

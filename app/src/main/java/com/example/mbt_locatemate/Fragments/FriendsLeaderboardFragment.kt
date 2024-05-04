@@ -49,7 +49,7 @@ class FriendsLeaderboardFragment : Fragment() {
 
                         leaderboardEntries.add(
                             Leaderboard(
-                                rank = 0, // Will be assigned later
+                                rank = 0,
                                 username = friend.username,
                                 pfpUrl = friend.pfpUrl,
                                 average = score,

@@ -9,5 +9,7 @@ import kotlinx.parcelize.RawValue
 data class Guess(
     val username: @RawValue String,
     val distance: @RawValue Double,
-    val pfpUrl: String
+    val pfpUrl: String,
+    val rank: Int,
+    val isCurrentUser: Boolean = false
 ) : Parcelable

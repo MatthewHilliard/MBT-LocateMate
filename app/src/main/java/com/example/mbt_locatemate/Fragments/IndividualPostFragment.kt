@@ -13,6 +13,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.type.LatLng
 import com.squareup.picasso.Picasso
@@ -28,12 +29,25 @@ class IndividualPostFragment: Fragment() {
     private lateinit var postId: String
     private lateinit var timeAgo: TextView
     private lateinit var leaderboard: ImageView
-    private lateinit var sendCaption: MaterialButton
+//    private lateinit var sendCaption: MaterialButton
+    private lateinit var captionView: TextInputLayout
 
     var onCommentsClickListener: ((Post) -> Unit)? = null
     private val db = FirebaseFirestore.getInstance()
 
-
+//<EditText
+//        android:id="@+id/post_caption"
+//        android:layout_width="276dp"
+//        android:layout_height="44dp"
+//        android:layout_marginStart="10dp"
+//        android:layout_marginTop="5dp"
+//        android:fontFamily="@font/poppins"
+//        android:text=""
+//        android:textColor="@color/md_theme_onSurface"
+//        android:textSize="18dp"
+//        android:textStyle="bold"
+//        app:layout_constraintStart_toStartOf="@id/post_image"
+//        app:layout_constraintTop_toBottomOf="@+id/leaderboardButton" />
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -41,38 +55,21 @@ class IndividualPostFragment: Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_individual_post, container, false)
         usernameTV = view.findViewById(R.id.post_user)
+        captionView = view.findViewById(R.id.captionField)
         caption = view.findViewById(R.id.post_caption)
         postImage = view.findViewById(R.id.post_image)
         pfpImage = view.findViewById(R.id.post_pfp)
         delete = view.findViewById(R.id.delete_button)
         timeAgo = view.findViewById(R.id.time_ago)
-        sendCaption = view.findViewById(R.id.send_caption)
+//        sendCaption = view.findViewById(R.id.send_caption)
         leaderboard = view.findViewById(R.id.leaderboardButton)
 
 
         delete.setOnClickListener {
             deletePost()
         }
-        caption.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                //do nothing
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                //do nothing
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-                // update caption in database
-                if (s.toString() != "") {
-                    sendCaption.visibility = View.VISIBLE
-                } else {
-
-                }
-            }
-        })
-
-        sendCaption.setOnClickListener{
+        captionView.setEndIconOnClickListener {
+            // Respond to end icon presses
             Log.d("PostActions", "attmepting to update caption")
             db.collection("posts").document(postId)
                 .update("caption", caption.text.toString())
@@ -80,9 +77,31 @@ class IndividualPostFragment: Fragment() {
                 }
                 .addOnFailureListener { e ->
                 }
-            sendCaption.clearFocus()
-
+            caption.clearFocus()
         }
+//        caption.addTextChangedListener(object : TextWatcher {
+//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+//                //do nothing
+//            }
+//
+//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+//                //do nothing
+//            }
+//
+//            override fun afterTextChanged(s: Editable?) {
+//                // update caption in database
+//                if (s.toString() != "") {
+//                    sendCaption.visibility = View.VISIBLE
+//                } else {
+//
+//                }
+//            }
+//        })
+
+//        sendCaption.setOnClickListener{
+//
+//
+//        }
 
         val commentsButton = view.findViewById<ImageView>(R.id.commentsButton)
         commentsButton.setOnClickListener{

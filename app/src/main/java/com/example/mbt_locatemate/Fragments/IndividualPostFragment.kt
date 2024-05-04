@@ -27,6 +27,7 @@ class IndividualPostFragment: Fragment() {
     private lateinit var delete: ImageView
     private lateinit var postId: String
     private lateinit var timeAgo: TextView
+    private lateinit var leaderboard: ImageView
     private lateinit var sendCaption: MaterialButton
 
     var onCommentsClickListener: ((Post) -> Unit)? = null
@@ -46,6 +47,8 @@ class IndividualPostFragment: Fragment() {
         delete = view.findViewById(R.id.delete_button)
         timeAgo = view.findViewById(R.id.time_ago)
         sendCaption = view.findViewById(R.id.send_caption)
+        leaderboard = view.findViewById(R.id.leaderboardButton)
+
 
         delete.setOnClickListener {
             deletePost()
@@ -98,6 +101,13 @@ class IndividualPostFragment: Fragment() {
         usernameTV.setOnClickListener {
             goToProfile()
         }
+        leaderboard.setOnClickListener {
+            val leaderboardFragment = PostLeaderboardFragment.newInstance(post)
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, leaderboardFragment)
+                .commit()
+        }
+
         return view
     }
 
@@ -126,8 +136,10 @@ class IndividualPostFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val currPost: Post? = arguments?.getParcelable("post")
         if (currPost != null) {
-            val location = com.google.android.gms.maps.model.LatLng(post.latitude, post.longitude)
+            val location = com.google.android.gms.maps.model.LatLng(currPost.latitude, currPost.longitude)
+            Log.d("Location", location.toString())
             postId = currPost.id
+            Log.d("display", "post $postId")
             post = currPost
             usernameTV.text = post.username
             caption.setText(post.caption)

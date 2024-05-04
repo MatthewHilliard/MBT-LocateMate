@@ -9,24 +9,28 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.QuerySnapshot
 import com.squareup.picasso.Picasso
-class LeaderboardListAdapter (private val friendsList: List<Friend>) :
+class LeaderboardListAdapter (private val friendsList: List<Leaderboard>) :
     RecyclerView.Adapter<LeaderboardListAdapter.LeaderboardViewHolder>() {
 
     class LeaderboardViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvFriendName: TextView = view.findViewById(R.id.tvFriendName)
-        val tvScore: TextView = view.findViewById(R.id.tvScore)
+        val username: TextView = view.findViewById(R.id.leaderboardUser)
+        val score: TextView = view.findViewById(R.id.leaderboardScore)
+        val pfpImage: ImageView = itemView.findViewById(R.id.pfp_guess)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LeaderboardViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_leaderboard, parent, false)
+            .inflate(R.layout.list_item_leaderboard, parent, false)
         return LeaderboardViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: LeaderboardViewHolder, position: Int) {
-        val friend = friendsList[position]
-        holder.tvFriendName.text = friend.name
-        holder.tvScore.text = friend.score.toString()
+        val leaderboard = friendsList[position]
+        Log.d("LeaderboardListAdapter", "Loading image from URL: ${leaderboard.pfpUrl}")
+        holder.username.text = leaderboard.username
+        holder.score.text = String.format("%.2f km", leaderboard.average / 1000)
+
+        Picasso.get().load(leaderboard.pfpUrl).into(holder.pfpImage)
     }
 
     override fun getItemCount() = friendsList.size

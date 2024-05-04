@@ -23,8 +23,9 @@ class FriendsLeaderboardFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: LeaderboardListAdapter
     private lateinit var friends: List<Friend>
-    private lateinit var leaderboardEntries: MutableList<Leaderboard>
     private lateinit var sortedEntries: List<Leaderboard>
+
+    private var leaderboardEntries: MutableList<Leaderboard> = mutableListOf()
 
     private var rank: Int = 0
 
@@ -34,6 +35,7 @@ class FriendsLeaderboardFragment : Fragment() {
             val friends = bundle.getParcelableArrayList<Friend>("friendsList")
             friends?.let { friendList ->
                 val db = FirebaseFirestore.getInstance()
+                var fetchCount = 0
 
                 for (friend in friendList) {
                     db.collection("users").document(friend.id).collection("guesses")
@@ -50,6 +52,10 @@ class FriendsLeaderboardFragment : Fragment() {
                                     average = score
                                 )
                             )
+                            fetchCount++
+                            if (fetchCount == friendList.size) {
+                                loadLeaderboard(leaderboardEntries)
+                            }
                         }
                 }
             }
@@ -66,8 +72,6 @@ class FriendsLeaderboardFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
         adapter = LeaderboardListAdapter(mutableListOf())
         recyclerView.adapter = adapter
-
-        loadLeaderboard(leaderboardEntries)
 
         val backButton = view.findViewById<ImageView>(R.id.leaderboardBackButton)
         backButton.setOnClickListener() {

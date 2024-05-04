@@ -79,8 +79,7 @@ class CommentsFragment : BottomSheetDialogFragment() {
             }
 
             override fun afterTextChanged(s: Editable?) {
-                // needs to check if comments exist yet and if not create a collection
-                // set comment text, pfpUrl, username for a new comment document
+                //if the user is typing a comment, make the send button visible, else make it invisible
                 if (s.toString() != "") {
                     sendComment.visibility = View.VISIBLE
                 } else {
@@ -108,7 +107,7 @@ class CommentsFragment : BottomSheetDialogFragment() {
             "text" to text,
             "timestamp" to timestamp,
         )
-
+        //add comment to database, if collection does not yet exist it will be created
         db.collection("posts").document(postId).collection("comments").document(UUID.randomUUID().toString())
             .set(commentInfo)
             .addOnSuccessListener {
@@ -116,12 +115,15 @@ class CommentsFragment : BottomSheetDialogFragment() {
             }
             .addOnFailureListener { e ->
             }
+        //clear the editText
         newCommentText.setText("")
+        //refresh the comment sheet to include new comment
         loadComments()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        //show the comments as a bottom sheet
         dialog?.setOnShowListener { dialog ->
             val d = dialog as BottomSheetDialog
             val bottomSheet = d.findViewById<View>(R.id.standard_bottom_sheet) as LinearLayout
@@ -130,6 +132,7 @@ class CommentsFragment : BottomSheetDialogFragment() {
             bottomSheetBehavior.peekHeight = bottomSheet.height
         }
         val currentUser = auth.currentUser
+        //get user data for the new comment section
         if (currentUser != null) {
             db.collection("users").document(currentUser.uid)
                 .get()
@@ -142,8 +145,8 @@ class CommentsFragment : BottomSheetDialogFragment() {
                     }
                 }
 
-
         val currPost: Post? = arguments?.getParcelable("post")
+        //save some of the post data for later use
         if (currPost != null) {
             postId = currPost.id
             username = currPost.username
@@ -153,6 +156,7 @@ class CommentsFragment : BottomSheetDialogFragment() {
     }
 
     private fun loadComments() {
+        //get reference to and fetch all comments in database for current post
         db.collection("posts").document(postId).collection("comments")
             .get()
             .addOnSuccessListener { documents ->
@@ -166,6 +170,7 @@ class CommentsFragment : BottomSheetDialogFragment() {
                     commentList.add(comment)
                 }
                 Log.d("CommentsList", commentList.toString())
+                //sort ascending (most recent comments on the bottom) and update adapter
                 val sortedList = commentList.sortedBy { it.timestamp }
                 adapter.updateComments(sortedList)
             }

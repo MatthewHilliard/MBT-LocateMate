@@ -30,6 +30,7 @@ class ProfileFragment: Fragment() {
     private lateinit var adapter: ProfilePostListAdapter
     private lateinit var profilePostRecyclerView: RecyclerView
     private lateinit var numPostsText: TextView
+    private lateinit var numGuessesText: TextView
     private var numGuesses = 0
 
     private var username: String? = null
@@ -44,6 +45,7 @@ class ProfileFragment: Fragment() {
 
         profilePostRecyclerView = view.findViewById(R.id.userPostsRecyclerView)
         numPostsText = view.findViewById(R.id.txtPostCount)
+        numGuessesText = view.findViewById(R.id.txtGuessCount)
 
         layoutManager = GridLayoutManager(requireContext(), 2)
         profilePostRecyclerView.layoutManager = layoutManager
@@ -74,6 +76,12 @@ class ProfileFragment: Fragment() {
                 Picasso.get().load(pfpUrl).into(pfpImage)
                 loadUserPosts()
                 }
+            }
+
+            db.collection("users").document(user.uid).collection("guesses").get().addOnSuccessListener { documents ->
+                val numberOfGuesses = documents.size()
+                Log.d("Firestore", "number of guesses: $numberOfGuesses")
+                numGuessesText.text = numberOfGuesses.toString()
             }
         }
 

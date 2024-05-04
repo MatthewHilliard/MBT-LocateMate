@@ -1,6 +1,7 @@
 package com.example.mbt_locatemate
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,10 +12,13 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.mbt_locatemate.Fragments.FriendsLeaderboardFragment
+import com.google.android.gms.tasks.Tasks
 import com.google.android.material.tabs.TabLayout
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.firestore
 
 class FriendsFragment : Fragment() {
@@ -24,6 +28,9 @@ class FriendsFragment : Fragment() {
     private lateinit var tabLayout: TabLayout
     private lateinit var searchView: SearchView
     private lateinit var searchText: String
+
+    private lateinit var leaderboardButton: ImageView
+  
     private var onFriends = true
     private var onRequest = false
     private var onAdd = false
@@ -43,6 +50,31 @@ class FriendsFragment : Fragment() {
                 DividerItemDecoration.VERTICAL
             )
         )
+
+        leaderboardButton = view.findViewById(R.id.leaderboardButton)
+        leaderboardButton.setOnClickListener {
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+            if (userId != null) {
+                fetchLeaderboardList(userId, object : DataReadyListener {
+                    override fun onDataReady(friendsList: MutableList<Friend>) {
+                        if (friendsList.isNotEmpty()) {
+                            val friendsLeaderboardFragment = FriendsLeaderboardFragment().apply {
+                                arguments = Bundle().apply {
+                                    putParcelableArrayList("friendsList", ArrayList(friendsList))
+                                }
+                            }
+                            parentFragmentManager.beginTransaction()
+                                .replace(R.id.fragment_container, friendsLeaderboardFragment)
+                                .commit()
+                        }
+                    }
+
+                    override fun onError(error: Exception) {
+                        Log.e("FriendsFragment", "Error fetching data: ${error.message}")
+                    }
+                })
+            }
+        }
 
         layoutManager = LinearLayoutManager(requireContext())
         friendRecyclerView.layoutManager = layoutManager
@@ -131,6 +163,13 @@ class FriendsFragment : Fragment() {
 
         loadFriends()
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        //auth = Firebase.auth
+
+        loadFriends()
     }
 
     //Used Chat GPT to assist in the query
@@ -367,4 +406,64 @@ class FriendsFragment : Fragment() {
             }
         }
     }
+
+    interface DataReadyListener {
+        fun onDataReady(friendsList: MutableList<Friend>)
+        fun onError(error: Exception)
+    }
+    fun fetchLeaderboardList(userId: String, listener: DataReadyListener) {
+        val friendsList = mutableListOf<Friend>()
+
+        db.collection("users").document(userId).get()
+            .addOnSuccessListener { userDocument ->
+                //get friends fields from user document
+                val id = userDocument.id
+                val username = userDocument.getString("username") ?: "Unknown"
+                val pfpUrl = userDocument.getString("pfpUrl") ?: ""
+
+                val currentUser = Friend(id, username, pfpUrl)
+                friendsList.add(currentUser)
+
+                // fetch friends
+                fetchFriends(userId, friendsList, listener)
+            }
+            .addOnFailureListener { e ->
+                Log.e("FriendsFragment", "Error fetching user details", e)
+            }
+    }
+
+    private fun fetchFriends(userId: String, friendsList: MutableList<Friend>, listener: DataReadyListener) {
+        db.collection("users").document(userId).collection("friends").get()
+            .addOnSuccessListener { friendsSnapshot ->
+                val count = friendsSnapshot.documents.size
+                if (count == 0) {
+                    listener.onDataReady(friendsList)
+                }
+
+                var processedCount = 0
+                for (friendRef in friendsSnapshot.documents) {
+                    val friendId = friendRef.id
+                    db.collection("users").document(friendId).get()
+                        .addOnSuccessListener { friendDoc ->
+                            val friendId = friendDoc.id
+                            val friendUsername = friendDoc.getString("username") ?: "Unknown"
+                            val friendPfpUrl = friendDoc.getString("pfpUrl") ?: ""
+
+                            friendsList.add(Friend(friendId, friendUsername, friendPfpUrl))
+
+                            processedCount++
+                            if (processedCount == count) {
+                                listener.onDataReady(friendsList)  //only call once all friends have been added
+                            }
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("FriendsFragment", "Error fetching friend details", e)
+                        }
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("FriendsFragment", "Error fetching friends list", e)
+            }
+    }
+
 }

@@ -25,7 +25,7 @@
         android:layout_marginTop="3dp"
         android:layout_marginEnd="56dp"
         android:fontFamily="@font/poppins"
-        android:text="Post Leaderboard"
+        android:text="Leaderboard"
         android:textColor="@color/md_theme_onSurface"
         android:textSize="50dp"
         android:textStyle="bold"
@@ -33,8 +33,17 @@
         app:layout_constraintStart_toEndOf="@+id/leaderboardBackButton"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/medalView"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_medal_gold" />
+
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/guess_recycler_view"
+        android:id="@+id/leaderboard_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginBottom="65dp"

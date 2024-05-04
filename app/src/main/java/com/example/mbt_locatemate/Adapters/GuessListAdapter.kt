@@ -36,7 +36,7 @@ class GuessListAdapter(private var guesses: List<Guess>) : RecyclerView.Adapter<
     override fun getItemCount() = guesses.size
 
     fun setGuesses(guesses: List<Guess>) {
-        this.guesses = guesses // Reassign with the new list
-        notifyDataSetChanged() // Notify the adapter to refresh the list
+        this.guesses = guesses
+        notifyDataSetChanged()
     }
 }

@@ -1,5 +1,6 @@
 package com.example.mbt_locatemate
 
+import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -28,25 +29,30 @@ class LeaderboardListAdapter (private val friendsList: List<Leaderboard>) :
 
     override fun onBindViewHolder(holder: LeaderboardViewHolder, position: Int) {
         val leaderboard = friendsList[position]
-        Log.d("LeaderboardListAdapter", "Loading image from URL: ${leaderboard.pfpUrl}")
-        if (leaderboard.rank == -1) {
-            holder.rank.text = ""
-        } else {
-            holder.rank.text = leaderboard.rank.toString()
-        }
-        holder.username.text = leaderboard.username
-        if (leaderboard.average != null) {
-            holder.score.text = String.format("%.2f km", leaderboard.average / 1000)
-        } else {
-            holder.score.text = "No guesses yet!"
-        }
 
-        Log.d("LoadImage", "Loading image from URL: ${leaderboard.pfpUrl}")
+        Log.d("LeaderboardListAdapter", "Loading image from URL: ${leaderboard.pfpUrl}")
+
+        holder.rank.text = if (leaderboard.rank == -1) "" else leaderboard.rank.toString()
+
+        holder.username.text = leaderboard.username
+
+        holder.score.text = if (leaderboard.average != null) {
+            String.format("%.2f km", leaderboard.average / 1000)
+        } else {
+            "No guesses yet!"
+        }
 
         if (leaderboard.pfpUrl.isNotEmpty()) {
             Picasso.get().load(leaderboard.pfpUrl).into(holder.pfpImage)
         } else {
             holder.pfpImage.setImageResource(R.drawable.vacation_test)
+        }
+
+        // Optionally highlight the current user's view
+        if (leaderboard.isCurrentUser) {
+            holder.itemView.setBackgroundColor(Color.YELLOW)
+        } else {
+            holder.itemView.setBackgroundColor(Color.TRANSPARENT)
         }
     }
 

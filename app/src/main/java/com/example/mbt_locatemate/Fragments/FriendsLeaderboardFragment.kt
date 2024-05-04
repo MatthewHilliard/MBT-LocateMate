@@ -16,6 +16,7 @@ import com.example.mbt_locatemate.Friend
 import com.example.mbt_locatemate.Leaderboard
 import com.example.mbt_locatemate.LeaderboardListAdapter
 import com.example.mbt_locatemate.R
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 
@@ -33,33 +34,33 @@ class FriendsLeaderboardFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let { bundle ->
-            val friends = bundle.getParcelableArrayList<Friend>("friendsList")
+            friends = bundle.getParcelableArrayList<Friend>("friendsList") ?: emptyList()
 
-            friends?.let { friendList ->
-                val db = FirebaseFirestore.getInstance()
-                var fetchCount = 0
+            val db = FirebaseFirestore.getInstance()
+            val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+            var fetchCount = 0
 
-                for (friend in friendList) {
-                    db.collection("users").document(friend.id).collection("guesses")
-                        .get()
-                        .addOnSuccessListener { documents ->
-                            val distances = documents.mapNotNull { it.getDouble("distance") }
-                            val score = if (distances.isNotEmpty()) distances.average() else null
+            friends.forEach { friend ->
+                db.collection("users").document(friend.id).collection("guesses")
+                    .get()
+                    .addOnSuccessListener { documents ->
+                        val distances = documents.mapNotNull { it.getDouble("distance") }
+                        val score = distances.average().takeIf { !distances.isEmpty() }
 
-                            leaderboardEntries.add(
-                                Leaderboard(
-                                    rank = 0,
-                                    username = friend.username,
-                                    pfpUrl = friend.pfpUrl,
-                                    average = score
-                                )
+                        leaderboardEntries.add(
+                            Leaderboard(
+                                rank = 0, // Will be assigned later
+                                username = friend.username,
+                                pfpUrl = friend.pfpUrl,
+                                average = score,
+                                isCurrentUser = friend.id == currentUserId
                             )
-                            fetchCount++
-                            if (fetchCount == friendList.size) {
-                                loadLeaderboard(leaderboardEntries)
-                            }
+                        )
+                        fetchCount++
+                        if (fetchCount == friends.size) {
+                            loadLeaderboard(leaderboardEntries)
                         }
-                }
+                    }
             }
         }
     }
@@ -89,36 +90,20 @@ class FriendsLeaderboardFragment : Fragment() {
         val sortedEntries = leaderboardEntries.sortedWith(compareBy(nullsLast<Double>()) { it.average })
 
         var rank = 1
-        //assign ranks
         sortedEntries.forEach { leaderboard ->
-            leaderboard.rank = if (leaderboard.average != null) rank++ else -1
+            leaderboard.rank = if (leaderboard.average != null) rank else -1
+            leaderboard.medal = when (rank) {
+                1 -> "Gold"
+                2 -> "Silver"
+                3 -> "Bronze"
+                else -> null
+            }
+            if (leaderboard.average != null) rank++
         }
 
         adapter = LeaderboardListAdapter(sortedEntries)
         recyclerView.adapter = adapter
     }
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val leaderboard = entries[position]
-        holder.username.text = leaderboard.username
-        holder.score.text = if (leaderboard.average != null) String.format("%.2f km", leaderboard.average / 1000) else "No guesses"
-
-        // Set medal image if present
-        holder.medalImage.visibility = if (leaderboard.medal != null) View.VISIBLE else View.GONE
-        when (leaderboard.medal) {
-            "Gold" -> holder.medalImage.setImageResource(R.drawable.ic_gold_medal)
-            "Silver" -> holder.medalImage.setImageResource(R.drawable.ic_silver_medal)
-            "Bronze" -> holder.medalImage.setImageResource(R.drawable.ic_bronze_medal)
-        }
-
-        // Highlight if current user
-        if (leaderboard.isCurrentUser) {
-            holder.itemView.setBackgroundColor(Color.YELLOW)  // Or any other highlight color
-        } else {
-            holder.itemView.setBackgroundColor(Color.TRANSPARENT)  // Normal background
-        }
-    }
-
-    */
 
     /*
     companion object {

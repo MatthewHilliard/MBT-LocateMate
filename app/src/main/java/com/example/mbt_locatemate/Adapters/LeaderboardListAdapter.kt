@@ -8,71 +8,63 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.firestore.QuerySnapshot
 import com.squareup.picasso.Picasso
 
-class LeaderboardListAdapter (private val friendsList: List<Leaderboard>) :
-    RecyclerView.Adapter<LeaderboardListAdapter.LeaderboardViewHolder>() {
-
-    class LeaderboardViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val rank: TextView = view.findViewById(R.id.leaderboardRank)
-        val username: TextView = view.findViewById(R.id.leaderboardUser)
-        val score: TextView = view.findViewById(R.id.leaderboardScore)
-        val pfpImage: ImageView = itemView.findViewById(R.id.pfp_leaderboard)
-        val medalImageView: ImageView = itemView.findViewById(R.id.medalImageView)
+class LeaderboardListAdapter (private var friendsList: List<Leaderboard>) : RecyclerView.Adapter<LeaderboardListAdapter.ViewHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.list_item_leaderboard, parent, false)
+        return ViewHolder(view)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LeaderboardViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.list_item_leaderboard, parent, false)
-        return LeaderboardViewHolder(view)
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bind(friendsList[position])
     }
-
-    override fun onBindViewHolder(holder: LeaderboardViewHolder, position: Int) {
-        val leaderboard = friendsList[position]
-
-        Log.d("LeaderboardListAdapter", "Loading image from URL: ${leaderboard.pfpUrl}")
-
-        holder.rank.text = if (leaderboard.rank == -1) "" else leaderboard.rank.toString()
-
-        holder.username.text = leaderboard.username
-
-        holder.score.text = if (leaderboard.average != null) {
-            String.format("%.2f km", leaderboard.average / 1000)
-        } else {
-            "No guesses yet!"
-        }
-
-        if (leaderboard.pfpUrl.isNotEmpty()) {
-            Picasso.get().load(leaderboard.pfpUrl).into(holder.pfpImage)
-        } else {
-            holder.pfpImage.setImageResource(R.drawable.vacation_test)
-        }
-
-        when (leaderboard.rank) {
-            1 -> {
-                holder.medalImageView.setImageResource(R.drawable.ic_gold_medal)
-                holder.medalImageView.visibility = View.VISIBLE
-            }
-            2 -> {
-                holder.medalImageView.setImageResource(R.drawable.ic_silver_medal)
-                holder.medalImageView.visibility = View.VISIBLE
-            }
-            3 -> {
-                holder.medalImageView.setImageResource(R.drawable.ic_bronze_medal)
-                holder.medalImageView.visibility = View.VISIBLE
-            }
-            else -> holder.medalImageView.visibility = View.GONE
-        }
-
-        //highlight the current user's view
-        if (leaderboard.isCurrentUser) {
-            holder.itemView.setBackgroundColor(Color.parseColor("#409440D3"))
-        } else {
-            holder.itemView.setBackgroundColor(Color.TRANSPARENT)
-        }
-    }
-
 
     override fun getItemCount() = friendsList.size
+    fun updateLeaderboard(newLeaderboard: List<Leaderboard>) {
+        friendsList = newLeaderboard
+        notifyDataSetChanged()
+    }
+
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val rank: TextView = itemView.findViewById(R.id.leaderboardRank)
+        private val username: TextView = itemView.findViewById(R.id.leaderboardUser)
+        private val score: TextView = itemView.findViewById(R.id.leaderboardScore)
+        private val pfpImage: ImageView = itemView.findViewById(R.id.pfp_leaderboard)
+        private val medalImageView: ImageView = itemView.findViewById(R.id.medalImageView)
+        fun bind(leaderboard: Leaderboard) {
+            rank.text = leaderboard.rank.toString()
+            username.text = leaderboard.username
+            score.text = score.text
+            Picasso.get().load(leaderboard.pfpUrl).into(pfpImage)
+            Log.d("LeaderboardListAdapter", leaderboard.username)
+
+            when (leaderboard.rank) {
+                1 -> {
+                    medalImageView.setImageResource(R.drawable.ic_gold_medal)
+                    medalImageView.visibility = View.VISIBLE
+                }
+
+                2 -> {
+                    medalImageView.setImageResource(R.drawable.ic_silver_medal)
+                    medalImageView.visibility = View.VISIBLE
+                }
+
+                3 -> {
+                    medalImageView.setImageResource(R.drawable.ic_bronze_medal)
+                    medalImageView.visibility = View.VISIBLE
+                }
+
+                else -> medalImageView.visibility = View.GONE
+            }
+
+
+        //highlight the current user's view
+            if (leaderboard.isCurrentUser) {
+                itemView.setBackgroundResource(R.color.md_theme_surfaceContainerHigh)
+            } else {
+                itemView.setBackgroundColor(Color.TRANSPARENT)
+            }
+        }
+    }
 }

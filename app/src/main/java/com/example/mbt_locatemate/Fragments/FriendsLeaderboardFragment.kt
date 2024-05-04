@@ -87,6 +87,7 @@ class FriendsLeaderboardFragment : Fragment() {
     private fun loadLeaderboard(leaderboardEntries: MutableList<Leaderboard>) {
         val sortedEntries = leaderboardEntries.sortedWith(compareBy(nullsLast<Double>()) { it.average })
 
+        var rank = 1
         //assign ranks
         sortedEntries.forEach { leaderboard ->
             leaderboard.rank = if (leaderboard.average != null) rank++ else -1

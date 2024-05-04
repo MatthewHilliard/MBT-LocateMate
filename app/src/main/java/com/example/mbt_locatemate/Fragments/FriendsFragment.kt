@@ -1,6 +1,7 @@
 package com.example.mbt_locatemate
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,10 +12,12 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mbt_locatemate.Fragments.FriendsLeaderboardFragment
+import com.google.android.gms.tasks.Tasks
 import com.google.android.material.tabs.TabLayout
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.firestore
 
 class FriendsFragment : Fragment() {
@@ -48,18 +51,23 @@ class FriendsFragment : Fragment() {
             )
         )
 
-        loadFriends()
-
         leaderboardButton = view.findViewById(R.id.leaderboardButton)
-        leaderboardButton.setOnClickListener(){
-            val friendsLeaderboardFragment = FriendsLeaderboardFragment().apply {
-                arguments = Bundle().apply {
-                    putParcelableArrayList("friendsList", ArrayList(friendList)) // Assuming 'friendList' is your List<Friend>
-                }
+        leaderboardButton.setOnClickListener {
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+            if (userId != null) {
+                fetchUserAndFriends(userId, object : DataReadyListener {
+                    override fun onDataReady(friendsList: MutableList<Friend>) {
+                        val friendsLeaderboardFragment = FriendsLeaderboardFragment().apply {
+                            arguments = Bundle().apply {
+                                putParcelableArrayList("friendsList", ArrayList(friendsList))
+                            }
+                        }
+                        parentFragmentManager.beginTransaction()
+                            .replace(R.id.fragment_container, friendsLeaderboardFragment)
+                            .commit()
+                    }
+                })
             }
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, friendsLeaderboardFragment)
-                .commit()
         }
 
         layoutManager = LinearLayoutManager(requireContext())
@@ -149,6 +157,13 @@ class FriendsFragment : Fragment() {
 
         loadFriends()
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        //auth = Firebase.auth
+
+        loadFriends()
     }
 
     //Used Chat GPT to assist in the query
@@ -384,4 +399,33 @@ class FriendsFragment : Fragment() {
             }
         }
     }
+
+    interface DataReadyListener {
+        fun onDataReady(friendsList: MutableList<Friend>)
+    }
+    private fun fetchUserAndFriends(userId: String, listener: DataReadyListener) {
+        val friendsList = mutableListOf<Friend>()
+        // fetch user +friends
+        db.collection("users").document(userId).get()
+            .addOnSuccessListener { userDocument ->
+                userDocument.toObject(Friend::class.java)?.let { currentUser ->
+                    friendsList.add(currentUser)  // add the current user
+                    db.collection("users").document(userId).collection("friends").get()
+                        .addOnSuccessListener { snapshot ->
+                            val tasks = snapshot.documents.map { doc ->
+                                db.collection("users").document(doc.id).get()
+                            }
+                            Tasks.whenAllSuccess<DocumentSnapshot>(tasks).addOnSuccessListener { friendDocs ->
+                                for (doc in friendDocs) {
+                                    doc.toObject(Friend::class.java)?.let { friend ->
+                                        friendsList.add(friend)
+                                    }
+                                }
+                                listener.onDataReady(friendsList) //return the list
+                            }
+                        }
+                }
+            }
+    }
+
 }

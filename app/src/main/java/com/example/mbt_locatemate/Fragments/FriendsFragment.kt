@@ -450,6 +450,7 @@ class FriendsFragment : Fragment() {
                     val friendUsername = friendDocument.id  // The ID of the friend document
                     db.collection("users").document(friendUsername).get()
                         .addOnSuccessListener { friendDoc ->
+                            Log.d("FirestoreData", "Document data: ${friendDoc.data}")
                             val friendId = friendDoc.getString("id") ?: "Unknown"
                             val friendPfpUrl = friendDoc.getString("pfp_url") ?: ""
                             friendsList.add(Friend(friendId, friendUsername, friendPfpUrl))

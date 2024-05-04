@@ -71,7 +71,7 @@ class SongsFragment : BottomSheetDialogFragment(), SongListAdapter.SongClickList
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             bottomSheetBehavior.peekHeight = bottomSheet.height
         }
-
+        //show random songs if the search bar is empty
         showRandomSongs()
         return view
     }

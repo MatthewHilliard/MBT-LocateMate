@@ -16,6 +16,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.type.LatLng
 import com.squareup.picasso.Picasso
@@ -82,29 +83,6 @@ class IndividualPostFragment: Fragment() {
                 }
             caption.clearFocus()
         }
-//        caption.addTextChangedListener(object : TextWatcher {
-//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-//                //do nothing
-//            }
-//
-//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-//                //do nothing
-//            }
-//
-//            override fun afterTextChanged(s: Editable?) {
-//                // update caption in database
-//                if (s.toString() != "") {
-//                    sendCaption.visibility = View.VISIBLE
-//                } else {
-//
-//                }
-//            }
-//        })
-
-//        sendCaption.setOnClickListener{
-//
-//
-//        }
 
         val commentsButton = view.findViewById<ImageView>(R.id.commentsButton)
         commentsButton.setOnClickListener{
@@ -148,17 +126,36 @@ class IndividualPostFragment: Fragment() {
     }
 
     private fun deletePost() {
-        Log.d("PostActions", "attmetping to delete post $postId")
-        //need id to delete?
-        db.collection("posts").document(postId)
-            .delete()
+        // Delete post document
+        val post = db.collection("posts").document(postId)
+        post.delete()
             .addOnSuccessListener {
-                Log.d("PostActions", "successfully deleted post $postId")
+                Log.d("PostActions", "Successfully deleted post $postId")
+                // Delete guesses
+                deleteCollection(post.collection("guesses"))
+                // Delete comments
+                deleteCollection(post.collection("comments"))
+                goToProfile()
             }
             .addOnFailureListener { e ->
-                Log.d("PostActions", "Error deleting post $postId")
+                Log.d("PostActions", "Error deleting post $postId: $e")
             }
-        goToProfile()
+    }
+    private fun deleteCollection(collection: CollectionReference) {
+        collection.get()
+            .addOnSuccessListener { snapshot ->
+                val batch = collection.firestore.batch()
+                for (document in snapshot.documents) {
+                    batch.delete(document.reference)
+                }
+                batch.commit()
+                    .addOnFailureListener { e ->
+                        Log.w("FirestoreUtil", "Error deleting collection", e)
+                    }
+            }
+            .addOnFailureListener { e ->
+                Log.w("FirestoreUtil", "Error retrieving documents for deletion", e)
+            }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

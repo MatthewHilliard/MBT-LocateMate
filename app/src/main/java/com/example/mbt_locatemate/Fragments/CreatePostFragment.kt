@@ -243,7 +243,45 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
     override fun onMapReady(googleMap: GoogleMap) {
         nMap = googleMap
         nMap.uiSettings.isZoomControlsEnabled = true
-        setUpMap()
+        if (hasLocationPermission()) {
+            setUpMap()
+        } else {
+            requestLocationPermissions()
+        }
+    }
+
+    private fun hasLocationPermission(): Boolean {
+        return ActivityCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestLocationPermissions() {
+        ActivityCompat.requestPermissions(
+            requireActivity(),
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ),
+            LOCATION_REQUEST_CODE
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == LOCATION_REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+                setUpMap()
+            }
+        }
     }
 
     private fun setUpMap() {

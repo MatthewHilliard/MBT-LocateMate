@@ -16,7 +16,7 @@ class LeaderboardListAdapter (private val friendsList: List<Leaderboard>) :
         val rank: TextView = view.findViewById(R.id.leaderboardRank)
         val username: TextView = view.findViewById(R.id.leaderboardUser)
         val score: TextView = view.findViewById(R.id.leaderboardScore)
-        val pfpImage: ImageView = itemView.findViewById(R.id.pfp_guess)
+        val pfpImage: ImageView = itemView.findViewById(R.id.pfp_leaderboard)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LeaderboardViewHolder {

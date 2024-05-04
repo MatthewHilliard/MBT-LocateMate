@@ -57,14 +57,20 @@ class FriendsFragment : Fragment() {
             if (userId != null) {
                 fetchLeaderboardList(userId, object : DataReadyListener {
                     override fun onDataReady(friendsList: MutableList<Friend>) {
-                        val friendsLeaderboardFragment = FriendsLeaderboardFragment().apply {
-                            arguments = Bundle().apply {
-                                putParcelableArrayList("friendsList", ArrayList(friendsList))
+                        if (friendsList.isNotEmpty()) {
+                            val friendsLeaderboardFragment = FriendsLeaderboardFragment().apply {
+                                arguments = Bundle().apply {
+                                    putParcelableArrayList("friendsList", ArrayList(friendsList))
+                                }
                             }
+                            parentFragmentManager.beginTransaction()
+                                .replace(R.id.fragment_container, friendsLeaderboardFragment)
+                                .commit()
                         }
-                        parentFragmentManager.beginTransaction()
-                            .replace(R.id.fragment_container, friendsLeaderboardFragment)
-                            .commit()
+                    }
+
+                    override fun onError(error: Exception) {
+                        Log.e("FriendsFragment", "Error fetching data: ${error.message}")
                     }
                 })
             }
@@ -402,6 +408,7 @@ class FriendsFragment : Fragment() {
 
     interface DataReadyListener {
         fun onDataReady(friendsList: MutableList<Friend>)
+        fun onError(error: Exception)
     }
     fun fetchLeaderboardList(userId: String, listener: DataReadyListener) {
         val friendsList = mutableListOf<Friend>()

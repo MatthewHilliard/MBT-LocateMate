@@ -7,7 +7,7 @@ import kotlinx.parcelize.RawValue
 @Parcelize
 data class Leaderboard(
     val username: @RawValue String,
-    val average: @RawValue Double,
+    val average: @RawValue Double?,
     val pfpUrl: String,
     var rank: Int
 ) : Parcelable {

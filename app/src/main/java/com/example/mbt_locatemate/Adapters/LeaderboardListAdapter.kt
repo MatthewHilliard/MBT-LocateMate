@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.QuerySnapshot
 import com.squareup.picasso.Picasso
+
 class LeaderboardListAdapter (private val friendsList: List<Leaderboard>) :
     RecyclerView.Adapter<LeaderboardListAdapter.LeaderboardViewHolder>() {
 
@@ -28,9 +29,15 @@ class LeaderboardListAdapter (private val friendsList: List<Leaderboard>) :
     override fun onBindViewHolder(holder: LeaderboardViewHolder, position: Int) {
         val leaderboard = friendsList[position]
         Log.d("LeaderboardListAdapter", "Loading image from URL: ${leaderboard.pfpUrl}")
-        holder.rank.text = leaderboard.rank.toString()
+        if (leaderboard.rank == -1) {
+            holder.rank.text = ""
+        } else {
+            holder.rank.text = leaderboard.rank.toString()
+        }
         holder.username.text = leaderboard.username
-        holder.score.text = String.format("%.2f km", leaderboard.average / 1000)
+        holder.score.text = String.format("%.2f km", (leaderboard.average ?: 0.0) / 1000)
+
+        Log.d("LoadImage", "Loading image from URL: ${leaderboard.pfpUrl}")
 
         if (leaderboard.pfpUrl.isNotEmpty()) {
             Picasso.get().load(leaderboard.pfpUrl).into(holder.pfpImage)
@@ -38,6 +45,7 @@ class LeaderboardListAdapter (private val friendsList: List<Leaderboard>) :
             holder.pfpImage.setImageResource(R.drawable.vacation_test)
         }
     }
+
 
     override fun getItemCount() = friendsList.size
 }

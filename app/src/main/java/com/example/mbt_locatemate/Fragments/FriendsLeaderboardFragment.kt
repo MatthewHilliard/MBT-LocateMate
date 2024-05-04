@@ -43,7 +43,7 @@ class FriendsLeaderboardFragment : Fragment() {
                         .get()
                         .addOnSuccessListener { documents ->
                             val distances = documents.mapNotNull { it.getDouble("distance") }
-                            val score = distances.average().takeIf { !distances.isEmpty() } ?: 0.0
+                            val score = if (distances.isNotEmpty()) distances.average() else null
 
                             leaderboardEntries.add(
                                 Leaderboard(
@@ -85,11 +85,11 @@ class FriendsLeaderboardFragment : Fragment() {
     }
 
     private fun loadLeaderboard(leaderboardEntries: MutableList<Leaderboard>) {
-        val sortedEntries = leaderboardEntries.sortedBy { it.average }
+        val sortedEntries = leaderboardEntries.sortedWith(compareBy(nullsLast<Double>()) { it.average })
 
         //assign ranks
-        sortedEntries.forEachIndexed { index, leaderboard ->
-            leaderboard.rank = index + 1
+        sortedEntries.forEach { leaderboard ->
+            leaderboard.rank = if (leaderboard.average != null) rank++ else -1
         }
 
         adapter = LeaderboardListAdapter(sortedEntries)

@@ -420,7 +420,7 @@ class FriendsFragment : Fragment() {
                 //get friends fields from user document
                 val id = userDocument.id
                 val username = userDocument.getString("username") ?: "Unknown"
-                val pfpUrl = userDocument.getString("pfpUrl") ?: ""
+                val pfpUrl = userDocument.getString("pfp_url") ?: ""
 
                 val currentUser = Friend(id, username, pfpUrl)
                 friendsList.add(currentUser)
@@ -451,9 +451,9 @@ class FriendsFragment : Fragment() {
                     db.collection("users").document(friendUsername).get()
                         .addOnSuccessListener { friendDoc ->
                             val friendId = friendDoc.getString("id") ?: "Unknown"
-                            val friendPfpUrl = friendDoc.getString("pfpUrl") ?: ""
+                            val friendPfpUrl = friendDoc.getString("pfp_url") ?: ""
                             friendsList.add(Friend(friendId, friendUsername, friendPfpUrl))
-                            Log.d("FriendsFragment", "Added friend: ID=$friendId, Username=$friendUsername")
+                            Log.d("FriendsFragment", "Added friend: ID=$friendId, Username=$friendUsername, pfpUrl=$friendPfpUrl")
 
                             processedCount++
                             if (processedCount == count) {

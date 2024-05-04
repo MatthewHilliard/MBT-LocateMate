@@ -58,7 +58,8 @@ class LeaderboardListAdapter (private var friendsList: List<Leaderboard>) : Recy
                 else -> medalImageView.visibility = View.GONE
             }
 
-            // Optionally highlight the current user's view
+
+        //highlight the current user's view
             if (leaderboard.isCurrentUser) {
                 itemView.setBackgroundResource(R.color.md_theme_surfaceContainerHigh)
             } else {

@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -60,6 +61,17 @@ class PostLeaderboardFragment : Fragment() {
     private fun loadLeaderboard(postId: String) {
         Log.d("PostLeaderboardFragment", "Loading leaderboard for post: $postId")
         val db = FirebaseFirestore.getInstance()
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+        var currentUsername = String()
+
+        if (currentUserId != null) {
+            db.collection("users").document(currentUserId)
+                .get()
+                .addOnSuccessListener { userDoc ->
+                    currentUsername = userDoc.getString("username") ?: "Unknown"
+                }
+        }
+
         db.collection("posts").document(postId)
             .collection("guesses")
             .orderBy("distance")
@@ -69,10 +81,12 @@ class PostLeaderboardFragment : Fragment() {
                 if (documents.isEmpty) {
                     Toast.makeText(context, "No guesses to show", Toast.LENGTH_SHORT).show()
                 } else {
-                    val guesses = documents.map { doc ->
-                        Guess(doc.getString("user") ?: "Unknown",
-                            doc.getDouble("distance") ?: 0.0,
-                            doc.getString("pfpUrl")?: "Unknown")
+                    val guesses = documents.mapIndexed { index, doc ->
+                        val user = doc.getString("user") ?: "Unknown"
+                        val distance = doc.getDouble("distance") ?: 0.0
+                        val pfpUrl = doc.getString("pfpUrl") ?: "Unknown"
+                        val isCurrentUser = user == currentUsername
+                        Guess(user, distance, pfpUrl, index + 1, isCurrentUser)
                     }
                     adapter.setGuesses(guesses)
                 }

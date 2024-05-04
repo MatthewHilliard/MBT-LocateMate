@@ -99,6 +99,7 @@
         android:id="@+id/send_caption"
         android:layout_width="71dp"
         android:layout_height="46dp"
+        android:backgroundTint="@color/md_theme_primary"
         android:drawableLeft="@drawable/up_arrow_svgrepo_com"
         app:layout_constraintEnd_toEndOf="@id/post_image"
         app:layout_constraintTop_toBottomOf="@id/commentsButton" />

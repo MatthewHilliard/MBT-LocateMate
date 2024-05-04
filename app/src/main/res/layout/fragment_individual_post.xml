@@ -93,7 +93,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/post_image"
         app:layout_constraintTop_toBottomOf="@+id/leaderboardButton">
-
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/post_caption"
             android:layout_width="match_parent"

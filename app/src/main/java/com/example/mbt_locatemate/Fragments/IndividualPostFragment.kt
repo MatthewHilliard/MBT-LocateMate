@@ -1,6 +1,7 @@
 package com.example.mbt_locatemate
 
 import android.media.Image
+import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import android.text.Editable
@@ -35,20 +36,8 @@ class IndividualPostFragment: Fragment() {
 
     var onCommentsClickListener: ((Post) -> Unit)? = null
     private val db = FirebaseFirestore.getInstance()
+    private var mediaPlayer: MediaPlayer? = null
 
-//<EditText
-//        android:id="@+id/post_caption"
-//        android:layout_width="276dp"
-//        android:layout_height="44dp"
-//        android:layout_marginStart="10dp"
-//        android:layout_marginTop="5dp"
-//        android:fontFamily="@font/poppins"
-//        android:text=""
-//        android:textColor="@color/md_theme_onSurface"
-//        android:textSize="18dp"
-//        android:textStyle="bold"
-//        app:layout_constraintStart_toStartOf="@id/post_image"
-//        app:layout_constraintTop_toBottomOf="@+id/leaderboardButton" />
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -145,6 +134,12 @@ class IndividualPostFragment: Fragment() {
         return view
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mediaPlayer?.release()
+        mediaPlayer = null
+    }
+
     private fun goToProfile() {
         val profileFragment = ProfileFragment()
         parentFragmentManager.beginTransaction().replace(R.id.fragment_container, profileFragment).commit()
@@ -180,6 +175,24 @@ class IndividualPostFragment: Fragment() {
             Picasso.get().load(post.imgUrl).into(postImage)
             Picasso.get().load(post.pfpUrl).into(pfpImage)
             timeAgo.text = calculateTimeAgo(post.timestamp)
+
+            db.collection("posts").document(post.id).get().addOnSuccessListener {document ->
+                if (document.contains("song_url")) {
+                    val songUrl = document.getString("song_url").toString()
+                    if (songUrl != "") {
+                        mediaPlayer = MediaPlayer().apply {
+                            setDataSource(songUrl)
+                            prepareAsync()
+                            setOnPreparedListener {
+                                it.start()
+                            }
+                            setOnErrorListener { mp, what, extra ->
+                                false
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 

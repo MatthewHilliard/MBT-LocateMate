@@ -19,6 +19,7 @@ class LeaderboardListAdapter (private val friendsList: List<Leaderboard>) :
         val username: TextView = view.findViewById(R.id.leaderboardUser)
         val score: TextView = view.findViewById(R.id.leaderboardScore)
         val pfpImage: ImageView = itemView.findViewById(R.id.pfp_leaderboard)
+        val medalImageView: ImageView = itemView.findViewById(R.id.medalImageView)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LeaderboardViewHolder {
@@ -46,6 +47,22 @@ class LeaderboardListAdapter (private val friendsList: List<Leaderboard>) :
             Picasso.get().load(leaderboard.pfpUrl).into(holder.pfpImage)
         } else {
             holder.pfpImage.setImageResource(R.drawable.vacation_test)
+        }
+
+        when (leaderboard.rank) {
+            1 -> {
+                holder.medalImageView.setImageResource(R.drawable.ic_gold_medal)
+                holder.medalImageView.visibility = View.VISIBLE
+            }
+            2 -> {
+                holder.medalImageView.setImageResource(R.drawable.ic_silver_medal)
+                holder.medalImageView.visibility = View.VISIBLE
+            }
+            3 -> {
+                holder.medalImageView.setImageResource(R.drawable.ic_bronze_medal)
+                holder.medalImageView.visibility = View.VISIBLE
+            }
+            else -> holder.medalImageView.visibility = View.GONE
         }
 
         // Optionally highlight the current user's view

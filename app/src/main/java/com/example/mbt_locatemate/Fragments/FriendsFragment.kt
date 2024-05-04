@@ -55,7 +55,7 @@ class FriendsFragment : Fragment() {
         leaderboardButton.setOnClickListener {
             val userId = FirebaseAuth.getInstance().currentUser?.uid
             if (userId != null) {
-                fetchUserAndFriends(userId, object : DataReadyListener {
+                fetchLeaderboardList(userId, object : DataReadyListener {
                     override fun onDataReady(friendsList: MutableList<Friend>) {
                         val friendsLeaderboardFragment = FriendsLeaderboardFragment().apply {
                             arguments = Bundle().apply {
@@ -403,28 +403,59 @@ class FriendsFragment : Fragment() {
     interface DataReadyListener {
         fun onDataReady(friendsList: MutableList<Friend>)
     }
-    private fun fetchUserAndFriends(userId: String, listener: DataReadyListener) {
+    fun fetchLeaderboardList(userId: String, listener: DataReadyListener) {
         val friendsList = mutableListOf<Friend>()
-        // fetch user +friends
+
+        // Fetch the current user's details
         db.collection("users").document(userId).get()
             .addOnSuccessListener { userDocument ->
-                userDocument.toObject(Friend::class.java)?.let { currentUser ->
-                    friendsList.add(currentUser)  // add the current user
-                    db.collection("users").document(userId).collection("friends").get()
-                        .addOnSuccessListener { snapshot ->
-                            val tasks = snapshot.documents.map { doc ->
-                                db.collection("users").document(doc.id).get()
-                            }
-                            Tasks.whenAllSuccess<DocumentSnapshot>(tasks).addOnSuccessListener { friendDocs ->
-                                for (doc in friendDocs) {
-                                    doc.toObject(Friend::class.java)?.let { friend ->
-                                        friendsList.add(friend)
-                                    }
-                                }
-                                listener.onDataReady(friendsList) //return the list
+                // Manually extract data from the document
+                val id = userDocument.id  // Use the document ID as the user ID
+                val username = userDocument.getString("username") ?: "Unknown"  // Provide default value if null
+                val pfpUrl = userDocument.getString("pfpUrl") ?: ""  // Provide default value if null
+
+                val currentUser = Friend(id, username, pfpUrl)
+                friendsList.add(currentUser)  // Add current user to the list
+
+                // Proceed to fetch the friends
+                fetchFriends(userId, friendsList, listener)
+            }
+            .addOnFailureListener { e ->
+                Log.e("FriendsFragment", "Error fetching user details", e)
+            }
+    }
+
+    private fun fetchFriends(userId: String, friendsList: MutableList<Friend>, listener: DataReadyListener) {
+        db.collection("users").document(userId).collection("friends").get()
+            .addOnSuccessListener { friendsSnapshot ->
+                val count = friendsSnapshot.documents.size
+                if (count == 0) {
+                    listener.onDataReady(friendsList)  // Call listener if there are no friends
+                }
+
+                var processedCount = 0
+                for (friendRef in friendsSnapshot.documents) {
+                    val friendId = friendRef.id
+                    db.collection("users").document(friendId).get()
+                        .addOnSuccessListener { friendDoc ->
+                            val friendId = friendDoc.id
+                            val friendUsername = friendDoc.getString("username") ?: "Unknown"
+                            val friendPfpUrl = friendDoc.getString("pfpUrl") ?: ""
+
+                            friendsList.add(Friend(friendId, friendUsername, friendPfpUrl))
+
+                            processedCount++
+                            if (processedCount == count) {
+                                listener.onDataReady(friendsList)  // Only call listener when all friends are processed
                             }
                         }
+                        .addOnFailureListener { e ->
+                            Log.e("FriendsFragment", "Error fetching friend details", e)
+                        }
                 }
+            }
+            .addOnFailureListener { e ->
+                Log.e("FriendsFragment", "Error fetching friends list", e)
             }
     }
 

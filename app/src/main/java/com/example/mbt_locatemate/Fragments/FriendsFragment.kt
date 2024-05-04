@@ -26,6 +26,7 @@ class FriendsFragment : Fragment() {
     private lateinit var searchText: String
 
     private lateinit var leaderboardButton: ImageView
+    private lateinit var friendList: MutableList<Friend>
 
     private var onFriends = true
     private var onRequest = false
@@ -49,9 +50,14 @@ class FriendsFragment : Fragment() {
 
         leaderboardButton = view.findViewById(R.id.leaderboardButton)
         leaderboardButton.setOnClickListener(){
-            val friendsLeaderboardFragment = FriendsLeaderboardFragment()
+            val friendsLeaderboardFragment = FriendsLeaderboardFragment().apply {
+                arguments = Bundle().apply {
+                    putParcelableArrayList("friendsList", ArrayList(friendList)) // Assuming 'friendList' is your List<Friend>
+                }
+            }
             parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, friendsLeaderboardFragment).commit()
+                .replace(R.id.fragment_container, friendsLeaderboardFragment)
+                .commit()
         }
 
         layoutManager = LinearLayoutManager(requireContext())
@@ -159,7 +165,7 @@ class FriendsFragment : Fragment() {
                                 .whereIn("username", friendUsernames)
                                 .get()
                                 .addOnSuccessListener { documents ->
-                                    val friendList = mutableListOf<Friend>()
+                                    //friendList = mutableListOf<Friend>()
                                     for (document in documents) {
                                         val id = document.getString("id") ?: ""
                                         val username = document.getString("username") ?: ""

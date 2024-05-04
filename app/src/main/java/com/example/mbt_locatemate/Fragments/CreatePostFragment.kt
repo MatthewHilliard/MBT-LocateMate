@@ -72,24 +72,30 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
     private lateinit var addSongButton: Button
     private var songUrl = ""
 
+    //if location permissions are requested, we can perform actions based on the result of the permission request
     private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
         if (isGranted) {
+            //set up the map now that we have access to our location
             Log.d("LocationPermissions", "permission granted, setting up map")
             setUpMap()
         } else {
+            //if location permissions are denied, we navigate back to explore since we cannot make a post
             val exploreFragment = ExploreFragment()
             parentFragmentManager.beginTransaction().replace(R.id.fragment_container, exploreFragment).commit()
             (activity as MainActivity).bottomNavBar.selectedItemId =
                 R.id.exploreTab        }
     }
 
+    //result of photo-taking action
     val resultContract = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
+            //getting the orientation and setting the image to the bitmap of the camera result
             val exif = ExifInterface(output!!.absolutePath)
             val orientation = exif.getAttributeInt(
                 ExifInterface.TAG_ORIENTATION,
                 ExifInterface.ORIENTATION_UNDEFINED
             )
+            //get the file using the uri generated when photo was taken
             val bitmap = BitmapFactory.decodeFile(output!!.absolutePath)
             val matrix = Matrix()
             when (orientation) {
@@ -102,9 +108,7 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
             imageBitmap = capturedImage
         }
     }
-    companion object {
-        private const val LOCATION_REQUEST_CODE = 1
-    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -114,20 +118,26 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(this)
         mapFragment?.onCreate(savedInstanceState)
-
+        //firebase instances
         auth = Firebase.auth
         storage = Firebase.storage
+        lastLocation = Location("")
+        lastLocation.latitude = 0.0
+        lastLocation.longitude = 0.0
+
         //open camera to take a photo
         image = view.findViewById(R.id.imageView)
         caption = view.findViewById(R.id.captionText)
         val takePic = view.findViewById<ImageView>(R.id.cameraButton)
         takePic.setOnClickListener {
+            //take a photo, save the image to external file storage temporarily and set a uri for later use
             GlobalScope.launch(Dispatchers.IO) {
                 val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                 val dir = context?.getExternalFilesDir(Environment.DIRECTORY_DCIM)
                 imageName = UUID.randomUUID().toString() + ".jpeg"
                 val currOutput = File(dir, imageName)
                 output = currOutput
+                //set a uri for the photo
                 val uri = context?.let { it1 ->
                     FileProvider.getUriForFile(
                         it1,
@@ -135,12 +145,14 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
                         currOutput
                     )
                 }
+                //store the photo externally
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
                 resultContract.launch(intent)
             }
         }
         val cancel = view.findViewById<ImageView>(R.id.cancelButton)
         cancel.setOnClickListener {
+            //canceling the post makes us go back to explore
             val exploreFragment = ExploreFragment()
             parentFragmentManager.beginTransaction().replace(R.id.fragment_container, exploreFragment).commit()
             (activity as MainActivity).bottomNavBar.selectedItemId =
@@ -148,6 +160,7 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
         }
         val post = view.findViewById<ImageView>(R.id.postButton)
         post.setOnClickListener {
+            //save the post to the database and navigate back to explore
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     savePost()
@@ -159,12 +172,13 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
             (activity as MainActivity).bottomNavBar.selectedItemId =
                 R.id.exploreTab
         }
-
+        //fused location provider client is for assisting with current location on the map
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext())
 
         friendsOnlyButton = view.findViewById(R.id.friendsOnlyButton)
         publicButton = view.findViewById(R.id.publicButton)
         segmentedButton = view.findViewById(R.id.postTypeButton)
+        //based on user selection, we can make the post public or private (friends only or able to be seen by all users of the app)
         segmentedButton.addOnButtonCheckedListener { group, checkedId, isChecked ->
             if (isChecked) {
                 when (checkedId) {
@@ -181,7 +195,7 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
                 }
             }
         }
-
+        //option to add a song or other background music to the post
         addSongButton = view.findViewById(R.id.post_add_song)
         addSongButton.setOnClickListener{
             val songsFragment = SongsFragment()
@@ -200,16 +214,16 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
             imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
             val data = baos.toByteArray()
             val imageId = UUID.randomUUID().toString()
-
+            //store the photo first in firebase cloud storage
             storage.reference.child("images/${currentUser.uid}/posts/$imageId.jpg").putBytes(data)
                 .addOnSuccessListener { task->
                     task.metadata!!.reference!!.downloadUrl
                         .addOnSuccessListener { url ->
+                            //once stored, we have the url and can store the other post info in firestore
                             val imageUrl = url.toString()
                             val captionText = caption.text.toString()
                             val latitude = lastLocation.latitude
                             val longitude = lastLocation.longitude
-                            //get username and stuff
                             db.collection("users")
                                 .document(currentUser.uid)
                                 .get()
@@ -218,7 +232,6 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
                                         val postId = UUID.randomUUID().toString()
                                         val username = document.getString("username") ?: ""
                                         val pfpUrl = document.getString("pfp_url") ?: ""
-                                        val emptyList: MutableList<Any> = mutableListOf()
                                         val timestamp = System.currentTimeMillis()
                                         val postInfo = hashMapOf(
                                             "id" to postId,
@@ -235,14 +248,11 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
                                         db.collection("posts").document(postId)
                                             .set(postInfo)
                                             .addOnSuccessListener { documentReference ->
-                                                // Post uploaded successfully
                                             }
                                             .addOnFailureListener { e ->
-                                                // Handle failure
                                             }
                                     }
                                 }.addOnFailureListener { exception ->
-                                            // Handle any errors that may occur
                                             println("Error getting document: $exception")
                                 }
                         }
@@ -253,13 +263,16 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
     override fun onMapReady(googleMap: GoogleMap) {
         nMap = googleMap
         nMap.uiSettings.isZoomControlsEnabled = true
+        //check for location permissions and set up map if they are met
         if (hasLocationPermission()) {
             setUpMap()
         } else {
+            //request the permission and wait for the result
             requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
     }
 
+    //checking for permissions
     private fun hasLocationPermission(): Boolean {
         return ActivityCompat.checkSelfPermission(
             requireContext(),
@@ -271,6 +284,7 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
     }
 
     private fun setUpMap() {
+        //make sure permissions are met before trying to get the last location
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -279,17 +293,19 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            //ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_REQUEST_CODE)
             return
         }
+
         nMap.isMyLocationEnabled = true
         fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
+            //once last location is fetched, set our lateinit variable and place a marker
             if (location != null) {
                 lastLocation = location
+                //place a marker at our location
                 val currentLatLong = LatLng(location.latitude, location.longitude)
                 placeMarker(currentLatLong)
             } else {
-                //fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null)
+                //do nothing
             }
         }
     }
@@ -298,6 +314,7 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
         val markerOptions = MarkerOptions().position(LatLng(latLong.latitude, latLong.longitude))
         markerOptions.title("$latLong")
         nMap.addMarker(markerOptions)
+        //pan camera to the marker
         nMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLong, 12f))
     }
 
@@ -306,6 +323,7 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
         Log.d("CreatePostFragment", "Song has been accepted, $songUrl")
     }
 
+    //make the marker non-clickable
     override fun onMarkerClick(p0: Marker): Boolean = false
 
 }

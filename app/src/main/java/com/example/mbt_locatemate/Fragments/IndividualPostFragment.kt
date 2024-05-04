@@ -32,10 +32,8 @@ class IndividualPostFragment: Fragment() {
     private lateinit var postId: String
     private lateinit var timeAgo: TextView
     private lateinit var leaderboard: ImageView
-//    private lateinit var sendCaption: MaterialButton
     private lateinit var captionView: TextInputLayout
 
-    var onCommentsClickListener: ((Post) -> Unit)? = null
     private val db = FirebaseFirestore.getInstance()
     private var mediaPlayer: MediaPlayer? = null
 
@@ -52,28 +50,28 @@ class IndividualPostFragment: Fragment() {
         pfpImage = view.findViewById(R.id.post_pfp)
         delete = view.findViewById(R.id.delete_button)
         timeAgo = view.findViewById(R.id.time_ago)
-//        sendCaption = view.findViewById(R.id.send_caption)
         leaderboard = view.findViewById(R.id.leaderboardButton)
 
         //used ChatGPT to help with dialog
         delete.setOnClickListener {
-                val builder = AlertDialog.Builder(requireContext())
-                builder.setTitle("Confirm Deletion")
-                builder.setMessage("Are you sure you want to delete this post?")
+            //asks for user confirmation to delete
+            val builder = AlertDialog.Builder(requireContext())
+            builder.setTitle("Confirm Deletion")
+            builder.setMessage("Are you sure you want to delete this post?")
 
-                builder.setPositiveButton("Yes") { dialog, _ ->
-                    deletePost()
-                    dialog.dismiss()
-                }
-                builder.setNegativeButton("No") { dialog, _ ->
-                    dialog.dismiss()
-                }
-
-                val dialog = builder.create()
-                dialog.show()
+            builder.setPositiveButton("Yes") { dialog, _ ->
+                deletePost()
+                dialog.dismiss()
             }
+            builder.setNegativeButton("No") { dialog, _ ->
+                dialog.dismiss()
+            }
+
+            val dialog = builder.create()
+            dialog.show()
+        }
         captionView.setEndIconOnClickListener {
-            // Respond to end icon presses
+            // respond to end icon presses to update the caption
             Log.d("PostActions", "attmepting to update caption")
             db.collection("posts").document(postId)
                 .update("caption", caption.text.toString())
@@ -81,11 +79,14 @@ class IndividualPostFragment: Fragment() {
                 }
                 .addOnFailureListener { e ->
                 }
+            //clear focus from the caption input to stop typing
             caption.clearFocus()
+            captionView.clearFocus()
         }
 
         val commentsButton = view.findViewById<ImageView>(R.id.commentsButton)
         commentsButton.setOnClickListener{
+            //send the post info to the comments fragment and open it
             val bundle = Bundle().apply {
                 putParcelable("post", post)
             }
@@ -94,13 +95,14 @@ class IndividualPostFragment: Fragment() {
             }
             commentsFragment.show(parentFragmentManager, "CommentsFragment")
         }
-
+        //allows user to navigate back to profile fragment by clicking the profile picture or the username
         pfpImage.setOnClickListener {
             goToProfile()
         }
         usernameTV.setOnClickListener {
             goToProfile()
         }
+        //navigates to leaderboard and adds this fragment to back stack (for navigation back here)
         leaderboard.setOnClickListener {
             val leaderboardFragment = PostLeaderboardFragment.newInstance(post)
             parentFragmentManager.beginTransaction()
@@ -114,6 +116,7 @@ class IndividualPostFragment: Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        //stop music
         mediaPlayer?.release()
         mediaPlayer = null
     }
@@ -126,14 +129,14 @@ class IndividualPostFragment: Fragment() {
     }
 
     private fun deletePost() {
-        // Delete post document
+        // delete post document
         val post = db.collection("posts").document(postId)
         post.delete()
             .addOnSuccessListener {
                 Log.d("PostActions", "Successfully deleted post $postId")
-                // Delete guesses
+                // delete guesses
                 deleteCollection(post.collection("guesses"))
-                // Delete comments
+                // delete comments
                 deleteCollection(post.collection("comments"))
                 goToProfile()
             }
@@ -141,6 +144,7 @@ class IndividualPostFragment: Fragment() {
                 Log.d("PostActions", "Error deleting post $postId: $e")
             }
     }
+    //deletes the collection within a post by using a batch commit
     private fun deleteCollection(collection: CollectionReference) {
         collection.get()
             .addOnSuccessListener { snapshot ->
@@ -150,11 +154,11 @@ class IndividualPostFragment: Fragment() {
                 }
                 batch.commit()
                     .addOnFailureListener { e ->
-                        Log.w("FirestoreUtil", "Error deleting collection", e)
+                        Log.d("Firestore", "Error deleting collection", e)
                     }
             }
             .addOnFailureListener { e ->
-                Log.w("FirestoreUtil", "Error retrieving documents for deletion", e)
+
             }
     }
 
@@ -162,8 +166,7 @@ class IndividualPostFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val currPost: Post? = arguments?.getParcelable("post")
         if (currPost != null) {
-            val location = com.google.android.gms.maps.model.LatLng(currPost.latitude, currPost.longitude)
-            Log.d("Location", location.toString())
+            //set all the post info in the fragment
             postId = currPost.id
             Log.d("display", "post $postId")
             post = currPost
@@ -173,6 +176,7 @@ class IndividualPostFragment: Fragment() {
             Picasso.get().load(post.pfpUrl).into(pfpImage)
             timeAgo.text = calculateTimeAgo(post.timestamp)
 
+            //allow us to play song in individual post fragment
             db.collection("posts").document(post.id).get().addOnSuccessListener {document ->
                 if (document.contains("song_url")) {
                     val songUrl = document.getString("song_url").toString()
@@ -193,6 +197,8 @@ class IndividualPostFragment: Fragment() {
         }
     }
 
+    //calculate how long ago the post was made using the timestamp
+    //used ChatGPT to assist in time conversion
     private fun calculateTimeAgo(timestamp: Long): String {
         val currentTime = System.currentTimeMillis()
         val timeDifference = currentTime - timestamp

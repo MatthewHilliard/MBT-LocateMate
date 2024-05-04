@@ -93,7 +93,7 @@ class SettingsFragment : Fragment() {
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, profileFragment).commit()
         }
-
+        //save updates to username or pfp
         val saveButton = view.findViewById<Button>(R.id.saveButton)
         saveButton.setOnClickListener {
             CoroutineScope(Dispatchers.IO).launch {
@@ -143,6 +143,7 @@ class SettingsFragment : Fragment() {
             return view
     }
 
+    //pfp orientation
     private fun getExifOrientation(uri: Uri): Int {
         val inputStream = context?.contentResolver?.openInputStream(uri)
         val exif = inputStream?.use { ExifInterface(it) }
@@ -184,6 +185,7 @@ class SettingsFragment : Fragment() {
     }
 
     //Utilized chat GPT for query assistance
+    //update your username for every friend (in their documents)
     private fun updateFriendUsernames(prevUsername: String, newUsername: String){
         val user = auth.currentUser
         if (user != null) {

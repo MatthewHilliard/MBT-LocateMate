@@ -49,6 +49,7 @@ class SongListAdapter(private var songs: List<Result>, private val listener: Son
         private val acceptButton: ImageView = itemView.findViewById(R.id.add_song)
 
         init {
+            //setting the mediaplayer based on the selected song
             itemView.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {

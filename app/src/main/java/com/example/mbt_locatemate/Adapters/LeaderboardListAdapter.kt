@@ -45,6 +45,7 @@ class LeaderboardListAdapter (private var friendsList: List<Leaderboard>) : Recy
             }
             Picasso.get().load(leaderboard.pfpUrl).into(pfpImage)
 
+          //set gold silver and bronze medals for ranks 1-3
             when (leaderboard.rank) {
                 1 -> {
                     medalImageView.setImageResource(R.drawable.ic_gold_medal)
@@ -63,8 +64,7 @@ class LeaderboardListAdapter (private var friendsList: List<Leaderboard>) : Recy
 
                 else -> medalImageView.visibility = View.GONE
             }
-
-
+       
         //highlight the current user's view
             if (leaderboard.isCurrentUser) {
                 itemView.setBackgroundResource(R.color.md_theme_surfaceContainerHigh)

@@ -46,6 +46,7 @@ class ExploreFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        //line between posts for separation
         val view = inflater.inflate(R.layout.fragment_explore, container, false)
         postRecyclerView = view.findViewById(R.id.post_recycler_view)
         postRecyclerView.addItemDecoration(
@@ -60,6 +61,7 @@ class ExploreFragment: Fragment() {
 
         auth = Firebase.auth
 
+        //navigation to guess, comment, and leaderboard fragments
         adapter = PostListAdapter(mutableListOf()).apply {
             onGuessClickListener = { post ->
                 navigateToMapGuessFragment(post)
@@ -90,6 +92,7 @@ class ExploreFragment: Fragment() {
         segmentedButton.addOnButtonCheckedListener { group, checkedId, isChecked ->
             if (isChecked) {
                 when (checkedId) {
+                    //load the friend or public posts based on segmented button
                     R.id.friendsButton -> {
                         CoroutineScope(Dispatchers.IO).launch {
                             loadFriendPosts()
@@ -109,7 +112,7 @@ class ExploreFragment: Fragment() {
                 }
             }
         }
-
+        //if a friend request is pending, show a red dot on friends icon
         notification = view.findViewById(R.id.notification)
         CoroutineScope(Dispatchers.IO).launch {
             loadFriendRequestsCount()
@@ -118,6 +121,8 @@ class ExploreFragment: Fragment() {
         segmentedButton.check(R.id.friendsButton)
         return view
     }
+
+    //check for any incoming requests and set the visibility of the dot
     private fun loadFriendRequestsCount() {
         val userId = auth.currentUser?.uid
         if (userId != null) {
@@ -143,6 +148,7 @@ class ExploreFragment: Fragment() {
         val leaderboardFragment = PostLeaderboardFragment.newInstance(post)
         parentFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, leaderboardFragment)
+            //allows us to go back to this fragment because it is in the back stack
             .addToBackStack(null)
             .commit()
     }
@@ -165,7 +171,7 @@ class ExploreFragment: Fragment() {
             userRef.get().addOnSuccessListener { documentSnapshot ->
                 val username = documentSnapshot.getString("username")
                 if (username != null) {
-                    // check if guess alrd exists
+                    // check if guess already exists
                     val postRef = Firebase.firestore.collection("posts").document(post.id.toString())
                     postRef.collection("guesses").whereEqualTo("user", username).get()
                         .addOnSuccessListener { queryDocumentSnapshots ->
@@ -177,7 +183,7 @@ class ExploreFragment: Fragment() {
                                     .addToBackStack(null)
                                     .commit()
                             } else {
-                                // theve alrd made guess
+                                // thev've already made a guess
                                 Toast.makeText(requireContext(), "You have already made a guess on this post!", Toast.LENGTH_SHORT).show()
                             }
                         }
@@ -195,6 +201,7 @@ class ExploreFragment: Fragment() {
     private fun loadFriendPosts() {
         val userId = auth.currentUser?.uid
         if (userId != null) {
+            //get all friend posts and add them to the adapter list through the friends document for current user
             db.collection("friends").document(userId)
                 .collection("friend_usernames")
                 .get()
@@ -219,6 +226,7 @@ class ExploreFragment: Fragment() {
                                     val post = Post(postId, username, caption, imgUrl, pfpUrl, latitude, longitude, timestamp)
                                     postList.add(post)
                                 }
+                                //sort posts descending by timestamp (newest posts first)
                                 postList.sortByDescending { it.timestamp }
                                 adapter.updatePosts(postList)
                             }
@@ -230,6 +238,7 @@ class ExploreFragment: Fragment() {
         }
     }
 
+    //same functionality as load posts but only get posts in which the public attribute is set to true
     private fun loadPublicPosts() {
         val userId = auth.currentUser?.uid
         val userFriends = mutableListOf<String>()

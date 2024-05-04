@@ -44,7 +44,6 @@ class PostLeaderboardFragment : Fragment() {
         adapter = GuessListAdapter(mutableListOf())
         recyclerView.adapter = adapter
 
-        //postId?.let { loadLeaderboard(it) }
         CoroutineScope(Dispatchers.IO).launch {
             loadLeaderboard(postId)
         }
@@ -58,6 +57,7 @@ class PostLeaderboardFragment : Fragment() {
     }
 
 
+    //load the guesses for the post and rank by highest guess
     private fun loadLeaderboard(postId: String) {
         Log.d("PostLeaderboardFragment", "Loading leaderboard for post: $postId")
         val db = FirebaseFirestore.getInstance()

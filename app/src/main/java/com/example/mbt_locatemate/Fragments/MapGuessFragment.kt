@@ -102,7 +102,7 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+        super.onViewCreated(view, savedInstanceState)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(this)
 
@@ -126,57 +126,74 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
                 )
                 val distanceInMeters = distance[0]
                 showDistanceToast(distanceInMeters)
+                CoroutineScope(Dispatchers.IO).launch {
 
-                if (currentUserId != null) {
-                    // fetching user details
-                    db.collection("users").document(currentUserId).get()
-                        .addOnSuccessListener { documentSnapshot ->
-                            if (documentSnapshot.exists()) {
-                                val username = documentSnapshot.getString("username")
-                                val pfpUrl = documentSnapshot.getString("pfp_url")
-                                val postId = post.id.toString()  // Ensure you have the postId from your post object
-                                Log.d("MapGuessFragment", "Loading image from URL: $pfpUrl")
+                    if (currentUserId != null) {
+                        // fetching user details
+                        db.collection("users").document(currentUserId).get()
+                            .addOnSuccessListener { documentSnapshot ->
+                                if (documentSnapshot.exists()) {
+                                    val username = documentSnapshot.getString("username")
+                                    val pfpUrl = documentSnapshot.getString("pfp_url")
+                                    val postId =
+                                        post.id.toString()  // Ensure you have the postId from your post object
+                                    Log.d("MapGuessFragment", "Loading image from URL: $pfpUrl")
 
-                                if (username != null) {
-                                    CoroutineScope(Dispatchers.IO).launch {
-                                        val userGuess = hashMapOf(
-                                            "postId" to postId,
-                                            "distance" to distanceInMeters
-                                        )
-                                        val postGuess = hashMapOf(
-                                            "user" to username,
-                                            "distance" to distanceInMeters,
-                                            "pfpUrl" to pfpUrl
-                                        )
+                                    if (username != null) {
+                                        CoroutineScope(Dispatchers.IO).launch {
+                                            val userGuess = hashMapOf(
+                                                "postId" to postId,
+                                                "distance" to distanceInMeters
+                                            )
+                                            val postGuess = hashMapOf(
+                                                "user" to username,
+                                                "distance" to distanceInMeters,
+                                                "pfpUrl" to pfpUrl
+                                            )
 
-                                        // add guess to guesses subcollection under the post document
-                                        val postRef = db.collection("posts").document(postId)
-                                        postRef.collection("guesses").add(postGuess).addOnSuccessListener {
-                                            // success, handle UI update or navigation
-                                        }.addOnFailureListener { e ->
-                                            Log.w("TAG", "Error adding document to post guesses", e)
+                                            // add guess to guesses subcollection under the post document
+                                            val postRef = db.collection("posts").document(postId)
+                                            postRef.collection("guesses").add(postGuess)
+                                                .addOnSuccessListener {
+
+                                                }.addOnFailureListener { e ->
+                                                Log.w(
+                                                    "TAG",
+                                                    "Error adding document to post guesses",
+                                                    e
+                                                )
+                                            }
+
+                                            // add guess to guesses subcollection under the user document
+                                            val userRef =
+                                                db.collection("users").document(currentUserId)
+                                            userRef.collection("guesses").add(userGuess)
+                                                .addOnSuccessListener {
+                                                    guessMade = true
+                                                    drawPolyline()
+                                                    guessButton.text = "See the Leaderboard"
+                                                    Log.d(
+                                                        "MapGuessFragment",
+                                                        "Guess added to user's collection"
+                                                    )
+                                                }.addOnFailureListener { e ->
+                                                Log.w(
+                                                    "TAG",
+                                                    "Error adding document to user guesses",
+                                                    e
+                                                )
+                                            }
                                         }
-
-                                        // add guess to guesses subcollection under the user document
-                                        val userRef = db.collection("users").document(currentUserId)
-                                        userRef.collection("guesses").add(userGuess).addOnSuccessListener {
-                                            guessMade = true
-                                            drawPolyline()
-                                            guessButton.text = "See the Leaderboard"
-                                            Log.d("MapGuessFragment", "Guess added to user's collection")
-                                        }.addOnFailureListener { e ->
-                                            Log.w("TAG", "Error adding document to user guesses", e)
-                                        }
+                                    } else {
+                                        Log.w("TAG", "null username")
                                     }
                                 } else {
-                                    Log.w("TAG", "null username")
+                                    Log.w("TAG", "no user?")
                                 }
-                            } else {
-                                Log.w("TAG", "no user?")
+                            }.addOnFailureListener { exception ->
+                                Log.w("TAG", "error fetching user document", exception)
                             }
-                        }.addOnFailureListener { exception ->
-                            Log.w("TAG", "error fetching user document", exception)
-                        }
+                    }
                 }
             } else {
                 Toast.makeText(context, "Please select a location first!", Toast.LENGTH_SHORT).show()
@@ -184,19 +201,8 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-/*
     private fun drawPolyline() {
-        map.addPolyline(
-            PolylineOptions()
-                .add(postLocation)
-                .add(guess)
-                .width(5f)
-                .color(Color.RED)
-        )
-    }
- */
-
-    private fun drawPolyline() {
+        //add both markers for guess and location
         map.addMarker(MarkerOptions()
             .position(postLocation)
             .title("Real Location")
@@ -206,11 +212,13 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
             .position(guess)
             .title("Guess Location"))
 
+        //add a polyline to show the distance between guess and real location
         val polyline = map.addPolyline(
             PolylineOptions()
                 .add(postLocation)
                 .add(guess)
                 .width(10f)
+                //follows Earth's curve
                 .geodesic(true)
                 .endCap(RoundCap())
                 .startCap(RoundCap())
@@ -228,28 +236,16 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
         map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding), object : GoogleMap.CancelableCallback {
             override fun onFinish() {
                 disableMapClickListener()
-                //disableMapInteractions()
             }
 
             override fun onCancel() {
                 disableMapClickListener()
-                //disableMapInteractions()
             }
         })
     }
 
     private fun disableMapClickListener() {
         map.setOnMapClickListener(null)
-    }
-
-    private fun disableMapInteractions() {
-        map.uiSettings.apply {
-            isScrollGesturesEnabled = false
-            isZoomGesturesEnabled = false
-            isTiltGesturesEnabled = false
-            isRotateGesturesEnabled = false
-            isZoomControlsEnabled = false
-        }
     }
 
     private fun calculateDynamicPadding(): Int {
@@ -261,31 +257,8 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
         return (50 + kmDistance * 10).toInt().coerceAtLeast(100).coerceAtMost(400)  // Ensures a minimum of 100px and a maximum of 400px padding
     }
 
-    private fun adjustCameraZoom(distance: Float) {
-        val zoomLevel = when {
-            distance < 200 -> 16f  // zoom in closer for very close guesses
-            distance < 1000 -> 14f  // slightly zoomed out
-            distance < 5000 -> 12f  // moderate zoom out
-            else -> 10f  // zoom out for distant guesses
-        }
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(guess, zoomLevel))
-    }
-
-    private fun adjustCameraBounds(postLocation: LatLng, guess: LatLng) {
-        val builder = LatLngBounds.Builder()
-        builder.include(postLocation)
-        builder.include(guess)
-        val bounds = builder.build()
-
-        // Calculate padding based on distance
-        val distance = FloatArray(1)
-        Location.distanceBetween(postLocation.latitude, postLocation.longitude, guess.latitude, guess.longitude, distance)
-        val padding = (distance[0] / 1000).toInt() * 50  // Increase padding as distance increases
-
-        map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding))
-    }
-
     private fun showDistanceToast(distance: Float) {
+        //display the distance to target
         val distanceInKm = distance / 1000
         Toast.makeText(context, "Distance to target: ${distanceInKm}km", Toast.LENGTH_LONG).show()
     }
@@ -297,7 +270,7 @@ class MapGuessFragment : Fragment(), OnMapReadyCallback {
         map.uiSettings.isScrollGesturesEnabled = true
         map.uiSettings.isZoomGesturesEnabled = true
 
-        // set click listener
+        //add marker for wherever the user clicks and remove older ones
         map.setOnMapClickListener { latLng ->
             guess = latLng
             map.clear()

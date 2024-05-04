@@ -45,7 +45,7 @@ class LoginFragment: Fragment() {
         val view = inflater.inflate(R.layout.fragment_login, container, false)
 
         (activity as MainActivity).showBottomNavBar(false)
-
+        //firebase authentication
         auth = Firebase.auth
         oneTapClient = Identity.getSignInClient(requireContext())
         signInRequest = BeginSignInRequest.builder()

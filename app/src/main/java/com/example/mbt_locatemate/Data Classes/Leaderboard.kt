@@ -11,5 +11,4 @@ data class Leaderboard(
     val pfpUrl: String,
     var rank: Int,
     var isCurrentUser: Boolean = false
-) : Parcelable {
-}
+) : Parcelable

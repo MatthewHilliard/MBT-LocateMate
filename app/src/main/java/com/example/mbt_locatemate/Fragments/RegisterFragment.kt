@@ -54,7 +54,7 @@ class RegisterFragment : Fragment() {
         profilePicture.setOnClickListener(){
             pickImage.launch("image/*")
         }
-
+        //check if the username exists, otherwise creates a new user document
         registerButton.setOnClickListener(){
             CoroutineScope(Dispatchers.IO).launch {
                 val usernameExists = checkIfUsernameExists(usernameInput.text.toString())

@@ -51,6 +51,7 @@ class ProfileFragment: Fragment() {
         layoutManager = GridLayoutManager(requireContext(), 2)
         profilePostRecyclerView.layoutManager = layoutManager
 
+        //send post info to individual post fragment
         adapter = ProfilePostListAdapter(emptyList()){ post ->
             val bundle = Bundle().apply {
                 putParcelable("post", post)
@@ -69,6 +70,7 @@ class ProfileFragment: Fragment() {
         val usernameText = view.findViewById<TextView>(R.id.txtUsername)
         val pfpImage = view.findViewById<ImageView>(R.id.imgProfile)
         if (user != null) {
+            //get user info and populate username and user posts
             CoroutineScope(Dispatchers.IO).launch {
             db.collection("users").document(user.uid).get().addOnSuccessListener { document ->
                 username = document.getString("username")
@@ -109,6 +111,7 @@ class ProfileFragment: Fragment() {
         return view
     }
 
+    //populate the cardview with user posts
     private fun loadUserPosts() {
         val userId = auth.currentUser?.uid
         if (userId != null) {
@@ -130,6 +133,7 @@ class ProfileFragment: Fragment() {
                         val post = Post(postId, username, caption, imgUrl, pfpUrl, latitude, longitude, timestamp)
                         postList.add(post)
                     }
+                    //sort newest on top
                     postList.sortByDescending { it.timestamp }
                     adapter.updatePosts(postList)
                     numPostsText.text = postList.size.toString()

@@ -197,7 +197,8 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
                         .addOnSuccessListener { url ->
                             val imageUrl = url.toString()
                             val captionText = caption.text.toString()
-                            val location = LatLng(lastLocation.latitude, lastLocation.longitude)
+                            val latitude = lastLocation.latitude
+                            val longitude = lastLocation.longitude
                             //get username and stuff
                             db.collection("users")
                                 .document(currentUser.uid)
@@ -215,7 +216,8 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
                                             "caption" to captionText,
                                             "pfp_url" to pfpUrl,
                                             "img_url" to imageUrl,
-                                            "location" to location,
+                                            "latitude" to latitude,
+                                            "longitude" to longitude,
                                             "timestamp" to timestamp,
                                             "public" to isPublicPost,
                                             "song_url" to songUrl

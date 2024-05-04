@@ -14,6 +14,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.type.LatLng
 import com.squareup.picasso.Picasso
 import java.util.concurrent.TimeUnit
 
@@ -125,6 +126,7 @@ class IndividualPostFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val currPost: Post? = arguments?.getParcelable("post")
         if (currPost != null) {
+            val location = com.google.android.gms.maps.model.LatLng(post.latitude, post.longitude)
             postId = currPost.id
             post = currPost
             usernameTV.text = post.username

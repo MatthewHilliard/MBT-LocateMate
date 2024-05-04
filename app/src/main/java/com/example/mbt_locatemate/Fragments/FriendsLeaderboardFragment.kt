@@ -33,6 +33,7 @@ class FriendsLeaderboardFragment : Fragment() {
         super.onCreate(savedInstanceState)
         arguments?.let { bundle ->
             val friends = bundle.getParcelableArrayList<Friend>("friendsList")
+
             friends?.let { friendList ->
                 val db = FirebaseFirestore.getInstance()
                 var fetchCount = 0

@@ -411,8 +411,9 @@ class FriendsFragment : Fragment() {
         fun onDataReady(friendsList: MutableList<Friend>)
         fun onError(error: Exception)
     }
-    fun fetchLeaderboardList(userId: String, listener: DataReadyListener) {
+    private fun fetchLeaderboardList(userId: String, listener: DataReadyListener) {
         val friendsList = mutableListOf<Friend>()
+        Log.d("FriendsFragment", "called fetch leaderboard list")
 
         db.collection("users").document(userId).get()
             .addOnSuccessListener { userDocument ->
@@ -423,6 +424,7 @@ class FriendsFragment : Fragment() {
 
                 val currentUser = Friend(id, username, pfpUrl)
                 friendsList.add(currentUser)
+                Log.d("FriendsFragment", "added user to list")
 
                 // fetch friends
                 fetchFriends(userId, friendsList, listener)
@@ -433,36 +435,32 @@ class FriendsFragment : Fragment() {
     }
 
     private fun fetchFriends(userId: String, friendsList: MutableList<Friend>, listener: DataReadyListener) {
-        db.collection("users").document(userId).collection("friends").get()
+        Log.d("FriendsFragment", "Called fetching friends list for user ID=$userId")
+        // Access the friends document first
+        db.collection("friends").document(userId).collection("friend_usernames").get()
             .addOnSuccessListener { friendsSnapshot ->
                 val count = friendsSnapshot.documents.size
                 if (count == 0) {
-                    listener.onDataReady(friendsList)
+                    listener.onDataReady(friendsList) // If there are no friends, return the empty list
                 }
 
                 var processedCount = 0
-                for (friendRef in friendsSnapshot.documents) {
-                    val friendId = friendRef.id
-                    db.collection("users").document(friendId).get()
+                for (friendDocument in friendsSnapshot.documents) {
+                    // Assume each document contains the friend's userID and possibly other data
+                    val friendUsername = friendDocument.id  // The ID of the friend document
+                    db.collection("users").document(friendUsername).get()
                         .addOnSuccessListener { friendDoc ->
-                            val friendId = friendDoc.id
-                            val friendUsername = friendDoc.getString("username") ?: "Unknown"
+                            val friendId = friendDoc.getString("id") ?: "Unknown"
                             val friendPfpUrl = friendDoc.getString("pfpUrl") ?: ""
-
                             friendsList.add(Friend(friendId, friendUsername, friendPfpUrl))
+                            Log.d("FriendsFragment", "Added friend: ID=$friendId, Username=$friendUsername")
 
                             processedCount++
                             if (processedCount == count) {
-                                listener.onDataReady(friendsList)  //only call once all friends have been added
+                                listener.onDataReady(friendsList) // Call listener once all friends have been processed
                             }
                         }
-                        .addOnFailureListener { e ->
-                            Log.e("FriendsFragment", "Error fetching friend details", e)
-                        }
                 }
-            }
-            .addOnFailureListener { e ->
-                Log.e("FriendsFragment", "Error fetching friends list", e)
             }
     }
 

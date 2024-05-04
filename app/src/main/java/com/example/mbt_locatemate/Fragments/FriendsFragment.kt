@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -29,7 +30,7 @@ class FriendsFragment : Fragment() {
     private lateinit var searchText: String
 
     private lateinit var leaderboardButton: ImageView
-
+  
     private var onFriends = true
     private var onRequest = false
     private var onAdd = false

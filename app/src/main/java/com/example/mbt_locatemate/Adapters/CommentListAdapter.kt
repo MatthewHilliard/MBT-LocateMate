@@ -8,6 +8,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
 class CommentListAdapter(private var comments: List<Comment>) : RecyclerView.Adapter<CommentListAdapter.ViewHolder>() {
@@ -36,11 +40,15 @@ class CommentListAdapter(private var comments: List<Comment>) : RecyclerView.Ada
         private val commentText: TextView = itemView.findViewById(R.id.comment_text)
         private val commentTime: TextView = itemView.findViewById(R.id.time_ago)
         fun bind(comment: Comment) {
-            Log.d("CommentBind", comment.toString())
-            commentUser.text = comment.username
-            Picasso.get().load(comment.pfpUrl).into(pfpImage)
-            commentText.text = comment.text
-            commentTime.text = calculateCommentTime(comment.timestamp)
+            CoroutineScope(Dispatchers.IO).launch {
+                withContext(Dispatchers.Main) {
+                    Log.d("CommentBind", comment.toString())
+                    commentUser.text = comment.username
+                    Picasso.get().load(comment.pfpUrl).into(pfpImage)
+                    commentText.text = comment.text
+                    commentTime.text = calculateCommentTime(comment.timestamp)
+                }
+            }
         }
 
         private fun calculateCommentTime(timestamp: Long): String {

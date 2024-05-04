@@ -17,6 +17,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 class ProfileFragment: Fragment() {
@@ -65,12 +68,14 @@ class ProfileFragment: Fragment() {
         val usernameText = view.findViewById<TextView>(R.id.txtUsername)
         val pfpImage = view.findViewById<ImageView>(R.id.imgProfile)
         if (user != null) {
+            CoroutineScope(Dispatchers.IO).launch {
             db.collection("users").document(user.uid).get().addOnSuccessListener { document ->
                 username = document.getString("username")
                 val pfpUrl = document.getString("pfp_url")
                 usernameText.text = username
                 Picasso.get().load(pfpUrl).into(pfpImage)
                 loadUserPosts()
+                }
             }
 
             db.collection("users").document(user.uid).collection("guesses").get().addOnSuccessListener { documents ->
@@ -109,7 +114,7 @@ class ProfileFragment: Fragment() {
                         val latitude = document.getDouble("latitude") ?: 0.0
                         val longitude = document.getDouble("longitude") ?: 0.0
                         val timestamp = document.getLong("timestamp") ?: 0
-                        val post = Post(postId, username, caption, imgUrl, pfpUrl, LatLng(latitude, longitude), timestamp)
+                        val post = Post(postId, username, caption, imgUrl, pfpUrl, latitude, longitude, timestamp)
                         postList.add(post)
                     }
                     postList.sortByDescending { it.timestamp }

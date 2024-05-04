@@ -10,6 +10,8 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,12 +21,16 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 class ExploreFragment: Fragment() {
     private lateinit var layoutManager: RecyclerView.LayoutManager
     private lateinit var adapter: PostListAdapter
     private lateinit var postRecyclerView: RecyclerView
+    private lateinit var notification: ImageView
 
     private lateinit var auth: FirebaseAuth
     private val db = Firebase.firestore
@@ -34,6 +40,7 @@ class ExploreFragment: Fragment() {
     private lateinit var explorePostsButton: Button
 
     private lateinit var friendsButton: ImageView
+    private var friendRequestsCount = 0
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -63,7 +70,9 @@ class ExploreFragment: Fragment() {
             }
 
             onLeaderboardClickListener = { post ->
-                navigateToPostLeaderboardFragment(post)
+                CoroutineScope(Dispatchers.IO).launch {
+                    navigateToPostLeaderboardFragment(post)
+                }
             }
         }
         postRecyclerView.adapter = adapter
@@ -82,29 +91,59 @@ class ExploreFragment: Fragment() {
             if (isChecked) {
                 when (checkedId) {
                     R.id.friendsButton -> {
-                        loadFriendPosts()
-                        postRecyclerView.smoothScrollToPosition(0)
-                        friendPostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_secondaryContainer))
-                        explorePostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_surface))
+                        CoroutineScope(Dispatchers.IO).launch {
+                            loadFriendPosts()
+                            postRecyclerView.smoothScrollToPosition(0)
+                            friendPostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_secondaryContainer))
+                            explorePostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_surface))
+                        }
                     }
                     R.id.exploreButton -> {
-                        loadPublicPosts()
-                        postRecyclerView.smoothScrollToPosition(0)
-                        explorePostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_secondaryContainer))
-                        friendPostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_surface))
+                        CoroutineScope(Dispatchers.IO).launch {
+                            loadPublicPosts()
+                            postRecyclerView.smoothScrollToPosition(0)
+                            explorePostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_secondaryContainer))
+                            friendPostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_surface))
+                        }
                     }
                 }
             }
         }
 
+        notification = view.findViewById(R.id.notification)
+        CoroutineScope(Dispatchers.IO).launch {
+            loadFriendRequestsCount()
+        }
+
         segmentedButton.check(R.id.friendsButton)
         return view
+    }
+    private fun loadFriendRequestsCount() {
+        val userId = auth.currentUser?.uid
+        if (userId != null) {
+            db.collection("friends").document(userId)
+                .collection("incoming_requests")
+                .get()
+                .addOnSuccessListener { snapshot ->
+                    friendRequestsCount = snapshot.size()
+                    if (friendRequestsCount > 0) {
+                        //have pending friend requests
+                        notification.visibility = View.VISIBLE
+                    } else {
+                        //do not have pending friend requests
+                        notification.visibility = View.INVISIBLE
+                    }
+                }
+                .addOnFailureListener { exception ->
+                }
+        }
     }
 
     private fun navigateToPostLeaderboardFragment(post: Post) {
         val leaderboardFragment = PostLeaderboardFragment.newInstance(post)
         parentFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, leaderboardFragment)
+            .addToBackStack(null)
             .commit()
     }
 
@@ -176,9 +215,8 @@ class ExploreFragment: Fragment() {
                                     val pfpUrl = document.getString("pfp_url") ?: ""
                                     val latitude = document.getDouble("latitude") ?: 0.0
                                     val longitude = document.getDouble("longitude") ?: 0.0
-                                    val location = LatLng(latitude, longitude)
                                     val timestamp = document.getLong("timestamp") ?: 0
-                                    val post = Post(postId, username, caption, imgUrl, pfpUrl, location, timestamp)
+                                    val post = Post(postId, username, caption, imgUrl, pfpUrl, latitude, longitude, timestamp)
                                     postList.add(post)
                                 }
                                 postList.sortByDescending { it.timestamp }
@@ -217,9 +255,8 @@ class ExploreFragment: Fragment() {
                             val pfpUrl = document.getString("pfp_url") ?: ""
                             val latitude = document.getDouble("latitude") ?: 0.0
                             val longitude = document.getDouble("longitude") ?: 0.0
-                            val location = LatLng(latitude, longitude)
                             val timestamp = document.getLong("timestamp") ?: 0
-                            val post = Post(postId, username, caption, imgUrl, pfpUrl, location, timestamp)
+                            val post = Post(postId, username, caption, imgUrl, pfpUrl, latitude, longitude, timestamp)
                             if (username != userUsername && username !in userFriends) {
                                 postList.add(post)
                             }

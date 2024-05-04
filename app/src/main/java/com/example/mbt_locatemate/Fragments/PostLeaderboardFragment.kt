@@ -11,6 +11,9 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class PostLeaderboardFragment : Fragment() {
 
@@ -41,13 +44,13 @@ class PostLeaderboardFragment : Fragment() {
         recyclerView.adapter = adapter
 
         //postId?.let { loadLeaderboard(it) }
-        loadLeaderboard(postId)
+        CoroutineScope(Dispatchers.IO).launch {
+            loadLeaderboard(postId)
+        }
 
         val backButton = view.findViewById<ImageView>(R.id.leaderboardBackButton)
-        backButton.setOnClickListener(){
-            val exploreFragment = ExploreFragment()
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, exploreFragment).commit()
+        backButton.setOnClickListener{
+            parentFragmentManager.popBackStack()
         }
 
         return view

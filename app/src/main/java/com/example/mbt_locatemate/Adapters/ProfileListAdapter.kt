@@ -9,6 +9,10 @@ import android.widget.TextView
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ProfilePostListAdapter(
     private var posts: List<Post>,
@@ -44,13 +48,16 @@ class ProfilePostListAdapter(
                     val postId = posts[position].id
                     Log.d("OnClick", "post $postId clicked!!")
                     onItemClick(posts[position])
-
                 }
             }
         }
         fun bind(post: Post) {
-            Picasso.get().load(post.imgUrl).into(postImage)
-            postCaption.text = post.caption
+            CoroutineScope(Dispatchers.IO).launch {
+                withContext(Dispatchers.Main) {
+                    Picasso.get().load(post.imgUrl).into(postImage)
+                    postCaption.text = post.caption
+                }
+            }
         }
     }
 }

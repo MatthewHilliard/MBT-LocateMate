@@ -6,7 +6,9 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.location.Location
+import android.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -23,6 +25,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -39,6 +42,7 @@ import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.storage
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -67,29 +71,25 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
     private var isPublicPost = false
     private lateinit var addSongButton: Button
     private var songUrl = ""
-//    val locationRequest = LocationRequest.create().apply {
-//        priority = Priority.PRIORITY_HIGH_ACCURACY
-//        interval = 10000 // 10 seconds
-//        fastestInterval = 5000 // 5 seconds
-//    }
-//    val locationCallback = object : LocationCallback() {
-//        override fun onLocationResult(locationResult: LocationResult) {
-//            locationResult ?: return
-//            for (location in locationResult.locations) {
-//                // Handle received location
-//                val currentLatLong = LatLng(location.latitude, location.longitude)
-//                placeMarker(currentLatLong)
-//            }
-//        }
-//    }
+
 
     val resultContract = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
-            val capturedImage = BitmapFactory.decodeFile(output!!.absolutePath)
+            val exif = ExifInterface(output!!.absolutePath)
+            val orientation = exif.getAttributeInt(
+                ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_UNDEFINED
+            )
+            val bitmap = BitmapFactory.decodeFile(output!!.absolutePath)
+            val matrix = Matrix()
+            when (orientation) {
+                ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
+                ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)
+                ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
+            }
+            val capturedImage = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
             image.setImageBitmap(capturedImage)
-//            val bitmap = result.data?.extras?.get("data") as Bitmap
             imageBitmap = capturedImage
-//            image.setImageBitmap(bitmap)
         }
     }
     companion object {
@@ -101,6 +101,10 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_post_create, container, false)
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
+        mapFragment?.getMapAsync(this)
+        mapFragment?.onCreate(savedInstanceState)
+
         auth = Firebase.auth
         storage = Firebase.storage
         //open camera to take a photo
@@ -110,7 +114,7 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
         takePic.setOnClickListener {
             GlobalScope.launch(Dispatchers.IO) {
                 val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                val dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
+                val dir = context?.getExternalFilesDir(Environment.DIRECTORY_DCIM)
                 imageName = UUID.randomUUID().toString() + ".jpeg"
                 val currOutput = File(dir, imageName)
                 output = currOutput
@@ -134,15 +138,17 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
         }
         val post = view.findViewById<ImageView>(R.id.postButton)
         post.setOnClickListener {
-            savePost()
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    savePost()
+                } catch (e: Exception) {
+                }
+            }
             val exploreFragment = ExploreFragment()
             parentFragmentManager.beginTransaction().replace(R.id.fragment_container, exploreFragment).commit()
             (activity as MainActivity).bottomNavBar.selectedItemId =
                 R.id.exploreTab
         }
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
-        mapFragment?.getMapAsync(this)
-        mapFragment?.onCreate(savedInstanceState)
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext())
 
@@ -191,7 +197,8 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
                         .addOnSuccessListener { url ->
                             val imageUrl = url.toString()
                             val captionText = caption.text.toString()
-                            val location = LatLng(lastLocation.latitude, lastLocation.longitude)
+                            val latitude = lastLocation.latitude
+                            val longitude = lastLocation.longitude
                             //get username and stuff
                             db.collection("users")
                                 .document(currentUser.uid)
@@ -209,7 +216,8 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
                                             "caption" to captionText,
                                             "pfp_url" to pfpUrl,
                                             "img_url" to imageUrl,
-                                            "location" to location,
+                                            "latitude" to latitude,
+                                            "longitude" to longitude,
                                             "timestamp" to timestamp,
                                             "public" to isPublicPost,
                                             "song_url" to songUrl

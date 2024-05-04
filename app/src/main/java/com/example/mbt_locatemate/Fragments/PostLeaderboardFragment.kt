@@ -45,9 +45,10 @@ class PostLeaderboardFragment : Fragment() {
 
         val backButton = view.findViewById<ImageView>(R.id.leaderboardBackButton)
         backButton.setOnClickListener(){
-            val exploreFragment = ExploreFragment()
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, exploreFragment).commit()
+//            val exploreFragment = ExploreFragment()
+//            parentFragmentManager.beginTransaction()
+//                .replace(R.id.fragment_container, exploreFragment).commit()
+            parentFragmentManager.popBackStack()
         }
 
         return view

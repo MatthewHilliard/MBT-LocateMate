@@ -105,6 +105,7 @@ class IndividualPostFragment: Fragment() {
             val leaderboardFragment = PostLeaderboardFragment.newInstance(post)
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, leaderboardFragment)
+                .addToBackStack(null)
                 .commit()
         }
 

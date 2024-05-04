@@ -8,5 +8,6 @@ import kotlinx.parcelize.Parcelize
 data class Friend (
     val id:String,
     val username:String,
-    val pfpUrl:String
+    val pfpUrl:String,
+    val rank: Int
 ) :Parcelable

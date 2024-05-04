@@ -72,6 +72,16 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
     private lateinit var addSongButton: Button
     private var songUrl = ""
 
+    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+        if (isGranted) {
+            Log.d("LocationPermissions", "permission granted, setting up map")
+            setUpMap()
+        } else {
+            val exploreFragment = ExploreFragment()
+            parentFragmentManager.beginTransaction().replace(R.id.fragment_container, exploreFragment).commit()
+            (activity as MainActivity).bottomNavBar.selectedItemId =
+                R.id.exploreTab        }
+    }
 
     val resultContract = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
@@ -246,7 +256,7 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
         if (hasLocationPermission()) {
             setUpMap()
         } else {
-            requestLocationPermissions()
+            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
     }
 
@@ -259,34 +269,6 @@ class CreatePostFragment: Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClic
             Manifest.permission.ACCESS_COARSE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
     }
-
-    private fun requestLocationPermissions() {
-        ActivityCompat.requestPermissions(
-            requireActivity(),
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ),
-            LOCATION_REQUEST_CODE
-        )
-        Log.d("Location Permission", "permissions requested, reloading fragment")
-        val createPostFragment = CreatePostFragment()
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, createPostFragment).commit()
-    }
-
-//    override fun onRequestPermissionsResult(
-//        requestCode: Int,
-//        permissions: Array<out String>,
-//        grantResults: IntArray
-//    ) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-//        if (requestCode == LOCATION_REQUEST_CODE) {
-//            if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
-//                setUpMap()
-//            }
-//        }
-//    }
 
     private fun setUpMap() {
         if (ActivityCompat.checkSelfPermission(

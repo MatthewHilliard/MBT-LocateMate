@@ -29,7 +29,6 @@ class FriendsFragment : Fragment() {
     private lateinit var searchText: String
 
     private lateinit var leaderboardButton: ImageView
-    private var friendList: MutableList<Friend>? = null
 
     private var onFriends = true
     private var onRequest = false
@@ -188,18 +187,19 @@ class FriendsFragment : Fragment() {
                                 .whereIn("username", friendUsernames)
                                 .get()
                                 .addOnSuccessListener { documents ->
-                                    //friendList = mutableListOf<Friend>()
+                                    val friendList = mutableListOf<Friend>()
                                     for (document in documents) {
                                         val id = document.getString("id") ?: ""
                                         val username = document.getString("username") ?: ""
                                         val pfpUrl = document.getString("pfp_url") ?: ""
                                         val friend = Friend(id, username, pfpUrl)
-                                        friendList?.add(friend)
+                                        friendList.add(friend)
                                     }
-                                    adapter.updateFriends(friendList ?: mutableListOf())
+                                    adapter.updateFriends(friendList)
                                 }
                         } else {
-                            adapter.updateFriends(friendList ?: mutableListOf())
+                            val friendList = mutableListOf<Friend>()
+                            adapter.updateFriends(friendList)
                         }
                     }
             } else {

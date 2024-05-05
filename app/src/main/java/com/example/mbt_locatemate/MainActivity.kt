@@ -48,10 +48,11 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         val currentUser = auth.currentUser
-        if (currentUser == null) run {
+        if (currentUser == null) {
             val loginFragment = LoginFragment()
             supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, loginFragment).commit()
+                .replace(R.id.fragment_container, loginFragment)
+                .commit()
         }
     }
 

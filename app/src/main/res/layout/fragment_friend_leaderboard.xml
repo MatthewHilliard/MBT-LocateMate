@@ -6,31 +6,31 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/md_theme_surface">
 
+
     <ImageView
         android:id="@+id/leaderboardBackButton"
-        android:layout_width="55dp"
-        android:layout_height="55dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_width="44dp"
+        android:layout_height="35dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:src="@drawable/baseline_arrow_back_ios_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
 
     <TextView
         android:id="@+id/leaderboardText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="45dp"
-        android:layout_marginTop="3dp"
-        android:layout_marginEnd="56dp"
+        android:layout_marginTop="4dp"
         android:fontFamily="@font/poppins"
+        android:padding="8dp"
         android:text="Leaderboard"
         android:textColor="@color/md_theme_onSurface"
-        android:textSize="50dp"
+        android:textSize="35dp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/leaderboardBackButton"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView

@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mbt_locatemate.ExploreFragment
@@ -34,6 +35,12 @@ class FriendsLeaderboardFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
         adapter = LeaderboardListAdapter(mutableListOf())
         recyclerView.adapter = adapter
+        recyclerView.addItemDecoration(
+            DividerItemDecoration(
+                recyclerView.context,
+                DividerItemDecoration.VERTICAL
+            )
+        )
 
         if (currentUserId != null) {
             db.collection("friends").document(currentUserId)
@@ -147,10 +154,8 @@ class FriendsLeaderboardFragment : Fragment() {
         }
 
         val backButton = view.findViewById<ImageView>(R.id.leaderboardBackButton)
-        backButton.setOnClickListener() {
-            val exploreFragment = ExploreFragment()
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, exploreFragment).commit()
+        backButton.setOnClickListener {
+            parentFragmentManager.popBackStack()
         }
 
         return view

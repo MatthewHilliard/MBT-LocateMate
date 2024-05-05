@@ -84,16 +84,14 @@ class RegisterFragment : Fragment() {
                                                 db.collection("users").document(user.uid)
                                                     .set(userInfo)
                                                     .addOnSuccessListener {
-                                                        Log.d(ContentValues.TAG, "New user document added")
+                                                        db.collection("friends").document(user.uid)
+                                                            .set(mapOf("exists" to true))
                                                         (activity as MainActivity).showBottomNavBar(true)
                                                         (activity as MainActivity).bottomNavBar.selectedItemId =
                                                             R.id.exploreTab
                                                     }.addOnFailureListener { e ->
                                                         Log.e(ContentValues.TAG, "Error adding new user document", e)
                                                     }
-
-                                                db.collection("friends").document(user.uid)
-                                                    .set(mapOf("exists" to true))
                                             }
                                     }
                             }

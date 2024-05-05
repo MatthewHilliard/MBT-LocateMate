@@ -70,9 +70,18 @@ class LoginFragment: Fragment() {
     }
 
     private suspend fun loginUser(view: View) {
-        val result = oneTapClient?.beginSignIn(signInRequest)?.await()
-        val intentSenderRequest = IntentSenderRequest.Builder(result!!.pendingIntent).build()
-        activityResultLauncher.launch(intentSenderRequest)
+        try {
+            val result = oneTapClient?.beginSignIn(signInRequest)?.await()
+            val intentSenderRequest = IntentSenderRequest.Builder(result!!.pendingIntent).build()
+            activityResultLauncher.launch(intentSenderRequest)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(
+                requireContext(),
+                "Login failed - try reinstalling app",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     private val activityResultLauncher: ActivityResultLauncher<IntentSenderRequest> =
@@ -117,6 +126,7 @@ class LoginFragment: Fragment() {
             val querySnapshot = db.collection("users").whereEqualTo("id", uid).get().await()
             !querySnapshot.isEmpty
         } catch (e: Exception) {
+            e.printStackTrace()
             false
         }
     }

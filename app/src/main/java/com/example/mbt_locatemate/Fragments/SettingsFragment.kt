@@ -126,6 +126,7 @@ class SettingsFragment : Fragment() {
                             if (user !== null) {
                                 updatePostUsernames(prevUsername, usernameInput.text.toString())
                                 updateFriendUsernames(prevUsername, usernameInput.text.toString())
+                                updateCommentGuessUsernames(prevUsername, usernameInput.text.toString())
 
                                 db.collection("users")
                                     .document(user.uid)
@@ -153,6 +154,7 @@ class SettingsFragment : Fragment() {
         ) ?: ExifInterface.ORIENTATION_UNDEFINED
     }
 
+    //Rotated posts to be vertical as sometimes they were incorrectly horizontal
     private fun rotateBitmap(uri: Uri, orientation: Int): Bitmap {
         val inputStream = context?.contentResolver?.openInputStream(uri)
         val bitmap = BitmapFactory.decodeStream(inputStream)
@@ -165,6 +167,7 @@ class SettingsFragment : Fragment() {
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
     }
 
+    //update your username for all of your posts
     private fun updatePostUsernames(prevUsername: String, newUsername: String){
         val user = auth.currentUser
         if(user != null){
@@ -176,7 +179,6 @@ class SettingsFragment : Fragment() {
                         querySnapshot.documents.forEach { postDoc ->
                             val postRef = db.collection("posts").document(postDoc.id)
                             batch.update(postRef, "username", newUsername)
-                            Log.d("SettingsFragment", "We are here")
                         }
 
                         batch.commit()
@@ -222,6 +224,44 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    private fun updateCommentGuessUsernames(prevUsername: String, newUsername: String){
+        val user = auth.currentUser
+        if (user != null) {
+            db.collection("posts").get().addOnSuccessListener { posts ->
+                for(post in posts){
+                    val postId = post.id
+
+                    db.collection("posts").document(postId)
+                        .collection("comments")
+                        .whereEqualTo("username", prevUsername)
+                        .get().addOnSuccessListener { comments ->
+                        val batch = db.batch()
+                        comments.documents.forEach { comment ->
+                            val commentRef = db.collection("posts").document(postId).collection("comments").document(comment.id)
+                            batch.update(commentRef, "username", newUsername)
+                        }
+
+                        batch.commit()
+                    }
+
+                    db.collection("posts").document(postId)
+                        .collection("guesses")
+                        .whereEqualTo("user", prevUsername)
+                        .get().addOnSuccessListener { guesses ->
+                            val batch = db.batch()
+                            guesses.documents.forEach { guess ->
+                                val guessRef = db.collection("posts").document(postId).collection("guesses").document(guess.id)
+                                batch.update(guessRef, "user", newUsername)
+                            }
+
+                            batch.commit()
+                    }
+                }
+            }
+        }
+    }
+
+    //check if username is already being used
     private suspend fun checkIfUsernameExists(username: String): Boolean {
         return try {
             val querySnapshot = db.collection("users").whereEqualTo("username", username).get().await()

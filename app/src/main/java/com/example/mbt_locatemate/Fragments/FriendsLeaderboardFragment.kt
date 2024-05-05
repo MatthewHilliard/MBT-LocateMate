@@ -147,10 +147,8 @@ class FriendsLeaderboardFragment : Fragment() {
         }
 
         val backButton = view.findViewById<ImageView>(R.id.leaderboardBackButton)
-        backButton.setOnClickListener() {
-            val exploreFragment = ExploreFragment()
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, exploreFragment).commit()
+        backButton.setOnClickListener {
+            parentFragmentManager.popBackStack()
         }
 
         return view

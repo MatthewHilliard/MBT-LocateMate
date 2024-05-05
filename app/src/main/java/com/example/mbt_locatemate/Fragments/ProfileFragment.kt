@@ -104,6 +104,7 @@ class ProfileFragment: Fragment() {
                 }
                 parentFragmentManager.beginTransaction()
                     .replace(R.id.fragment_container, friendsLeaderboardFragment)
+                    .addToBackStack(null)
                     .commit()
                         }
         }

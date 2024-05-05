@@ -1,5 +1,6 @@
 package com.example.mbt_locatemate
 
+import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
@@ -61,7 +62,7 @@ class ExploreFragment: Fragment() {
                 DividerItemDecoration.VERTICAL
             )
         )
-
+        sharedPreferences = requireActivity().getSharedPreferences("RecyclerViewPosition", MODE_PRIVATE)
 
         layoutManager = LinearLayoutManager(requireContext())
         postRecyclerView.layoutManager = layoutManager
@@ -107,6 +108,7 @@ class ExploreFragment: Fragment() {
                             postRecyclerView.smoothScrollToPosition(0)
                             friendPostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_secondaryContainer))
                             explorePostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_surface))
+                            //loadPosition()
                     }
                     R.id.exploreButton -> {
                             isExplore = true
@@ -114,9 +116,20 @@ class ExploreFragment: Fragment() {
                             postRecyclerView.smoothScrollToPosition(0)
                             explorePostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_secondaryContainer))
                             friendPostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_surface))
+                            //loadPosition()
                     }
                 }
             }
+        }
+
+        if (isExplore) {
+            savedPosition = sharedPreferences.getInt("explorePosition", 0)
+            postRecyclerView.scrollToPosition(savedPosition)
+            Log.d("Position", "scrolled to position $savedPosition")
+        } else {
+            savedPosition = sharedPreferences.getInt("friendsPosition", 0)
+            postRecyclerView.scrollToPosition(savedPosition)
+            Log.d("Position", "scrolled to position $savedPosition")
         }
         //if a friend request is pending, show a red dot on friends icon
         notification = view.findViewById(R.id.notification)
@@ -124,23 +137,12 @@ class ExploreFragment: Fragment() {
 
         segmentedButton.check(R.id.friendsButton)
 
-        sharedPreferences = requireActivity().getSharedPreferences("RecyclerViewPosition", MODE_PRIVATE)
-        loadPosition()
         return view
     }
 
     private fun loadPosition() {
         postRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        if (isExplore) {
-            savedPosition = sharedPreferences.getInt("explorePosition", 0)
-            Log.d("Position", "loading position $savedPosition")
-            postRecyclerView.smoothScrollToPosition(savedPosition)
-        } else {
-            savedPosition = sharedPreferences.getInt("friendsPosition", 0)
-            Log.d("Position", "loading position $savedPosition")
-            postRecyclerView.smoothScrollToPosition(savedPosition)
-        }
     }
 
     override fun onDestroyView() {
@@ -159,12 +161,6 @@ class ExploreFragment: Fragment() {
             editor.apply()
         }
     }
-
-    //    override fun onPause() {
-//        super.onPause()
-//        // Save the current position of the RecyclerView when navigating away
-//        savedPosition = (postRecyclerView.layoutManager as LinearLayoutManager?)?.findFirstVisibleItemPosition() ?: RecyclerView.NO_POSITION
-//    }
 
     //check for any incoming requests and set the visibility of the dot
     private fun loadFriendRequestsCount() {

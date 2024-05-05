@@ -10,7 +10,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="1"
-        android:textStyle="bold"
         android:textColor="@color/md_theme_onSurface"
         android:textSize="16sp"
         app:layout_constraintVertical_bias="0.5"
@@ -22,6 +21,7 @@
         android:id="@+id/pfp_leaderboard"
         android:layout_width="40dp"
         android:layout_height="40dp"
+        android:scaleType="centerCrop"
         android:src="@drawable/vacation_test"
         app:shapeAppearanceOverlay="@style/roundedImageView"
         app:layout_constraintStart_toEndOf="@+id/leaderboardRank"
@@ -50,7 +50,6 @@
         android:layout_marginEnd="40dp"
         android:text="4021.48 km"
         android:textSize="16sp"
-        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

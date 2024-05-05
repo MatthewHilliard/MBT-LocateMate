@@ -53,7 +53,7 @@ class GuessListAdapter(private var guesses: List<Guess>) : RecyclerView.Adapter<
         }
 
         if (guess.isCurrentUser) {
-            holder.itemView.setBackgroundColor(Color.parseColor("#409440D3"))
+            holder.itemView.setBackgroundResource(R.color.md_theme_surfaceContainerHigh)
         } else {
             holder.itemView.setBackgroundColor(Color.TRANSPARENT)
         }

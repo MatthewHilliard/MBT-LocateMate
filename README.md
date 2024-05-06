@@ -31,7 +31,7 @@ To get a local copy up and running follow these simple steps.
    git clone https://github.com/MatthewHilliard/MBT-LocateMate.git
    ```
    
-2. Follow steps 1-3 of option 1 from [Firebase](https://firebase.google.com/docs/android/setup) to setup the Firebase project, ensuring to add your local SHA key within Android Studio to Firebase. Also ensure to replace the google-services.json within the app folder of the local project.
+3. Follow steps 1-3 of option 1 from [Firebase](https://firebase.google.com/docs/android/setup) to setup the Firebase project, ensuring to add your local SHA key within Android Studio to Firebase. Also ensure to replace the google-services.json within the app folder of the local project.
    
 4. Follow the Creating API Keys step for [Google Cloud Console](https://developers.google.com/maps/documentation/android-sdk/get-api-key) and copy paste your Google API Key into the AndroidManifest.xml here:
    ```sh
@@ -40,7 +40,7 @@ To get a local copy up and running follow these simple steps.
    android:value="PUT YOUR API KEY HERE"/>
    ```
    
-5. Follow steps to onbtain a Jamendo API key [here](https://developer.jamendo.com/v3.0) and copy paste your Jamendo API Key into the Constants file within the Jamendo API folder:
+5. Follow steps to obtain a Jamendo API key [here](https://developer.jamendo.com/v3.0) and copy paste your Jamendo API Key into the Constants file within the Jamendo API folder:
    ```sh
    class Constants {
     companion object{
@@ -57,14 +57,7 @@ Run the app within an Android Studio emulator or with a device connected via USB
 ## Authors
 
 Brinja Vogler (bvogler@bu.edu)
+
 Matthew Hilliard (mch2003@bu.edu)
+
 Ting Liu (tinglliu@gmail.com)
-
-## Acknowledgments
-
-Inspiration, code snippets, etc.
-* [awesome-readme](https://github.com/matiassingers/awesome-readme)
-* [PurpleBooth](https://gist.github.com/PurpleBooth/109311bb0361f32d87a2)
-* [dbader](https://github.com/dbader/readme-template)
-* [zenorocha](https://gist.github.com/zenorocha/4526327)
-* [fvcproductions](https://gist.github.com/fvcproductions/1bfc2d4aecb01a834b46)

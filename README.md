@@ -1,10 +1,10 @@
-# Project Title
+# LocateMate
 
-Simple overview of use/purpose.
+LocateMate is a social media application centered around a location-based guessing game, enabling users to share adventures through photo uploads and location guessing. 
 
 ## Description
 
-An in-depth paragraph about your project and overview of use.
+When creating a post, the user is able to take a photo, get their location pinned, and add a song choice. Once posted, friends are free to comment and guess on their post. Friends' guesses on each others posts are displayed in a Post Leaderboard, where the closest guess is ranked number 1. Once a user guesses on any post, their average guess is calculated and displayed in a Friend Leaderboard, where all of a user's friends (including them) are ranked by the average of every guess they have made. This adds a game-like effect to the application.
 
 ## Getting Started
 
@@ -35,22 +35,9 @@ command to run if program contains helper info
 
 ## Authors
 
-Contributors names and contact info
-
-ex. Dominique Pizzie  
-ex. [@DomPizzie](https://twitter.com/dompizzie)
-
-## Version History
-
-* 0.2
-    * Various bug fixes and optimizations
-    * See [commit change]() or See [release history]()
-* 0.1
-    * Initial Release
-
-## License
-
-This project is licensed under the [NAME HERE] License - see the LICENSE.md file for details
+Brinja Vogler (bvogler@bu.edu)
+Matthew Hilliard (mch2003@bu.edu)
+Ting Liu (tinglliu@gmail.com)
 
 ## Acknowledgments
 

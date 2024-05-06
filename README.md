@@ -22,7 +22,7 @@ To get a local copy up and running follow these simple steps.
 ### Installing
 
 1. Clone the repo
-SSH - 
+   SSH - 
    ```sh
    git clone git@github.com:MatthewHilliard/MBT-LocateMate.git
    ```
@@ -30,14 +30,17 @@ SSH -
    ```sh
    git clone https://github.com/MatthewHilliard/MBT-LocateMate.git
    ```
+   
 2. Follow steps 1-3 of option 1 from [Firebase](https://firebase.google.com/docs/android/setup) to setup the Firebase project, ensuring to add your local SHA key within Android Studio to Firebase. Also ensure to replace the google-services.json within the app folder of the local project.
-3. Follow the Creating API Keys step for [Google Cloud Console](https://developers.google.com/maps/documentation/android-sdk/get-api-key) and copy paste your Google API Key into the AndroidManifest.xml here:
+   
+4. Follow the Creating API Keys step for [Google Cloud Console](https://developers.google.com/maps/documentation/android-sdk/get-api-key) and copy paste your Google API Key into the AndroidManifest.xml here:
    ```sh
    <meta-data
    android:name="com.google.android.geo.API_KEY"
    android:value="PUT YOUR API KEY HERE"/>
    ```
-4. Follow steps to onbtain a Jamendo API key [here](https://developer.jamendo.com/v3.0) and copy paste your Jamendo API Key into the Constants file within the Jamendo API folder:
+   
+5. Follow steps to onbtain a Jamendo API key [here](https://developer.jamendo.com/v3.0) and copy paste your Jamendo API Key into the Constants file within the Jamendo API folder:
    ```sh
    class Constants {
     companion object{
@@ -49,22 +52,7 @@ SSH -
 
 ### Executing program
 
-* How to run the program
-* Create a Firebase Project and follow these instructions:
-* 
-* Replace the Google API Key in the AndroidManifest.xml file with your own
-* replace the google-services.json file with your own
-* replace the JAMENDO_API_KEY in the Constants file with your own
-```
-code blocks for commands
-```
-
-## Help
-
-Any advise for common problems or issues.
-```
-command to run if program contains helper info
-```
+Run the app within an Android Studio emulator or with a device connected via USB
 
 ## Authors
 

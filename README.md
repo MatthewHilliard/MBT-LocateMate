@@ -26,7 +26,7 @@ SSH -
    ```sh
    git clone git@github.com:MatthewHilliard/MBT-LocateMate.git
    ```
-HTTPS - 
+   HTTPS - 
    ```sh
    git clone https://github.com/MatthewHilliard/MBT-LocateMate.git
    ```

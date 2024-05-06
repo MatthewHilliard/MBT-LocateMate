@@ -6,7 +6,11 @@ LocateMate is a social media application centered around a location-based guessi
 
 When creating a post, the user is able to take a photo, get their location pinned, and add a song choice. Once posted, friends are free to comment and guess on their post. Friends' guesses on each others posts are displayed in a Post Leaderboard, where the closest guess is ranked number 1. Once a user guesses on any post, their average guess is calculated and displayed in a Friend Leaderboard, where all of a user's friends (including them) are ranked by the average of every guess they have made. Users are able to view their post history and edit their captions.
 
+<!-- GETTING STARTED -->
 ## Getting Started
+
+This is an example of how you can set up the project locally.
+To get a local copy up and running follow these simple steps.
 
 ### Dependencies
 
@@ -17,8 +21,15 @@ When creating a post, the user is able to take a photo, get their location pinne
 
 ### Installing
 
-* How/where to download your program
-* Any modifications needed to be made to files/folders
+1. Clone the repo
+SSH - 
+   ```sh
+   git clone git@github.com:MatthewHilliard/MBT-LocateMate.git
+   ```
+HTTPS - 
+   ```sh
+   git clone https://github.com/MatthewHilliard/MBT-LocateMate.git
+   ```
 
 ### Executing program
 

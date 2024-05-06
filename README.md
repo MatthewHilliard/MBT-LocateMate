@@ -31,11 +31,20 @@ SSH -
    git clone https://github.com/MatthewHilliard/MBT-LocateMate.git
    ```
 2. Follow steps 1-3 of option 1 from [Firebase](https://firebase.google.com/docs/android/setup) to setup the Firebase project, ensuring to add your local SHA key within Android Studio to Firebase. Also ensure to replace the google-services.json within the app folder of the local project.
-3. Follow the Creating API Keys step for [Google Cloud Console](https://developers.google.com/maps/documentation/android-sdk/get-api-key) and copy paste your Google API Key into the AndroidManifest.xml here -
+3. Follow the Creating API Keys step for [Google Cloud Console](https://developers.google.com/maps/documentation/android-sdk/get-api-key) and copy paste your Google API Key into the AndroidManifest.xml here:
    ```sh
    <meta-data
    android:name="com.google.android.geo.API_KEY"
    android:value="PUT YOUR API KEY HERE"/>
+   ```
+4. Follow steps to onbtain a Jamendo API key (here)[https://developer.jamendo.com/v3.0] and copy paste your Jamendo API Key into the Constants file within the Jamendo API folder:
+   ```sh
+   class Constants {
+    companion object{
+        const val JAMENDO_KEY = "YOUR API KEY HERE"
+        const val BASE_URL = "https://api.jamendo.com/"
+       }
+   }
    ```
 
 ### Executing program

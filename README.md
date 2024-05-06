@@ -10,8 +10,10 @@ When creating a post, the user is able to take a photo, get their location pinne
 
 ### Dependencies
 
-* Describe any prerequisites, libraries, OS version, etc., needed before installing program.
-* ex. Windows 10
+* Android Studio
+* Firebase Project
+* Google API Key
+* Jamendo API Key
 
 ### Installing
 
@@ -21,7 +23,11 @@ When creating a post, the user is able to take a photo, get their location pinne
 ### Executing program
 
 * How to run the program
-* Step-by-step bullets
+* Create a Firebase Project and follow these instructions:
+* 
+* Replace the Google API Key in the AndroidManifest.xml file with your own
+* replace the google-services.json file with your own
+* replace the JAMENDO_API_KEY in the Constants file with your own
 ```
 code blocks for commands
 ```

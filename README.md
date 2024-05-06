@@ -37,7 +37,7 @@ SSH -
    android:name="com.google.android.geo.API_KEY"
    android:value="PUT YOUR API KEY HERE"/>
    ```
-4. Follow steps to onbtain a Jamendo API key (here)[https://developer.jamendo.com/v3.0] and copy paste your Jamendo API Key into the Constants file within the Jamendo API folder:
+4. Follow steps to onbtain a Jamendo API key [here](https://developer.jamendo.com/v3.0) and copy paste your Jamendo API Key into the Constants file within the Jamendo API folder:
    ```sh
    class Constants {
     companion object{

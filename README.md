@@ -5,16 +5,11 @@
     <img src="app/src/main/res/drawable/explore_logo.png" alt="Logo" width="80" height="80">
   </a>
 
-  <h3 align="center">Grub Gallery</h3>
+  <h3 align="center">LocateMate</h3>
 
   <p align="center">
-    Personalized dishes and recipes with the click of a button!
+    Share adventures, guess locations, and connect globally!
     <br />
-    <a href="https://www.youtube.com/watch?v=HiiPeKkUXfM" target= "_blank">View Demo</a>
-    ·
-    <a href="https://github.com/MatthewHilliard/Grub-Gallery/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/MatthewHilliard/Grub-Gallery/issues">Request Feature</a>
   </p>
 </div>
 

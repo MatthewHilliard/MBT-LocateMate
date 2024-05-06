@@ -30,7 +30,7 @@ SSH -
    ```sh
    git clone https://github.com/MatthewHilliard/MBT-LocateMate.git
    ```
-2. Follow steps 1-3 from [Firebase](https://firebase.google.com/docs/android/setup) to setup the Firebase project, ensuring to add your local SHA key within Android Studio to Firebase
+2. Follow steps 1-3 for options 1 from [Firebase](https://firebase.google.com/docs/android/setup) to setup the Firebase project, ensuring to add your local SHA key within Android Studio to Firebase. Also ensure to replace the google-services.json within the app folder of the local project.
 
 ### Executing program
 

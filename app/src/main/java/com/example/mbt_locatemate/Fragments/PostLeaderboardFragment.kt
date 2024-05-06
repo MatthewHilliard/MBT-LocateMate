@@ -31,7 +31,6 @@ class PostLeaderboardFragment : Fragment() {
         if (postId == null) {
             Log.e("PostLeaderboardFragment", "Post ID is null")
         }
-        Toast.makeText(requireContext(), "Post ID: $postId", Toast.LENGTH_SHORT).show()
     }
 
     override fun onCreateView(

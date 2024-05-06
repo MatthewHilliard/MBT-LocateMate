@@ -1,5 +1,8 @@
 package com.example.mbt_locatemate
 
+import android.content.Context
+import android.content.Context.MODE_PRIVATE
+import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
@@ -25,12 +28,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.UUID
+import kotlin.properties.Delegates
 
 class ExploreFragment: Fragment() {
     private lateinit var layoutManager: RecyclerView.LayoutManager
     private lateinit var adapter: PostListAdapter
     private lateinit var postRecyclerView: RecyclerView
     private lateinit var notification: ImageView
+    private var savedPosition: Int = RecyclerView.NO_POSITION
+    private lateinit var sharedPreferences: SharedPreferences
 
     private lateinit var auth: FirebaseAuth
     private val db = Firebase.firestore
@@ -38,6 +44,7 @@ class ExploreFragment: Fragment() {
     private lateinit var segmentedButton: MaterialButtonToggleGroup
     private lateinit var friendPostsButton: Button
     private lateinit var explorePostsButton: Button
+    private var isExplore = false
 
     private lateinit var friendsButton: ImageView
     private var friendRequestsCount = 0
@@ -55,6 +62,7 @@ class ExploreFragment: Fragment() {
                 DividerItemDecoration.VERTICAL
             )
         )
+        sharedPreferences = requireActivity().getSharedPreferences("RecyclerViewPosition", MODE_PRIVATE)
 
         layoutManager = LinearLayoutManager(requireContext())
         postRecyclerView.layoutManager = layoutManager
@@ -77,6 +85,9 @@ class ExploreFragment: Fragment() {
         }
         postRecyclerView.adapter = adapter
 
+        //create shared preferences to save the recyclerview
+
+
         friendsButton = view.findViewById(R.id.friendsIcon)
         friendsButton.setOnClickListener(){
             val friendsFragment = FriendsFragment()
@@ -92,26 +103,63 @@ class ExploreFragment: Fragment() {
                 when (checkedId) {
                     //load the friend or public posts based on segmented button
                     R.id.friendsButton -> {
+                            isExplore = false
                             loadFriendPosts()
                             postRecyclerView.smoothScrollToPosition(0)
                             friendPostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_secondaryContainer))
                             explorePostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_surface))
+                            //loadPosition()
                     }
                     R.id.exploreButton -> {
+                            isExplore = true
                             loadPublicPosts()
                             postRecyclerView.smoothScrollToPosition(0)
                             explorePostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_secondaryContainer))
                             friendPostsButton.setBackgroundColor(resources.getColor(R.color.md_theme_surface))
+                            //loadPosition()
                     }
                 }
             }
+        }
+
+        if (isExplore) {
+            savedPosition = sharedPreferences.getInt("explorePosition", 0)
+            postRecyclerView.scrollToPosition(savedPosition)
+            Log.d("Position", "scrolled to position $savedPosition")
+        } else {
+            savedPosition = sharedPreferences.getInt("friendsPosition", 0)
+            postRecyclerView.scrollToPosition(savedPosition)
+            Log.d("Position", "scrolled to position $savedPosition")
         }
         //if a friend request is pending, show a red dot on friends icon
         notification = view.findViewById(R.id.notification)
         loadFriendRequestsCount()
 
         segmentedButton.check(R.id.friendsButton)
+
         return view
+    }
+
+    private fun loadPosition() {
+        postRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        savePosition()
+    }
+
+    private fun savePosition() {
+        savedPosition = (postRecyclerView.layoutManager as LinearLayoutManager?)?.findFirstVisibleItemPosition() ?: RecyclerView.NO_POSITION
+        val editor = sharedPreferences.edit()
+        if (isExplore) {
+            editor.putInt("explorePosition", savedPosition)
+            editor.apply()
+        } else {
+            editor.putInt("friendsPosition", savedPosition)
+            editor.apply()
+        }
     }
 
     //check for any incoming requests and set the visibility of the dot

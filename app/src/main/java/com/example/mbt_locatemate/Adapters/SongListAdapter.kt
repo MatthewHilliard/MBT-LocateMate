@@ -74,7 +74,9 @@ class SongListAdapter(private var songs: List<Result>, private val listener: Son
 
         fun bind(song: Result, isClicked: Boolean) {
             songTitle.text = song.name
-            Picasso.get().load(song.album_image).into(songImage)
+            if(song.album_image.isNotEmpty()){
+                Picasso.get().load(song.album_image).into(songImage)
+            }
             if (isClicked) {
                 itemView.setBackgroundResource(R.color.md_theme_surfaceContainerHigh)
             } else {

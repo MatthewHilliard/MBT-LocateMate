@@ -69,6 +69,7 @@ class LoginFragment: Fragment() {
         return view
     }
 
+    //sign in button was clicked, begin authentication
     private suspend fun loginUser(view: View) {
         try {
             val result = oneTapClient?.beginSignIn(signInRequest)?.await()
@@ -84,6 +85,7 @@ class LoginFragment: Fragment() {
         }
     }
 
+    //sign in and navigate to registration if new user, explore page if already a known user
     private val activityResultLauncher: ActivityResultLauncher<IntentSenderRequest> =
         registerForActivityResult(
             ActivityResultContracts.StartIntentSenderForResult()

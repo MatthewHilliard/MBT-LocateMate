@@ -36,6 +36,7 @@ class GuessListAdapter(private var guesses: List<Guess>) : RecyclerView.Adapter<
 
         Picasso.get().load(guess.pfpUrl).into(holder.pfpImage)
 
+        //load medal image view if in top 3 guesses
         when (guess.rank) {
             1 -> {
                 holder.medalImageView.setImageResource(R.drawable.ic_gold_medal)
@@ -52,6 +53,7 @@ class GuessListAdapter(private var guesses: List<Guess>) : RecyclerView.Adapter<
             else -> holder.medalImageView.visibility = View.GONE
         }
 
+        //highlight current user guess
         if (guess.isCurrentUser) {
             holder.itemView.setBackgroundResource(R.color.md_theme_surfaceContainerHigh)
         } else {

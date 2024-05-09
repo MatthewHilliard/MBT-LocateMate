@@ -103,6 +103,7 @@ class PostLeaderboardFragment : Fragment() {
             }
     }
 
+    //pass post information to leaderboard fragment
     companion object {
         const val ARG_POST = "post"
 

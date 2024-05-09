@@ -36,9 +36,11 @@ class LeaderboardListAdapter (private var friendsList: List<Leaderboard>) : Recy
         fun bind(leaderboard: Leaderboard) {
             rank.text = leaderboard.rank.toString()
             username.text = leaderboard.username
+            //display if user has no guesses
             if(leaderboard.average == -1.0){
                 score.text = "Has no guesses"
             } else{
+                //format guess numbers to have commas and two decimal places
                 val formatter = DecimalFormat("#,###.##")
                 val formattedNumber = formatter.format(leaderboard.average)
                 score.text = formattedNumber.toString() + " km"

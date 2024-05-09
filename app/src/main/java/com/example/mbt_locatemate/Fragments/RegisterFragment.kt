@@ -65,6 +65,12 @@ class RegisterFragment : Fragment() {
                             "Username already exists",
                             Toast.LENGTH_SHORT
                         ).show()
+                    } else if (usernameInput.text.toString().length > 16){
+                        Toast.makeText(
+                            requireContext(),
+                            "Please choose a username of 16 characters or less",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     } else {
                         val user = auth.currentUser
                         if (user !== null) {

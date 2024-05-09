@@ -107,6 +107,7 @@ class SongsFragment : BottomSheetDialogFragment(), SongListAdapter.SongClickList
         })
     }
 
+    //search Jamendo songs based on user input
     private fun searchSongs(query: String){
         val call: Call<SongResponse> = api.getSongs(query)
         call.enqueue(object : Callback<SongResponse> {

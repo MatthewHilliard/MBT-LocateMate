@@ -42,6 +42,7 @@ class FriendsLeaderboardFragment : Fragment() {
             )
         )
 
+        //find friend info of current user within the database, take the average of all their guesses for the leaderboard
         if (currentUserId != null) {
             db.collection("friends").document(currentUserId)
                 .collection("friend_usernames")
@@ -119,6 +120,7 @@ class FriendsLeaderboardFragment : Fragment() {
                                 }
                             }
                     } else {
+                        //user has no friends, just load their own average of all guesses
                         val friendList = mutableListOf<Leaderboard>()
                         val currentUserDocument = db.collection("users").document(currentUserId)
                         currentUserDocument.get().addOnSuccessListener { userDocument ->

@@ -18,6 +18,7 @@ LocateMate is a social media application centered around a location-based guessi
 
 ### App Architecture
 Database: Firebase Firestore and Firebase Cloud Storage (image storage)
+
 APIs: Google Maps API, Jamendo API
 ### Main Fragments
 **Explore:**
@@ -52,23 +53,17 @@ APIs: Google Maps API, Jamendo API
 - Highlights current users guess
   
 ### Data Classes:
-**Comment**:
-- keeps track of text, username, and profile photo of commenter
+**Comment**: keeps track of text, username, and profile photo of commenter
   
-**Post**:
-- keeps track of post content including image, profile picture, username, timestamp, location, and caption text
+**Post**: keeps track of post content including image, profile picture, username, timestamp, location, and caption text
 
-**Friend**:
-- keeps track of the id, username and profile picture of a friendrture
+**Friend**: keeps track of the id, username and profile picture of a friendrture
 
-**Guess**:
-- keeps track of the username, profile picture, distance, and rank of a guess for a post
+**Guess**: keeps track of the username, profile picture, distance, and rank of a guess for a post
 
-**Leaderboard**:
-- keeps track of the username, profile picture, average guess distance, and rank for a user (used )
+**Leaderboard**: keeps track of the username, profile picture, average guess distance, and rank for a user (used )
 
-**Result/SongResponse:**
-- used for the results of Jamendo API to fetch songs
+**Result/SongResponse:** used for the results of Jamendo API to fetch songs
 
 ### Database Design
 Main Collections:

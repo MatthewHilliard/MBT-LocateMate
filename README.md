@@ -79,12 +79,12 @@ LocateMate is a social media application centered around a location-based guessi
 - **Friends**: friend associations for each user
 
 **Subcollections:**
-- Within **Posts**:
+- Within Posts:
   - **Guesses**: Friend's guesses on this post
   - **Comments**: Friend's comments on this post
-- Within **Users**:
+- Within Users:
   - **Guesses**: all guesses made by this user
-- Within **Friends**:
+- Within Friends:
   - **Incoming Requests**
   - **Outgoing Requests**
   - **Friend usernames**

@@ -30,7 +30,6 @@ LocateMate is a social media application centered around a location-based guessi
 ### Main Fragments
 **Explore:**
 - Fetches friend/public posts from the Firestore and displays them in a recycler view
-- Allows user to view friend requests, add/remove friends, search for users
   
 **Create Post:**
 - Gets current location of user and displays a marker in a SupportMapFragment
@@ -38,6 +37,9 @@ LocateMate is a social media application centered around a location-based guessi
   
 **Profile:**
 - Allows user to view their own posts, navigate to the Friend Leaderboard, and access settings
+
+**Friends:**
+- Allows user to view friend requests, add/remove friends, search for users
   
 **Individual Post:**
 - Allows user to view a post of their own in more detail, edit their caption, or delete their post

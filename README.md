@@ -138,7 +138,10 @@ To get a local copy up and running follow these simple steps.
 
 ### Executing program
 
+Log into Google Chrome on the emulator or device with your Google account before opening the application (for Oauth)
+
 Run the app within an Android Studio emulator or with a device connected via USB
+
 
 ## Authors
 

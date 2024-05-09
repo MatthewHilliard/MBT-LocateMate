@@ -69,12 +69,12 @@ LocateMate is a social media application centered around a location-based guessi
 **Result/SongResponse:** used for the results of Jamendo API to fetch songs
 
 ### Database Design
-Main Collections:
+**Main Collections:**
 - **Posts**: all posts
 - **Users**: all users
 - **Friends**: friend associations for each user
 
-Subcollections:
+**Subcollections:**
 - Within **Posts**:
   - **Guesses**: Friend's guesses on this post
   - **Comments**: Friend's comments on this post

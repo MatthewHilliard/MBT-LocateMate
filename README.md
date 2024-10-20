@@ -14,7 +14,7 @@
 </div>
 
 ## About the Project
-LocateMate is a social media application centered around a location-based guessing game, enabling users to share adventures through photo uploads and location guessing. When creating a post, the user is able to take a photo, get their location pinned, and add a song choice. Once posted, friends are free to comment and guess on their post. Friends' guesses on each others posts are displayed in a Post Leaderboard, where the closest guess is ranked number 1. Once a user guesses on any post, their average guess is calculated and displayed in a Friend Leaderboard, where all of a user's friends (including them) are ranked by the average of every guess they have made. Users are able to view their post history and edit their captions.
+LocateMate is a social media application centered around a location-based guessing game, enabling users to share adventures through photo uploads and location guessing. When creating a post, the user is able to take a photo, get their location pinned, and add a song choice. Once posted, friends are free to comment and guess on their post. Friends' guesses on each other's posts are displayed in a Post Leaderboard, where the closest guess is ranked number 1. Once a user guesses on any post, their average guess is calculated and displayed in a Friend Leaderboard, where all of a user's friends (including them) are ranked by the average of every guess they have made. Users are able to view their post history and edit their captions.
 
 ### Built With
 
